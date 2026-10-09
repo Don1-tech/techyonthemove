@@ -1,0 +1,254 @@
+/* =========================================================
+   TECHY ON THE MOVE — ABOUT US
+   FIXED 1280px DESIGN CANVAS (Increased Font & Fading Text Cards)
+   ========================================================= */
+
+.about {
+  position: relative;
+  width: 100%;
+  height: 680px;
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      135deg,
+      #e8f1f5 0%,
+      #dfe7ee 40%,
+      #d4e2ed 100%
+    );
+  
+  border-top: 1px solid rgba(180, 205, 225, 0.4);
+}
+
+/* =========================================================
+   ABOUT CONTAINER
+   ========================================================= */
+
+.aboutInner {
+  position: relative;
+
+  width: 1184px;
+  height: 620px;
+
+  margin: 30px auto 0;
+  padding: 10px 0 0 0;
+
+  box-sizing: border-box;
+
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* =========================================================
+   SECTION HEADING
+   ========================================================= */
+
+.sectionTitle {
+  width: 100%;
+  margin: 0 auto 28px auto;
+
+  color: #222;
+
+  font-family: inherit;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  line-height: 1.15;
+
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.sectionTitle::after {
+  content: "";
+  display: block;
+
+  width: 52px;
+  height: 2px;
+
+  margin: 8px auto 0;
+
+  border-radius: 999px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #9b7bea,
+      #48d4dc,
+      #5ba8ed
+    );
+}
+
+/* =========================================================
+   ROWS
+   ========================================================= */
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+
+  width: 1128px;
+  height: 260px;
+}
+
+/* =========================================================
+   IMAGE & TEXT CARDS
+   ========================================================= */
+
+.imageCard,
+.textCard {
+  width: 100%;
+  height: 260px;
+  box-sizing: border-box;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.imageCard {
+  background: rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 24px rgba(60, 90, 120, 0.08);
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* =========================================================
+   TEXT CARD (Blends and Fades completely into the background)
+   ========================================================= */
+
+.textCard {
+  padding: 22px 28px;
+  
+  /* Softens the border so it doesn't look boxed-in */
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  
+  /* Fades from semi-opaque white on the text side down to completely transparent to blend with the section background */
+  background: 
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.75) 0%,
+      rgba(255, 255, 255, 0.20) 65%,
+      rgba(255, 255, 255, 0) 100%
+    );
+
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  
+  /* Softened shadow to enhance the floating, blending glass effect */
+  box-shadow: 0 8px 24px rgba(60, 90, 120, 0.05);
+}
+
+/* =========================================================
+   SMALL CARD HEADING
+   ========================================================= */
+
+.label {
+  margin: 0 0 12px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #9b7bea 0%,
+      #48d4dc 48%,
+      #5ba8ed 100%
+    );
+
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  line-height: 1.15;
+
+  text-transform: uppercase;
+}
+
+.label::after {
+  content: "";
+  display: block;
+
+  width: 42px;
+  height: 2px;
+
+  margin-top: 4px;
+
+  border-radius: 999px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #9b7bea 0%,
+      #48d4dc 50%,
+      #5ba8ed 100%
+    );
+}
+
+/* =========================================================
+   BULLET CONTENT (Increased Font Size)
+   ========================================================= */
+
+.points {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  margin: 0;
+  padding: 0 0 0 16px;
+
+  color: #222222;
+
+  font-family: inherit;
+  /* Slightly increased body font size */
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.points li {
+  padding-left: 2px;
+}
+
+.points li::marker {
+  color: #48d4dc;
+  font-size: 8px;
+}
+
+/* =========================================================
+   SECOND ROW ORDERING
+   ========================================================= */
+
+.right .textCard {
+  order: 1;
+}
+
+.right .imageCard {
+  order: 2;
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .image {
+    scroll-behavior: auto;
+  }
+}

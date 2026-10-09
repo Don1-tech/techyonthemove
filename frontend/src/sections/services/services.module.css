@@ -1,0 +1,207 @@
+/* =========================================================
+   TECHY ON THE MOVE
+   SERVICES SECTION (Centered Grid Layout)
+   ========================================================= */
+
+.services {
+  position: relative;
+  width: 100%;
+  padding: 60px 20px;
+  overflow: hidden;
+  box-sizing: border-box;
+
+  background:
+    linear-gradient(
+      90deg,
+      #dff6e9 0%,
+      #d7f3f7 30%,
+      #cfe4f8 60%,
+      #b8cfee 100%
+    );
+}
+
+/* =========================================================
+   TITLE
+   ========================================================= */
+
+.sectionTitle {
+  width: 100%;
+  margin: 0 auto 40px auto;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  line-height: 1.15;
+  color: #222;
+  text-transform: uppercase;
+}
+
+.sectionTitle::after {
+  content: "";
+  display: block;
+  width: 52px;
+  height: 2px;
+  margin: 8px auto 0;
+  border-radius: 999px;
+  background:
+    linear-gradient(
+      90deg,
+      #9b7bea,
+      #48d4dc,
+      #5ba8ed
+    );
+}
+
+/* =========================================================
+   SERVICES GRID (Centered container)
+   ========================================================= */
+
+.servicesCanvas,
+.servicesGrid {
+  display: grid;
+  width: 1200px;
+  max-width: 100%;
+  margin: 0 auto;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 380px 380px;
+  column-gap: 30px;
+  row-gap: 30px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* TOP ROW — 3 cards */
+.serviceCard:nth-child(1) {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.serviceCard:nth-child(2) {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.serviceCard:nth-child(3) {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+/* BOTTOM ROW — 2 wider centered/balanced cards spanning columns */
+.serviceCard:nth-child(4) {
+  grid-column: 1 / span 1;
+  grid-row: 2;
+}
+
+.serviceCard:nth-child(5) {
+  grid-column: 2 / span 2;
+  grid-row: 2;
+}
+
+
+/* =========================================================
+   BASE CARD (Increased Size & Clean Container)
+   ========================================================= */
+
+.serviceCard {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: #dcecf3;
+  box-sizing: border-box;
+  box-shadow: 0 12px 32px rgba(60, 100, 125, 0.15);
+}
+
+
+/* =========================================================
+   CARD IMAGE
+   ========================================================= */
+
+.cardImage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  z-index: 0;
+}
+
+
+/* =========================================================
+   IMAGE OVERLAY
+   ========================================================= */
+
+.cardOverlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.68) 0%,
+      rgba(0, 0, 0, 0.42) 40%,
+      rgba(0, 0, 0, 0.12) 75%,
+      rgba(0, 0, 0, 0) 100%
+    );
+}
+
+
+/* =========================================================
+   TEXT ON IMAGE
+   ========================================================= */
+
+.cardContent {
+  position: absolute;
+  left: 20px;
+  top: 40%;
+  width: 44%;
+  transform: translateY(-50%);
+  z-index: 2;
+}
+
+
+/* =========================================================
+   CARD TITLE
+   ========================================================= */
+
+.cardContent h3 {
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: 0.1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #d8c0ff 15%,
+      #72e2e6 65%,
+      #a0d0ff 100%
+    );
+
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+
+/* =========================================================
+   CARD DESCRIPTION
+   ========================================================= */
+
+.cardContent p {
+  margin: 0;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.55);
+}

@@ -1,0 +1,518 @@
+/* =========================================================
+   LEGAL DOCUMENT OVERLAY
+   ========================================================= */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+
+  z-index: 2000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 40px;
+
+  box-sizing: border-box;
+
+  background: rgba(13, 20, 27, 0.48);
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  animation: overlayIn 180ms ease both;
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   DOCUMENT
+   ========================================================= */
+
+.document {
+  position: relative;
+
+  width: min(760px, 74vw);
+
+  /*
+   * A4 is approximately 1 : 1.414.
+   * The height is intentionally below the full viewport.
+   */
+  height: min(82vh, 1060px);
+
+  max-height: 86vh;
+
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #fcfdff 52%,
+      #f8fafc 100%
+    );
+
+  border: 1px solid rgba(150, 170, 190, 0.35);
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 28px 70px rgba(15, 30, 45, 0.28),
+    0 8px 24px rgba(15, 30, 45, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+
+  overflow: hidden;
+
+  animation: documentIn 220ms ease both;
+}
+
+
+/* =========================================================
+   CLOSE BUTTON
+   ========================================================= */
+
+.closeButton {
+  position: absolute;
+
+  top: 18px;
+  right: 18px;
+
+  z-index: 5;
+
+  width: 36px;
+  height: 36px;
+
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(100, 120, 140, 0.20);
+  border-radius: 50%;
+
+  background: rgba(240, 245, 250, 0.92);
+
+  color: #44515d;
+
+  font-family: Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 300;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 4px 12px rgba(20, 40, 60, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.closeButton:hover {
+  background: #eaf3f8;
+
+  color: #17212b;
+
+  transform: scale(1.05);
+
+  box-shadow:
+    0 5px 14px rgba(20, 40, 60, 0.12);
+}
+
+.closeButton:active {
+  transform: scale(0.94);
+}
+
+.closeButton:focus-visible {
+  outline: 2px solid #8ebff0;
+  outline-offset: 3px;
+}
+
+
+/* =========================================================
+   DOCUMENT HEADER
+   ========================================================= */
+
+.documentHeader {
+  flex: 0 0 auto;
+
+  padding:
+    42px
+    72px
+    28px;
+
+  border-bottom: 1px solid rgba(100, 120, 140, 0.16);
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(248, 251, 253, 0.96) 0%,
+      rgba(255, 255, 255, 1) 100%
+    );
+
+  text-align: center;
+}
+
+.documentLabel {
+  margin: 0 0 10px;
+
+  color: #7690a2;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  letter-spacing: 2.2px;
+
+  line-height: 1.2;
+
+  text-transform: uppercase;
+}
+
+.documentHeader h1 {
+  margin: 0;
+
+  color: #26343f;
+
+  font-size: 24px;
+  font-weight: 700;
+
+  letter-spacing: 0.7px;
+
+  line-height: 1.25;
+
+  text-transform: uppercase;
+}
+
+.effectiveDate {
+  margin: 10px 0 0;
+
+  color: #7c8994;
+
+  font-size: 11px;
+  font-weight: 500;
+
+  line-height: 1.4;
+}
+
+
+/* =========================================================
+   DOCUMENT BODY
+   ========================================================= */
+
+.documentBody {
+  flex: 1 1 auto;
+
+  min-height: 0;
+
+  padding:
+    34px
+    72px
+    40px;
+
+  overflow-y: auto;
+
+  overscroll-behavior: contain;
+
+  scrollbar-width: thin;
+  scrollbar-color: rgba(120, 145, 165, 0.45) transparent;
+}
+
+.documentBody::-webkit-scrollbar {
+  width: 7px;
+}
+
+.documentBody::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.documentBody::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+
+  background: rgba(120, 145, 165, 0.38);
+}
+
+.documentBody::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 130, 150, 0.58);
+}
+
+
+/* =========================================================
+   DOCUMENT SECTIONS
+   ========================================================= */
+
+.documentSection {
+  margin: 0 0 28px;
+}
+
+.documentSection:last-child {
+  margin-bottom: 0;
+}
+
+.documentSection h2 {
+  margin: 0 0 10px;
+
+  color: #354652;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  letter-spacing: 0.45px;
+
+  line-height: 1.4;
+
+  text-transform: uppercase;
+}
+
+.documentSection p {
+  margin: 0 0 10px;
+
+  color: #586670;
+
+  font-size: 12.5px;
+  font-weight: 400;
+
+  line-height: 1.72;
+}
+
+.documentSection p:last-child {
+  margin-bottom: 0;
+}
+
+.documentSection a {
+  color: #4c87b6;
+
+  font-weight: 600;
+
+  text-decoration: none;
+}
+
+.documentSection a:hover {
+  text-decoration: underline;
+}
+
+
+/* =========================================================
+   DOCUMENT FOOTER
+   ========================================================= */
+
+.documentFooter {
+  flex: 0 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding:
+    14px
+    72px;
+
+  border-top: 1px solid rgba(100, 120, 140, 0.14);
+
+  background: #f7f9fb;
+
+  color: #8996a0;
+
+  font-size: 9px;
+  font-weight: 600;
+
+  letter-spacing: 0.6px;
+
+  line-height: 1.3;
+
+  text-transform: uppercase;
+}
+
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+@keyframes overlayIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes documentIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .overlay {
+    padding: 28px;
+  }
+
+  .document {
+    width: min(720px, 82vw);
+    height: 84vh;
+  }
+
+  .documentHeader {
+    padding-left: 52px;
+    padding-right: 52px;
+  }
+
+  .documentBody {
+    padding-left: 52px;
+    padding-right: 52px;
+  }
+
+  .documentFooter {
+    padding-left: 52px;
+    padding-right: 52px;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 767px) {
+  .overlay {
+    align-items: center;
+
+    padding: 16px;
+  }
+
+  .document {
+    width: 100%;
+    height: 90vh;
+    max-height: 90vh;
+
+    border-radius: 15px;
+  }
+
+  .closeButton {
+    top: 12px;
+    right: 12px;
+
+    width: 34px;
+    height: 34px;
+  }
+
+  .documentHeader {
+    padding:
+      34px
+      46px
+      22px;
+  }
+
+  .documentHeader h1 {
+    font-size: 19px;
+  }
+
+  .documentBody {
+    padding:
+      26px
+      28px
+      32px;
+  }
+
+  .documentSection {
+    margin-bottom: 24px;
+  }
+
+  .documentSection h2 {
+    font-size: 11.5px;
+  }
+
+  .documentSection p {
+    font-size: 12px;
+    line-height: 1.68;
+  }
+
+  .documentFooter {
+    padding:
+      12px
+      28px;
+
+    font-size: 8px;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL SCREENS
+   ========================================================= */
+
+@media (max-width: 420px) {
+  .overlay {
+    padding: 10px;
+  }
+
+  .document {
+    height: 94vh;
+    max-height: 94vh;
+  }
+
+  .documentHeader {
+    padding:
+      30px
+      38px
+      20px;
+  }
+
+  .documentHeader h1 {
+    font-size: 17px;
+  }
+
+  .documentBody {
+    padding:
+      22px
+      22px
+      28px;
+  }
+
+  .documentFooter {
+    padding:
+      10px
+      22px;
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .document {
+    animation: none;
+  }
+
+  .closeButton {
+    transition: none;
+  }
+}

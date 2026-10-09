@@ -1,0 +1,1010 @@
+
+.step {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   HEADING
+   ========================================================= */
+
+.heading {
+  flex: 0 0 auto;
+  padding: 2px 0 10px;
+  text-align: center;
+}
+
+.heading h2 {
+  margin: 0;
+  color: #64748b;
+  font-size: 19px;
+  line-height: 1.2;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.heading p {
+  margin: 4px 0 0;
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.35;
+  font-weight: 600;
+}
+
+/* =========================================================
+   CONTENT
+   ========================================================= */
+
+.content {
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1 1 auto;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 2px;
+}
+
+/* =========================================================
+   SECTION
+   ========================================================= */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  flex: 0 0 auto;
+}
+
+/* =========================================================
+   SECTION TITLE
+   ========================================================= */
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sectionTitle h3 {
+  margin: 0;
+  color: #334155;
+  font-size: 13px;
+  line-height: 1.2;
+  font-weight: 900;
+}
+
+.sectionTitle span {
+  color: #7c8a90;
+  font-size: 10px;
+  line-height: 1.2;
+  font-weight: 600;
+}
+
+/* =========================================================
+   DATE GRID
+   ========================================================= */
+
+.dateGrid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   DATE CARD
+   ========================================================= */
+
+.dateCard {
+  min-width: 0;
+  min-height: 66px;
+  padding: 6px 5px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+
+  box-sizing: border-box;
+
+  border: 1px solid transparent;
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff 0%,
+      #f0f9ff 48%,
+      #f5f0ff 100%
+    ) padding-box,
+    linear-gradient(
+      135deg,
+      #87cefa 0%,
+      #22d3ee 48%,
+      #c4b5fd 100%
+    ) border-box;
+
+  color: #0f172a;
+  cursor: pointer;
+
+  box-shadow:
+    0 3px 9px rgba(135, 206, 250, 0.12),
+    0 2px 6px rgba(196, 181, 253, 0.08);
+
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease,
+    background 180ms ease;
+}
+
+/* =========================================================
+   AVAILABLE HOVER
+   ========================================================= */
+
+.dateCard:not(:disabled):hover {
+  border-color: transparent;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ecfeff 0%,
+      #e0f2fe 50%,
+      #f3e8ff 100%
+    ) padding-box,
+    linear-gradient(
+      135deg,
+      #38bdf8 0%,
+      #06b6d4 48%,
+      #a78bfa 100%
+    ) border-box;
+
+  box-shadow:
+    0 0 8px rgba(135, 206, 250, 0.35),
+    0 0 16px rgba(34, 211, 238, 0.20),
+    0 0 20px rgba(196, 181, 253, 0.18);
+
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   SELECTED
+   ========================================================= */
+
+.dateCard.selected {
+  border-color: transparent;
+
+  background:
+    linear-gradient(
+      145deg,
+      #dff7ff 0%,
+      #cffafe 48%,
+      #ede9fe 100%
+    ) padding-box,
+    linear-gradient(
+      135deg,
+      #38bdf8 0%,
+      #06b6d4 48%,
+      #a78bfa 100%
+    ) border-box;
+
+  box-shadow:
+    0 0 0 2px rgba(135, 206, 250, 0.16),
+    0 0 12px rgba(34, 211, 238, 0.24),
+    0 0 18px rgba(196, 181, 253, 0.20);
+
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   UNAVAILABLE
+   ========================================================= */
+
+.dateCard.unavailable {
+  border-color: #e2e8f0;
+
+  background:
+    linear-gradient(
+      145deg,
+      #f8fafc 0%,
+      #f1f5f9 55%,
+      #f5f3ff 100%
+    );
+
+  color: #94a3b8;
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.65;
+}
+
+/* =========================================================
+   DATE TEXT
+   ========================================================= */
+
+.dayName {
+  color: #475569;
+  font-size: 10px;
+  line-height: 1.15;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.dayNumber {
+  color: #020617;
+  font-size: 24px;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.monthName {
+  color: #475569;
+  font-size: 9px;
+  line-height: 1.1;
+  font-weight: 700;
+}
+
+/* =========================================================
+   SELECTED TEXT
+   ========================================================= */
+
+.dateCard.selected .dayName {
+  color: #0369a1;
+}
+
+.dateCard.selected .dayNumber {
+  color: #075985;
+}
+
+.dateCard.selected .monthName {
+  color: #6d28d9;
+}
+
+/* =========================================================
+   UNAVAILABLE TEXT
+   ========================================================= */
+
+.dateCard.unavailable .dayName,
+.dateCard.unavailable .dayNumber,
+.dateCard.unavailable .monthName {
+  color: #94a3b8;
+}
+
+/* =========================================================
+   UNAVAILABLE LABEL
+   ========================================================= */
+
+.unavailableLabel {
+  margin-top: 2px;
+  color: #64748b;
+  font-size: 8px;
+  line-height: 1;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   TIME SLOT GRID
+   ========================================================= */
+
+.slotGrid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   STATUS / LOADING
+   ========================================================= */
+
+.statusMessage {
+  min-height: 55px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 8px;
+
+  border: 1px solid transparent;
+  border-radius: 10px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f0f9ff 0%,
+      #ecfeff 50%,
+      #f5f3ff 100%
+    ) padding-box,
+    linear-gradient(
+      135deg,
+      #bae6fd,
+      #a5f3fc,
+      #ddd6fe
+    ) border-box;
+
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* =========================================================
+   SPINNER
+   ========================================================= */
+
+.spinner {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 15px;
+
+  border: 2px solid #bae6fd;
+  border-top-color: #06b6d4;
+  border-right-color: #a78bfa;
+
+  border-radius: 50%;
+  animation: spin 800ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
+.errorMessage {
+  padding: 8px 10px;
+
+  border: 1px solid transparent;
+  border-radius: 9px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #fff7f7 0%,
+      #f5f3ff 100%
+    ) padding-box,
+    linear-gradient(
+      135deg,
+      #bae6fd,
+      #c4b5fd
+    ) border-box;
+
+  color: #991b1b;
+  font-size: 11px;
+  line-height: 1.35;
+  text-align: center;
+}
+
+/* =========================================================
+   EMPTY
+   ========================================================= */
+
+.emptyMessage {
+  padding: 18px 12px;
+
+  border: 1px dashed #a5d8f3;
+  border-radius: 10px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f0f9ff 0%,
+      #ecfeff 50%,
+      #f5f3ff 100%
+    );
+
+  color: #64748b;
+  font-size: 12px;
+  text-align: center;
+}
+
+/* =========================================================
+   SELECTION SUMMARY
+   ========================================================= */
+
+.selectionSummary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 8px 10px;
+
+  border: 1px solid transparent;
+  border-radius: 9px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f0f9ff 0%,
+      #ecfeff 50%,
+      #f5f3ff 100%
+    ) padding-box,
+    linear-gradient(
+      135deg,
+      #7dd3fc 0%,
+      #67e8f9 48%,
+      #c4b5fd 100%
+    ) border-box;
+
+  color: #475569;
+  font-size: 11px;
+  line-height: 1.3;
+  font-weight: 600;
+  flex: 0 0 auto;
+
+  box-shadow:
+    0 3px 10px rgba(135, 206, 250, 0.10),
+    0 2px 8px rgba(196, 181, 253, 0.08);
+}
+
+.selectionSummary strong {
+  color: #6d28d9;
+}
+
+/* =========================================================
+   INFORMATION ICON
+   ========================================================= */
+
+.infoIcon {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid transparent;
+  border-radius: 50%;
+
+  background:
+    linear-gradient(
+      135deg,
+      #dff7ff 0%,
+      #cffafe 55%,
+      #ede9fe 100%
+    ) padding-box,
+    linear-gradient(
+      135deg,
+      #38bdf8,
+      #22d3ee,
+      #a78bfa
+    ) border-box;
+
+  color: #6d28d9;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+/* =========================================================
+   ACTION BAR
+   ========================================================= */
+
+.actionBar {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  margin-top: 7px;
+  padding-top: 7px;
+
+  border-top: 1px solid #dbeafe;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+}
+
+/* =========================================================
+   BUTTONS — SHARED BASE
+   ========================================================= */
+
+.backButton,
+.continueButton {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  height: 40px;
+  padding: 0 18px;
+
+  border-radius: 9999px;
+
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+
+  transition:
+    transform 180ms ease,
+    box-shadow 200ms ease,
+    background 200ms ease,
+    border-color 180ms ease;
+
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* =========================================================
+   BACK BUTTON — GLASS GRADIENT + OUTER GLOW
+   ========================================================= */
+
+.backButton {
+  position: relative;
+  isolation: isolate;
+
+  min-width: 100px;
+  height: 40px;
+  padding: 0 18px;
+
+  box-sizing: border-box;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  border: 1px solid transparent;
+  border-radius: 9999px;
+
+  background:
+    linear-gradient(
+      110deg,
+      rgba(196, 165, 235, 0.42) 0%,
+      rgba(142, 224, 239, 0.38) 45%,
+      rgba(155, 205, 247, 0.44) 100%
+    ) padding-box,
+    linear-gradient(
+      110deg,
+      #d6a8ff 0%,
+      #b8c9ff 30%,
+      #75e4f4 62%,
+      #9bc9ff 100%
+    ) border-box;
+
+  color: #334155;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+
+  cursor: pointer;
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.65),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.16),
+    0 0 8px rgba(207, 159, 255, 0.22),
+    0 0 16px rgba(117, 224, 246, 0.16);
+
+  transition:
+    background 200ms ease,
+    transform 180ms ease,
+    box-shadow 200ms ease;
+}
+
+/* Gradient border */
+
+.backButton::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+  padding: 1.5px;
+
+  box-sizing: border-box;
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      110deg,
+      #d6a8ff 0%,
+      #b8c9ff 30%,
+      #75e4f4 62%,
+      #9bc9ff 100%
+    );
+
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+
+  -webkit-mask-composite: xor;
+
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+
+  mask-composite: exclude;
+
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Soft outer glow */
+
+.backButton::after {
+  content: "";
+
+  position: absolute;
+  inset: -3px;
+
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      110deg,
+      rgba(207, 159, 255, 0.42) 0%,
+      rgba(117, 224, 246, 0.36) 50%,
+      rgba(155, 202, 255, 0.40) 100%
+    );
+
+  filter: blur(7px);
+  opacity: 0.45;
+
+  pointer-events: none;
+  z-index: -1;
+
+  transition:
+    opacity 200ms ease,
+    filter 200ms ease;
+}
+
+/* Keep button text and icons above the effects */
+
+.backButton > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Hover */
+
+.backButton:hover {
+  background:
+    linear-gradient(
+      110deg,
+      rgba(207, 174, 242, 0.70) 0%,
+      rgba(145, 229, 240, 0.66) 45%,
+      rgba(166, 214, 250, 0.70) 100%
+    ) padding-box,
+    linear-gradient(
+      110deg,
+      #c084fc 0%,
+      #22d3ee 50%,
+      #60a5fa 100%
+    ) border-box;
+
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.80),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.20),
+    0 0 10px rgba(207, 159, 255, 0.34),
+    0 0 22px rgba(117, 224, 246, 0.26);
+
+  transform: translateY(-1px);
+}
+
+.backButton:hover::after {
+  opacity: 0.75;
+  filter: blur(9px);
+}
+
+/* Active */
+
+.backButton:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Keyboard focus */
+
+.backButton:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: 3px;
+}
+
+
+/* =========================================================
+   CONTINUE BUTTON — GLASS GRADIENT + OUTER GLOW
+   ========================================================= */
+
+.continueButton {
+  position: relative;
+  isolation: isolate;
+
+  min-width: 135px;
+  width: 140px;
+  height: 45px;
+  padding: 0 18px;
+
+  border: 1px solid transparent;
+  border-radius: 9999px;
+
+  background:
+    linear-gradient(
+      110deg,
+      rgba(196, 165, 235, 0.58) 0%,
+      rgba(142, 224, 239, 0.52) 45%,
+      rgba(155, 205, 247, 0.58) 100%
+    ) padding-box,
+    linear-gradient(
+      110deg,
+      #d6a8ff 0%,
+      #b8c9ff 30%,
+      #75e4f4 62%,
+      #9bc9ff 100%
+    ) border-box;
+
+  color: #17212b;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.65),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.16),
+    0 0 8px rgba(207, 159, 255, 0.24),
+    0 0 16px rgba(117, 224, 246, 0.18);
+
+  transition:
+    background 200ms ease,
+    transform 180ms ease,
+    box-shadow 200ms ease,
+    opacity 180ms ease;
+}
+
+/* Gradient border */
+
+.continueButton::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+  padding: 1.5px;
+
+  box-sizing: border-box;
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      110deg,
+      #d6a8ff 0%,
+      #b8c9ff 30%,
+      #75e4f4 62%,
+      #9bc9ff 100%
+    );
+
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+
+  -webkit-mask-composite: xor;
+
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+
+  mask-composite: exclude;
+
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Soft outer glow */
+
+.continueButton::after {
+  content: "";
+
+  position: absolute;
+  inset: -3px;
+
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      110deg,
+      rgba(207, 159, 255, 0.50) 0%,
+      rgba(117, 224, 246, 0.42) 50%,
+      rgba(155, 202, 255, 0.46) 100%
+    );
+
+  filter: blur(7px);
+  opacity: 0.55;
+
+  pointer-events: none;
+  z-index: -1;
+
+  transition:
+    opacity 200ms ease,
+    filter 200ms ease;
+}
+
+/* Keep button text and icons above the effects */
+
+.continueButton > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Hover */
+
+.continueButton:hover:not(:disabled) {
+  background:
+    linear-gradient(
+      110deg,
+      rgba(207, 174, 242, 0.76) 0%,
+      rgba(145, 229, 240, 0.72) 45%,
+      rgba(166, 214, 250, 0.76) 100%
+    ) padding-box,
+    linear-gradient(
+      110deg,
+      #c084fc 0%,
+      #22d3ee 50%,
+      #60a5fa 100%
+    ) border-box;
+
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.80),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.20),
+    0 0 10px rgba(207, 159, 255, 0.36),
+    0 0 22px rgba(117, 224, 246, 0.28);
+
+  transform: translateY(-1px);
+}
+
+.continueButton:hover:not(:disabled)::after {
+  opacity: 0.8;
+  filter: blur(9px);
+}
+
+/* Active */
+
+.continueButton:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Disabled */
+
+.continueButton:disabled {
+  background:
+    linear-gradient(
+      110deg,
+      rgba(226, 232, 240, 0.90) 0%,
+      rgba(207, 250, 254, 0.80) 50%,
+      rgba(237, 233, 254, 0.90) 100%
+    ) padding-box,
+    linear-gradient(
+      110deg,
+      #cbd5e1,
+      #a5f3fc,
+      #ddd6fe
+    ) border-box;
+
+  color: #64748b;
+  cursor: not-allowed;
+  opacity: 0.7;
+
+  box-shadow: none;
+  transform: none;
+}
+
+.continueButton:disabled::after {
+  opacity: 0.15;
+  filter: blur(5px);
+}
+
+/* Keyboard focus */
+
+.backButton:focus-visible,
+.continueButton:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: 3px;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 700px) {
+  .dateGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .slotGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .heading {
+    padding-bottom: 7px;
+  }
+
+  .heading h2 {
+    font-size: 17px;
+  }
+
+  .heading p {
+    font-size: 12px;
+  }
+
+  .content {
+    gap: 8px;
+  }
+
+  .dateGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 5px;
+  }
+
+  .dateCard {
+    min-height: 60px;
+    padding: 5px 3px;
+  }
+
+  .dayNumber {
+    font-size: 21px;
+  }
+
+  .dayName,
+  .monthName {
+    font-size: 8px;
+  }
+
+  .slotGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 5px;
+  }
+
+  .selectionSummary {
+    padding: 7px 8px;
+    font-size: 10px;
+  }
+
+  .actionBar {
+    margin-top: 5px;
+    padding-top: 6px;
+  }
+
+  .backButton,
+  .continueButton {
+    height: 38px;
+    padding: 0 14px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 400px) {
+  .dateGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .slotGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

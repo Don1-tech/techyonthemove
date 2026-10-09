@@ -1,0 +1,408 @@
+.step {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   HEADING
+   ========================================================= */
+
+.heading {
+  margin-bottom: 18px;
+}
+
+.heading h1 {
+  margin: 0;
+
+  color: #0f172a;
+
+  font-size: 30px;
+  line-height: 1.15;
+  font-weight: 800;
+
+  letter-spacing: -0.03em;
+}
+
+.heading p {
+  margin: 5px 0 0;
+
+  color: #64748b;
+
+  font-size: 15px;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+
+/* =========================================================
+   CONTENT
+   ========================================================= */
+
+.content {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 18px;
+
+  flex: 1;
+}
+
+
+/* =========================================================
+   FIELD GROUP
+   ========================================================= */
+
+.fieldGroup {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  box-sizing: border-box;
+}
+
+.fieldGroup label {
+  margin-bottom: 7px;
+
+  color: #172033;
+
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 700;
+}
+
+.required {
+  margin-left: 3px;
+
+  color: #0ea5e9;
+}
+
+.optional {
+  margin-left: 6px;
+
+  color: #94a3b8;
+
+  font-size: 12px;
+  font-weight: 500;
+}
+
+
+/* =========================================================
+   TEXTAREA
+   ========================================================= */
+
+.textarea {
+  width: 100%;
+  min-height: 150px;
+
+  padding: 14px 15px;
+
+  box-sizing: border-box;
+
+  resize: vertical;
+
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff 0%,
+      #f8fcff 100%
+    );
+
+  color: #172033;
+
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.55;
+
+  outline: none;
+
+  box-shadow:
+    0 5px 16px rgba(14, 165, 233, 0.045);
+
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.textarea::placeholder {
+  color: #94a3b8;
+}
+
+.textarea:hover {
+  border-color: #bae6fd;
+}
+
+.textarea:focus {
+  border-color: #38bdf8;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 0 0 3px rgba(56, 189, 248, 0.12),
+    0 7px 18px rgba(14, 165, 233, 0.07);
+}
+
+.smallTextarea {
+  min-height: 82px;
+}
+
+
+/* =========================================================
+   FIELD FOOTER
+   ========================================================= */
+
+.fieldFooter {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  margin-top: 7px;
+}
+
+
+/* =========================================================
+   HINT PILL
+   ========================================================= */
+
+.hintPill {
+  max-width: 620px;
+
+  display: inline-flex;
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 6px 10px 6px 7px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #dbeafe;
+  border-radius: 999px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f0f9ff 0%,
+      #f5f3ff 100%
+    );
+
+  color: #64748b;
+
+  font-size: 11px;
+  line-height: 1.35;
+  font-weight: 500;
+}
+
+
+/* =========================================================
+   INFO ICON
+   ========================================================= */
+
+.infoIcon {
+  width: 20px;
+  height: 20px;
+
+  flex: 0 0 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  border: 1px solid #7dd3fc;
+  border-radius: 50%;
+
+  background: #e0f7ff;
+
+  color: #0284c7;
+
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 800;
+}
+
+
+/* =========================================================
+   CHARACTER COUNT
+   ========================================================= */
+
+.characterCount {
+  flex: 0 0 auto;
+
+  color: #94a3b8;
+
+  font-size: 11px;
+  line-height: 1.3;
+  font-weight: 500;
+}
+
+
+/* =========================================================
+   ACTION BAR
+   ========================================================= */
+
+.actionBar {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-top: 10px;
+  padding-top: 8px;
+
+  border-top: 1px solid #eef2f7;
+}
+
+
+/* =========================================================
+   BACK BUTTON
+   ========================================================= */
+
+.backButton,
+.continueButton {
+  height: 44px;
+
+  padding: 0 20px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  border-radius: 12px;
+
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.backButton {
+  min-width: 105px;
+
+  border: 1px solid #e2e8f0;
+
+  background: #f8fafc;
+
+  color: #64748b;
+
+  cursor: pointer;
+}
+
+.backButton:hover {
+  background: #f1f5f9;
+
+  border-color: #cbd5e1;
+
+  transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   CONTINUE BUTTON
+   ========================================================= */
+
+.continueButton {
+  min-width: 145px;
+
+  border: none;
+
+  background:
+    linear-gradient(
+      135deg,
+      #38bdf8 0%,
+      #0ea5e9 55%,
+      #3b82f6 100%
+    );
+
+  color: #ffffff;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 7px 16px rgba(14, 165, 233, 0.2);
+}
+
+.continueButton:not(:disabled):hover {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 10px 20px rgba(14, 165, 233, 0.28);
+}
+
+.continueButton:not(:disabled):active {
+  transform: translateY(0);
+}
+
+.continueButton:disabled {
+  background: #dbeafe;
+
+  color: #93c5fd;
+
+  box-shadow: none;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 560px) {
+  .heading {
+    margin-bottom: 14px;
+  }
+
+  .heading h1 {
+    font-size: 25px;
+  }
+
+  .heading p {
+    font-size: 14px;
+  }
+
+  .content {
+    gap: 14px;
+  }
+
+  .textarea {
+    min-height: 135px;
+  }
+
+  .fieldFooter {
+    align-items: flex-start;
+  }
+
+  .hintPill {
+    font-size: 10px;
+  }
+
+  .actionBar {
+    margin-top: 6px;
+    padding-top: 8px;
+  }
+}

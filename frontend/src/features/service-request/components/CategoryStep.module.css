@@ -1,0 +1,626 @@
+/* =========================================================
+   CATEGORY STEP
+   ========================================================= */
+
+.step {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   HEADING
+   ========================================================= */
+
+.heading {
+  width: 100%;
+
+  margin: 0 0 16px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+}
+
+.heading h2 {
+  margin: 0;
+
+  color: #334155;
+
+  font-size: 20px;
+  line-height: 1.3;
+  font-weight: 600;
+
+  letter-spacing: -0.01em;
+}
+
+
+/* =========================================================
+   CATEGORY GRID
+   ========================================================= */
+
+.categoryGrid {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+
+  gap: 16px;
+
+  flex: 1;
+
+  align-content: stretch;
+
+  box-sizing: border-box;
+
+  /*
+   * Creates a little breathing room between
+   * the category cards and the Continue button.
+   */
+  margin-bottom: 10px;
+}
+
+
+/* =========================================================
+   CATEGORY CARD
+   ========================================================= */
+
+.categoryCard {
+  position: relative;
+
+  min-height: 100px;
+
+  padding: 14px 12px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #dbeafe;
+  border-radius: 17px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff 0%,
+      #f8fcff 55%,
+      #f3f9ff 100%
+    );
+
+  box-shadow:
+    0 6px 18px rgba(14, 165, 233, 0.06);
+
+  cursor: pointer;
+
+  font: inherit;
+
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+
+.categoryCard:hover {
+  transform: translateY(-2px);
+
+  border-color: #7dd3fc;
+
+  box-shadow:
+    0 10px 24px rgba(14, 165, 233, 0.12);
+}
+
+
+.categoryCard:focus-visible {
+  outline: 3px solid rgba(34, 211, 238, 0.3);
+  outline-offset: 2px;
+}
+
+
+/* =========================================================
+   ICON CONTAINER
+   ========================================================= */
+
+.iconContainer {
+  width: 54px;
+  height: 54px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  flex-shrink: 0;
+
+  border: 1px solid rgba(56, 189, 248, 0.55);
+
+  border-radius: 16px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #eff6ff 0%,
+      #dff7ff 52%,
+      #f0eaff 100%
+    );
+
+  box-shadow:
+    0 7px 18px rgba(14, 165, 233, 0.14),
+    0 2px 5px rgba(15, 23, 42, 0.05),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.8);
+
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+
+.categoryCard:hover .iconContainer {
+  transform: translateY(-1px);
+
+  border-color: rgba(14, 165, 233, 0.7);
+
+  box-shadow:
+    0 9px 21px rgba(14, 165, 233, 0.18),
+    0 2px 6px rgba(15, 23, 42, 0.06),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+}
+
+
+/* =========================================================
+   CATEGORY ICON
+   ========================================================= */
+
+.icon {
+  width: 40px;
+  height: 40px;
+
+  display: block;
+
+  object-fit: contain;
+
+  transition:
+    transform 180ms ease,
+    filter 180ms ease;
+}
+
+
+.categoryCard:hover .icon {
+  transform: scale(1.05);
+}
+
+
+/* =========================================================
+   CATEGORY NAME
+   ========================================================= */
+
+.categoryName {
+  max-width: 155px;
+
+  color: #263445;
+
+  font-size: 13px;
+  line-height: 1.3;
+  font-weight: 600;
+
+  text-align: center;
+}
+
+
+/* =========================================================
+   SELECTED CATEGORY
+   ========================================================= */
+
+.categoryCard.selected {
+  border-color: transparent;
+
+  background:
+    linear-gradient(
+      135deg,
+      #a361e6 0%,
+      #9dd9f3 55%,
+      #537b9a 100%
+    );
+
+  box-shadow:
+    0 12px 28px rgba(14, 165, 233, 0.28),
+    0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+
+  transform: translateY(-3px);
+}
+
+
+.categoryCard.selected:hover {
+  transform: translateY(-4px);
+
+  box-shadow:
+    0 15px 32px rgba(14, 165, 233, 0.32),
+    0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+}
+
+
+/* =========================================================
+   SELECTED ICON CONTAINER
+   ========================================================= */
+
+.categoryCard.selected .iconContainer {
+  border-color: rgba(255, 255, 255, 0.38);
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.24),
+      rgba(255, 255, 255, 0.12)
+    );
+
+  box-shadow:
+    0 7px 17px rgba(8, 145, 178, 0.18),
+    0 0 0 1px rgba(255, 255, 255, 0.18) inset;
+}
+
+
+/* =========================================================
+   SELECTED CATEGORY NAME
+   ========================================================= */
+
+.categoryCard.selected .categoryName {
+  color: #263445;
+}
+
+
+/* =========================================================
+   SELECTED CHECK
+   ========================================================= */
+
+.selectedIndicator {
+  position: absolute;
+
+  top: 10px;
+  right: 10px;
+
+  width: 25px;
+  height: 25px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+
+  border-radius: 50%;
+
+  background: #ffffff;
+
+  color: #0891b2;
+
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 800;
+
+  box-shadow:
+    0 4px 10px rgba(15, 23, 42, 0.12);
+}
+
+
+/* =========================================================
+   ACTION BAR
+   ========================================================= */
+
+.actionBar {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  margin-top: 6px;
+  padding-top: 8px;
+
+  border-top: 1px solid #eef2f7;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   CONTINUE BUTTON
+   ========================================================= */
+
+.continueButton {
+  position: relative;
+
+  width: 140px;
+  height: 45px;
+
+  padding: 0;
+
+  box-sizing: border-box;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  border: 0;
+  border-radius: 9999px;
+
+  background:
+    linear-gradient(
+      110deg,
+      rgba(196, 165, 235, 0.58) 0%,
+      rgba(142, 224, 239, 0.52) 45%,
+      rgba(155, 205, 247, 0.58) 100%
+    );
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  color: #17212b;
+
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  isolation: isolate;
+
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.55),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.16),
+    0 0 8px rgba(207, 159, 255, 0.24),
+    0 0 16px rgba(117, 224, 246, 0.18);
+
+  transition:
+    background 200ms ease,
+    transform 150ms ease,
+    box-shadow 200ms ease;
+}
+
+
+/* =========================================================
+   GRADIENT BORDER
+   ========================================================= */
+
+.continueButton::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  padding: 1.5px;
+
+  box-sizing: border-box;
+
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      110deg,
+      #d6a8ff 0%,
+      #b8c9ff 30%,
+      #75e4f4 62%,
+      #9bc9ff 100%
+    );
+
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+
+  -webkit-mask-composite: xor;
+
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+
+  mask-composite: exclude;
+
+  pointer-events: none;
+
+  z-index: 0;
+}
+
+
+/* =========================================================
+   SOFT OUTER GLOW
+   ========================================================= */
+
+.continueButton::after {
+  content: "";
+
+  position: absolute;
+
+  inset: -3px;
+
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      110deg,
+      rgba(207, 159, 255, 0.50) 0%,
+      rgba(117, 224, 246, 0.42) 50%,
+      rgba(155, 202, 255, 0.46) 100%
+    );
+
+  filter: blur(7px);
+
+  opacity: 0.55;
+
+  pointer-events: none;
+
+  z-index: -1;
+}
+
+
+/* =========================================================
+   BUTTON CONTENT
+   ========================================================= */
+
+.continueButton > * {
+  position: relative;
+
+  z-index: 1;
+}
+
+
+/* =========================================================
+   BUTTON HOVER
+   ========================================================= */
+
+.continueButton:hover:not(:disabled) {
+  background:
+    linear-gradient(
+      110deg,
+      rgba(207, 174, 242, 0.72) 0%,
+      rgba(145, 229, 240, 0.66) 45%,
+      rgba(166, 214, 250, 0.70) 100%
+    );
+
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.72),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.20),
+    0 0 10px rgba(207, 159, 255, 0.34),
+    0 0 22px rgba(117, 224, 246, 0.26);
+
+  transform: scale(1.02);
+}
+
+
+/* =========================================================
+   BUTTON ACTIVE
+   ========================================================= */
+
+.continueButton:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+
+/* =========================================================
+   BUTTON DISABLED
+   ========================================================= */
+
+.continueButton:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.55;
+
+  transform: none;
+
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.35),
+    0 0 6px rgba(148, 163, 184, 0.12);
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLET
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+  .categoryGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(4, minmax(0, 1fr));
+
+    gap: 12px;
+
+    margin-bottom: 10px;
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+   ========================================================= */
+
+@media (max-width: 560px) {
+
+  .heading {
+    margin-bottom: 14px;
+  }
+
+
+  .heading h2 {
+    font-size: 19px;
+    font-weight: 600;
+  }
+
+
+  .categoryGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(4, minmax(0, 1fr));
+
+    gap: 8px;
+
+    margin-bottom: 10px;
+  }
+
+
+  .categoryCard {
+    min-height: 104px;
+
+    padding: 10px 8px;
+
+    gap: 5px;
+  }
+
+
+  .iconContainer {
+    width: 46px;
+    height: 46px;
+
+    border-radius: 14px;
+  }
+
+
+  .icon {
+    width: 34px;
+    height: 34px;
+  }
+
+
+  .categoryName {
+    font-size: 13px;
+  }
+
+
+  .actionBar {
+    margin-top: 4px;
+
+    padding-top: 8px;
+  }
+
+
+  .continueButton {
+    width: 125px;
+    height: 42px;
+
+    padding: 0 16px;
+
+    font-size: 13px;
+  }
+}

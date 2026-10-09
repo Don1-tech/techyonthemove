@@ -1,0 +1,345 @@
+
+/* =========================================================
+   REQUEST SERVICE MODAL
+   ========================================================= */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+
+  padding: 90px 20px 20px;
+
+  background: rgba(8, 15, 30, 0.34);
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  box-sizing: border-box;
+
+z-index: 100;
+}
+
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+
+.modal {
+  display: flex;
+  flex-direction: column;
+
+  width: min(820px, calc(100vw - 40px));
+  height: min(620px, calc(100vh - 40px));
+
+  overflow: hidden;
+
+  background: #ffffff;
+
+  border: 1px solid rgba(14, 165, 233, 0.16);
+  border-radius: 24px;
+
+  box-shadow:
+    0 24px 60px rgba(15, 23, 42, 0.18),
+    0 8px 28px rgba(14, 165, 233, 0.10);
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.modalHeader {
+  position: relative;
+
+  flex: 0 0 auto;
+
+  padding: 20px 28px 8px;
+
+  box-sizing: border-box;
+}
+
+.headerText {
+  padding-right: 44px;
+}
+
+.headerLabel {
+  display: block;
+
+  margin-bottom: 5px;
+
+  color: #0284c7;
+
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+
+  letter-spacing: 0.5px;
+}
+
+.modalHeader h2 {
+  margin: 0;
+
+  color: #172033;
+
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.modalHeader p {
+  margin: 5px 0 0;
+
+  color: #64748b;
+
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+
+/* =========================================================
+   CLOSE BUTTON
+   ========================================================= */
+
+.closeButton {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 1px solid #e0f2fe;
+  border-radius: 50%;
+
+  background: #f0f9ff;
+
+  color: #64748b;
+
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease;
+}
+
+.closeButton:hover {
+  background: #e0f2fe;
+  border-color: #bae6fd;
+  color: #0284c7;
+}
+
+.closeButton:active {
+  background: #bae6fd;
+}
+
+
+/* =========================================================
+   PROGRESS
+   ========================================================= */
+
+.progressArea {
+  flex: 0 0 auto;
+
+  padding: 8px 28px 18px;
+
+  box-sizing: border-box;
+}
+
+.progressStepper {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+}
+
+
+/* Each step occupies equal space */
+.progressItem {
+  display: flex;
+  align-items: center;
+
+  flex: 1;
+  min-width: 0;
+}
+
+
+/* Last item does not need another line after it */
+.progressItem:last-child {
+  flex: 0 0 auto;
+}
+
+
+/* =========================================================
+   PROGRESS CIRCLE
+   ========================================================= */
+
+.progressCircle {
+  width: 28px;
+  height: 28px;
+
+  flex: 0 0 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 50%;
+
+  background: #f8fafc;
+
+  color: #94a3b8;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  box-sizing: border-box;
+
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+
+/* Current step */
+.progressCircleActive {
+  border-color: #0ea5e9;
+
+  background:
+    linear-gradient(
+      135deg,
+      #38bdf8 0%,
+      #0ea5e9 55%,
+      #0284c7 100%
+    );
+
+  color: #ffffff;
+
+  box-shadow:
+    0 0 0 4px rgba(14, 165, 233, 0.12),
+    0 5px 14px rgba(14, 165, 233, 0.20);
+}
+
+
+/* Completed step */
+.progressCircleCompleted {
+  border-color: #0ea5e9;
+
+  background: #e0f2fe;
+
+  color: #0284c7;
+}
+
+
+/* =========================================================
+   PROGRESS CONNECTING LINES
+   ========================================================= */
+
+.progressLine {
+  height: 2px;
+
+  flex: 1;
+
+  min-width: 24px;
+
+  margin: 0 8px;
+
+  background: #0284c7 100%;
+
+  border-radius: 999px;
+}
+
+
+/* =========================================================
+   PROGRESS LABEL
+   ========================================================= */
+
+.progressLabel {
+  display: block;
+
+  margin-top: 6px;
+
+  color: #000000;
+
+  font-size: 9px;
+  font-weight: 600;
+
+  text-align: center;
+}
+
+
+/* =========================================================
+   BODY
+   ========================================================= */
+
+.modalBody {
+  flex: 1 1 auto;
+
+  min-height: 0;
+
+  padding: 0 28px 20px;
+
+  overflow: hidden;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 800px) {
+  .modalOverlay {
+    padding: 14px;
+  }
+
+  .modal {
+    width: calc(100vw - 28px);
+    height: calc(100vh - 28px);
+
+    border-radius: 20px;
+  }
+
+  .modalHeader {
+    padding: 18px 20px 8px;
+  }
+
+  .progressArea {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 16px;
+  }
+
+  .modalBody {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .progressLine {
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+}

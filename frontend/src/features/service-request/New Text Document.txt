@@ -1,0 +1,547 @@
+/* =========================================================
+   REQUEST SERVICE MODAL
+   ========================================================= */
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  background: rgba(0, 0, 0, 0.3);
+
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+
+.modal {
+  display: flex;
+  flex-direction: column;
+
+  width: min(440px, 100%);
+  max-height: min(620px, calc(100vh - 48px));
+
+  overflow: hidden;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.15);
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.modalHeader {
+  position: relative;
+
+  padding: 24px 24px 12px;
+
+  box-sizing: border-box;
+}
+
+.headerText {
+  padding-right: 34px;
+}
+
+.headerLabel {
+  display: block;
+
+  margin-bottom: 6px;
+
+  color: #64748b;
+
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+
+  letter-spacing: 0.3px;
+}
+
+.modalHeader h2 {
+  margin: 0;
+
+  color: #172033;
+
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.modalHeader p {
+  margin: 7px 0 0;
+
+  color: #6b7280;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+
+/* =========================================================
+   CLOSE BUTTON
+   ========================================================= */
+
+.closeButton {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 0;
+  border-radius: 50%;
+
+  background: transparent;
+
+  color: #64748b;
+
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  transition:
+    background 160ms ease,
+    color 160ms ease;
+}
+
+.closeButton:hover {
+  background: #f1f5f9;
+  color: #172033;
+}
+
+.closeButton:active {
+  background: #e2e8f0;
+}
+
+
+/* =========================================================
+   PROGRESS
+   ========================================================= */
+
+.progressArea {
+  padding: 4px 24px 18px;
+
+  box-sizing: border-box;
+}
+
+.progressStepper {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+}
+
+.progressItem {
+  display: flex;
+  align-items: center;
+
+  flex: 1;
+}
+
+.progressItem:last-child {
+  flex: 0;
+}
+
+.progressCircle {
+  width: 22px;
+  height: 22px;
+
+  flex: 0 0 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #d1d5db;
+  border-radius: 50%;
+
+  background: #ffffff;
+
+  color: #9ca3af;
+
+  font-size: 9px;
+  font-weight: 600;
+
+  box-sizing: border-box;
+}
+
+.progressCircleActive {
+  border-color: #0ea5e9;
+  background: #0ea5e9;
+  color: #ffffff;
+}
+
+.progressCircleCompleted {
+  border-color: #0ea5e9;
+  background: #0ea5e9;
+  color: #ffffff;
+}
+
+.progressLine {
+  height: 1px;
+
+  flex: 1;
+
+  margin: 0 5px;
+
+  background: #e5e7eb;
+}
+
+.progressLabel {
+  display: block;
+
+  margin-top: 7px;
+
+  color: #9ca3af;
+
+  font-size: 10px;
+  font-weight: 500;
+
+  text-align: center;
+}
+
+
+/* =========================================================
+   BODY
+   ========================================================= */
+
+.modalBody {
+  flex: 1;
+
+  min-height: 0;
+
+  padding: 0 24px 20px;
+
+  overflow-y: auto;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   SERVICE GRID
+   ========================================================= */
+
+.serviceGrid {
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 12px;
+}
+
+
+/* =========================================================
+   SERVICE OPTION
+   ========================================================= */
+
+.serviceOption {
+  position: relative;
+
+  min-height: 68px;
+
+  display: flex;
+  align-items: center;
+
+  padding: 12px 28px 12px 12px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 11px;
+
+  background: #ffffff;
+
+  color: #334155;
+
+  font-family: inherit;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  box-sizing: border-box;
+
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.serviceOption:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+.serviceOptionSelected {
+  border: 2px solid #0ea5e9;
+
+  background: #eff6ff;
+
+  box-shadow:
+    0 4px 12px rgba(14, 165, 233, 0.08);
+}
+
+.serviceOptionSelected:hover {
+  border-color: #0ea5e9;
+  background: #eff6ff;
+}
+
+
+/* =========================================================
+   SERVICE ICON
+   ========================================================= */
+
+.serviceIcon {
+  width: 28px;
+  height: 28px;
+
+  flex: 0 0 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-right: 9px;
+
+  border-radius: 8px;
+
+  background: #f1f5f9;
+
+  color: #94a3b8;
+
+  font-size: 18px;
+  line-height: 1;
+}
+
+.serviceIconSelected {
+  background: #dbeafe;
+  color: #0ea5e9;
+}
+
+
+/* =========================================================
+   SERVICE NAME
+   ========================================================= */
+
+.serviceName {
+  color: #334155;
+
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.serviceOptionSelected .serviceName {
+  color: #075985;
+}
+
+
+/* =========================================================
+   CHECKMARK
+   ========================================================= */
+
+.checkmark {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+
+  width: 17px;
+  height: 17px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #0ea5e9;
+
+  color: #ffffff;
+
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.modalFooter {
+  flex: 0 0 auto;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 14px 20px;
+
+  border-top: 1px solid #e5e7eb;
+
+  background: #f8fafb;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   BACK
+   ========================================================= */
+
+.backButton,
+.nextButton {
+  min-width: 76px;
+  height: 34px;
+
+  padding: 0 18px;
+
+  border-radius: 999px;
+
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+
+  cursor: pointer;
+
+  box-sizing: border-box;
+}
+
+.backButton {
+  border: 1px solid #e5e7eb;
+  background: #eef1f4;
+
+  color: #a1a8b0;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   NEXT
+   ========================================================= */
+
+.nextButton {
+  border: 1px solid #0ea5e9;
+
+  background: #0ea5e9;
+
+  color: #ffffff;
+
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.nextButton:hover:not(:disabled) {
+  border-color: #0284c7;
+  background: #0284c7;
+}
+
+.nextButton:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.nextButton:disabled {
+  border-color: #cbd5e1;
+  background: #cbd5e1;
+
+  color: #ffffff;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 480px) {
+  .modalOverlay {
+    padding: 16px;
+  }
+
+  .modal {
+    width: 100%;
+    max-height: calc(100vh - 32px);
+  }
+
+  .modalHeader {
+    padding: 20px 20px 10px;
+  }
+
+  .headerText {
+    padding-right: 32px;
+  }
+
+  .progressArea {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 16px;
+  }
+
+  .modalBody {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 18px;
+  }
+
+  .serviceGrid {
+    gap: 10px;
+  }
+
+  .serviceOption {
+    min-height: 64px;
+    padding-left: 10px;
+    padding-right: 24px;
+  }
+
+  .serviceName {
+    font-size: 11px;
+  }
+
+  .modalFooter {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+@media (max-width: 374px) {
+  .serviceGrid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,1002 @@
+/* =========================================================
+   SUCCESS STEP
+   Theme: Sky Blue + Cyan + Lilac + Cream
+   Celebration: Mint Green + Gold + Coral + Pink
+   Confetti: 8 original pieces + 8 additional pieces
+   ========================================================= */
+
+.step {
+  position: relative;
+  isolation: isolate;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+
+  padding: clamp(14px, 2.5vh, 22px) clamp(14px, 3vw, 24px);
+  box-sizing: border-box;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  text-align: center;
+  color: #26364b;
+
+  background:
+    radial-gradient(
+      circle at 12% 12%,
+      rgba(103, 232, 249, 0.14),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at 88% 82%,
+      rgba(196, 181, 253, 0.15),
+      transparent 36%
+    ),
+    radial-gradient(
+      circle at 50% 100%,
+      rgba(253, 230, 138, 0.09),
+      transparent 35%
+    );
+}
+
+/* =========================================================
+   CONFETTI CONTAINER
+   ========================================================= */
+
+.confetti {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+
+  overflow: hidden;
+  pointer-events: none;
+
+  border-radius: inherit;
+}
+
+.confetti span {
+  position: absolute;
+  display: block;
+
+  width: 7px;
+  height: 13px;
+
+  border-radius: 3px;
+  opacity: 0.95;
+
+  box-shadow:
+    0 1px 3px rgba(51, 65, 85, 0.12),
+    0 0 7px rgba(255, 255, 255, 0.35);
+}
+
+/* =========================================================
+   ORIGINAL CONFETTI — 8 PIECES
+   ========================================================= */
+
+/* Cyan */
+
+.confetti span:nth-child(1) {
+  top: 12%;
+  left: 11%;
+
+  background: linear-gradient(
+    160deg,
+    #a5f3fc,
+    #22d3ee
+  );
+
+  transform: rotate(25deg);
+}
+
+/* Lilac */
+
+.confetti span:nth-child(2) {
+  top: 18%;
+  right: 14%;
+
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+
+  background: #c4b5fd;
+
+  transform: rotate(-35deg);
+}
+
+/* Mint green */
+
+.confetti span:nth-child(3) {
+  top: 38%;
+  left: 6%;
+
+  background: linear-gradient(
+    160deg,
+    #bbf7d0,
+    #4ade80
+  );
+
+  transform: rotate(70deg);
+}
+
+/* Gold */
+
+.confetti span:nth-child(4) {
+  top: 34%;
+  right: 7%;
+
+  width: 8px;
+  height: 12px;
+
+  background: linear-gradient(
+    160deg,
+    #fef3c7,
+    #fbbf24
+  );
+
+  transform: rotate(-15deg);
+}
+
+/* Coral */
+
+.confetti span:nth-child(5) {
+  bottom: 24%;
+  left: 12%;
+
+  width: 7px;
+  height: 10px;
+
+  background: linear-gradient(
+    160deg,
+    #fecdd3,
+    #fb7185
+  );
+
+  transform: rotate(-45deg);
+}
+
+/* Sky blue */
+
+.confetti span:nth-child(6) {
+  right: 11%;
+  bottom: 19%;
+
+  background: linear-gradient(
+    160deg,
+    #bae6fd,
+    #38bdf8
+  );
+
+  transform: rotate(35deg);
+}
+
+/* Cream and lavender */
+
+.confetti span:nth-child(7) {
+  top: 8%;
+  left: 49%;
+
+  width: 6px;
+  height: 10px;
+
+  background: linear-gradient(
+    160deg,
+    #fff7d6,
+    #a78bfa
+  );
+
+  transform: rotate(10deg);
+}
+
+/* Fresh green */
+
+.confetti span:nth-child(8) {
+  bottom: 11%;
+  left: 48%;
+
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+
+  background: linear-gradient(
+    135deg,
+    #86efac,
+    #34d399
+  );
+
+  transform: rotate(-25deg);
+}
+
+/* =========================================================
+   ADDITIONAL CONFETTI — 8 EXTRA PIECES
+   Each existing piece gets one additional decoration.
+   Total: 16 visible pieces.
+   ========================================================= */
+
+.confetti span::before {
+  content: "";
+
+  position: absolute;
+  display: block;
+
+  width: 6px;
+  height: 11px;
+
+  border-radius: 2px;
+  opacity: 0.98;
+
+  box-shadow:
+    0 1px 3px rgba(51, 65, 85, 0.14),
+    0 0 7px rgba(255, 255, 255, 0.4);
+}
+
+/* Extra mint-green confetti */
+
+.confetti span:nth-child(1)::before {
+  top: -9px;
+  left: 15px;
+
+  background: linear-gradient(
+    160deg,
+    #bbf7d0,
+    #22c55e
+  );
+
+  transform: rotate(48deg);
+}
+
+/* Extra golden confetti */
+
+.confetti span:nth-child(2)::before {
+  top: 13px;
+  left: -14px;
+
+  background: linear-gradient(
+    160deg,
+    #fef3c7,
+    #f59e0b
+  );
+
+  transform: rotate(-55deg);
+}
+
+/* Extra lavender confetti */
+
+.confetti span:nth-child(3)::before {
+  top: -12px;
+  left: 14px;
+
+  background: linear-gradient(
+    160deg,
+    #ddd6fe,
+    #8b5cf6
+  );
+
+  transform: rotate(65deg);
+}
+
+/* Extra coral-pink confetti */
+
+.confetti span:nth-child(4)::before {
+  top: 12px;
+  left: -15px;
+
+  background: linear-gradient(
+    160deg,
+    #fecdd3,
+    #f43f5e
+  );
+
+  transform: rotate(-40deg);
+}
+
+/* Extra bright-cyan confetti */
+
+.confetti span:nth-child(5)::before {
+  top: -10px;
+  left: 14px;
+
+  background: linear-gradient(
+    160deg,
+    #a5f3fc,
+    #06b6d4
+  );
+
+  transform: rotate(55deg);
+}
+
+/* Extra sky-blue confetti */
+
+.confetti span:nth-child(6)::before {
+  top: 13px;
+  left: -14px;
+
+  background: linear-gradient(
+    160deg,
+    #bae6fd,
+    #3b82f6
+  );
+
+  transform: rotate(-60deg);
+}
+
+/* Extra fresh-green confetti */
+
+.confetti span:nth-child(7)::before {
+  top: 12px;
+  left: 13px;
+
+  background: linear-gradient(
+    160deg,
+    #d9f99d,
+    #10b981
+  );
+
+  transform: rotate(35deg);
+}
+
+/* Extra peach-and-gold confetti */
+
+.confetti span:nth-child(8)::before {
+  top: -9px;
+  left: -14px;
+
+  background: linear-gradient(
+    160deg,
+    #ffedd5,
+    #fb923c
+  );
+
+  transform: rotate(-50deg);
+}
+
+/* =========================================================
+   SUCCESS CHECKMARK
+   ========================================================= */
+
+.successIcon {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+
+  width: 68px;
+  height: 68px;
+
+  border: 2px solid rgba(255, 255, 255, 0.98);
+  border-radius: 50%;
+
+  background: linear-gradient(
+    135deg,
+    #67e8f9 0%,
+    #7dd3fc 36%,
+    #a5b4fc 70%,
+    #c4b5fd 100%
+  );
+
+  box-shadow:
+    0 0 0 5px rgba(224, 242, 254, 0.82),
+    0 0 0 9px rgba(237, 233, 254, 0.42),
+    0 8px 22px rgba(56, 189, 248, 0.22),
+    0 0 22px rgba(196, 181, 253, 0.26);
+}
+
+.successIcon span {
+  display: block;
+
+  color: #ffffff;
+  font-family: Arial, sans-serif;
+  font-size: 39px;
+  font-weight: 900;
+  line-height: 1;
+
+  text-shadow: 0 2px 5px rgba(30, 58, 95, 0.2);
+
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   HEADING
+   ========================================================= */
+
+.heading {
+  position: relative;
+  z-index: 1;
+
+  flex: 0 0 auto;
+
+  width: 100%;
+  max-width: 440px;
+
+  margin-top: 16px;
+}
+
+.eyebrow {
+  margin: 0 0 5px;
+
+  color: #52647a;
+
+  font-size: 10px;
+  font-weight: 850;
+  line-height: 1.5;
+  letter-spacing: 0.16em;
+}
+
+.heading h2 {
+  margin: 0;
+
+  color: #26364b;
+
+  font-size: 23px;
+  font-weight: 900;
+  line-height: 1.28;
+  letter-spacing: -0.025em;
+
+  overflow-wrap: anywhere;
+}
+
+.heading p:last-child {
+  margin: 7px 0 0;
+
+  color: #52647a;
+
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.55;
+}
+
+/* =========================================================
+   REQUEST NUMBER CARD
+   ========================================================= */
+
+.referenceCard {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+
+  width: min(100%, 370px);
+  min-width: 0;
+
+  margin-top: 13px;
+  padding: 12px 18px;
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(103, 232, 249, 0.72);
+  border-radius: 15px;
+
+  background: linear-gradient(
+    115deg,
+    #fffdf5 0%,
+    rgba(207, 250, 254, 0.92) 36%,
+    rgba(219, 234, 254, 0.94) 69%,
+    rgba(237, 233, 254, 0.95) 100%
+  );
+
+  box-shadow:
+    0 6px 17px rgba(56, 189, 248, 0.1),
+    0 0 13px rgba(196, 181, 253, 0.11),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+}
+
+.referenceLabel {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: #475569;
+
+  font-size: 10px;
+  font-weight: 850;
+  line-height: 1.5;
+  letter-spacing: 0.13em;
+}
+
+.referenceCard strong {
+  display: block;
+
+  max-width: 100%;
+
+  color: #26364b;
+
+  font-size: 19px;
+  font-weight: 900;
+  line-height: 1.4;
+  letter-spacing: 0.055em;
+
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.referenceHint {
+  display: block;
+
+  margin-top: 4px;
+
+  color: #52647a;
+
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+/* =========================================================
+   APPROXIMATE PRICE CARD
+   ========================================================= */
+
+.priceCard {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: center;
+
+  width: min(100%, 370px);
+  min-width: 0;
+
+  margin-top: 8px;
+  padding: 10px 16px;
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(196, 181, 253, 0.78);
+  border-radius: 14px;
+
+  background: linear-gradient(
+    115deg,
+    rgba(255, 253, 245, 0.98) 0%,
+    rgba(224, 242, 254, 0.96) 47%,
+    rgba(237, 233, 254, 0.97) 100%
+  );
+
+  box-shadow:
+    0 5px 16px rgba(196, 181, 253, 0.14),
+    0 0 10px rgba(103, 232, 249, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+}
+
+.priceLabel {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: #475569;
+
+  font-size: 10px;
+  font-weight: 850;
+  line-height: 1.45;
+  letter-spacing: 0.1em;
+}
+
+.priceCard strong {
+  display: block;
+
+  max-width: 100%;
+
+  color: #1e3a5f;
+
+  font-size: 21px;
+  font-weight: 900;
+  line-height: 1.35;
+
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.priceHint {
+  display: block;
+
+  max-width: 300px;
+  margin-top: 3px;
+
+  color: #52647a;
+
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+/* =========================================================
+   PHONE CONFIRMATION MESSAGE
+   Consistent sentence styling; no number pill or box.
+   ========================================================= */
+
+.message {
+  position: relative;
+  z-index: 1;
+
+  flex: 0 0 auto;
+
+  width: 100%;
+  max-width: 430px;
+
+  margin-top: 12px;
+
+  color: #475569;
+
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.7;
+
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.message p,
+.message .phoneNumber {
+  display: inline;
+
+  margin: 0;
+  padding: 0;
+
+  color: inherit;
+
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.message .confirmationText {
+  margin: 0;
+
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}
+
+/* Add a normal space between the inline JSX pieces. */
+
+.message .confirmationText::after,
+.message p:not(.confirmationText):not(.finalMessage)::after,
+.message .phoneNumber::after {
+  content: " ";
+}
+
+.message .phoneNumber {
+  color: #334155;
+  font-size: inherit;
+  font-weight: 750;
+  letter-spacing: 0.005em;
+}
+
+.message .finalMessage {
+  display: inline;
+
+  margin: 0;
+
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+}
+
+/* =========================================================
+   DONE BUTTON
+   Cyan + sky-blue + lilac gradient border and outer glow.
+   ========================================================= */
+
+.doneButton {
+  position: relative;
+  z-index: 1;
+
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  width: min(100%, 370px);
+  min-height: 44px;
+
+  margin-top: 13px;
+  padding: 10px 20px;
+
+  box-sizing: border-box;
+
+  border: 2px solid transparent;
+  border-radius: 999px;
+
+  cursor: pointer;
+
+  color: #20344d;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 850;
+  line-height: 1.35;
+  text-align: center;
+
+  background:
+    linear-gradient(
+      110deg,
+      #fff9e9 0%,
+      #a5f3fc 27%,
+      #7dd3fc 54%,
+      #a5b4fc 78%,
+      #ddd6fe 100%
+    ) padding-box,
+    linear-gradient(
+      110deg,
+      #c4b5fd 0%,
+      #22d3ee 32%,
+      #60a5fa 65%,
+      #a78bfa 100%
+    ) border-box;
+
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.98),
+    0 0 10px rgba(103, 232, 249, 0.3),
+    0 0 17px rgba(196, 181, 253, 0.23),
+    0 5px 14px rgba(56, 189, 248, 0.13);
+
+  transition:
+    transform 180ms ease,
+    box-shadow 220ms ease,
+    filter 220ms ease;
+}
+
+.doneButton span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.doneButton:hover {
+  transform: translateY(-2px);
+  filter: saturate(1.12) brightness(1.015);
+
+  box-shadow:
+    inset 0 1px 1px #ffffff,
+    0 0 13px rgba(103, 232, 249, 0.48),
+    0 0 23px rgba(196, 181, 253, 0.36),
+    0 0 9px rgba(96, 165, 250, 0.22),
+    0 8px 19px rgba(56, 189, 248, 0.18);
+}
+
+.doneButton:active {
+  transform: translateY(0) scale(0.99);
+
+  box-shadow:
+    inset 0 1px 2px rgba(30, 58, 95, 0.08),
+    0 0 8px rgba(103, 232, 249, 0.32),
+    0 0 13px rgba(196, 181, 253, 0.22);
+}
+
+.doneButton:focus-visible {
+  outline: 3px solid rgba(56, 189, 248, 0.88);
+  outline-offset: 4px;
+}
+
+.doneButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  transform: none;
+}
+
+/* =========================================================
+   SHORT VIEWPORTS
+   Reduce spacing on shorter screens.
+   Scrolling remains available as a fallback.
+   ========================================================= */
+
+@media (max-height: 700px) {
+  .step {
+    justify-content: flex-start;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  .successIcon {
+    width: 56px;
+    height: 56px;
+  }
+
+  .successIcon span {
+    font-size: 32px;
+  }
+
+  .heading {
+    margin-top: 12px;
+  }
+
+  .heading h2 {
+    font-size: 21px;
+  }
+
+  .heading p:last-child {
+    margin-top: 5px;
+  }
+
+  .referenceCard {
+    margin-top: 10px;
+    padding: 9px 15px;
+  }
+
+  .referenceCard strong {
+    font-size: 18px;
+  }
+
+  .priceCard {
+    margin-top: 7px;
+    padding: 8px 14px;
+  }
+
+  .priceCard strong {
+    font-size: 19px;
+  }
+
+  .priceHint {
+    margin-top: 2px;
+  }
+
+  .message {
+    margin-top: 9px;
+    line-height: 1.6;
+  }
+
+  .doneButton {
+    margin-top: 10px;
+    min-height: 42px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 520px) {
+  .step {
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+
+  .successIcon {
+    width: 62px;
+    height: 62px;
+  }
+
+  .successIcon span {
+    font-size: 35px;
+  }
+
+  .heading {
+    margin-top: 15px;
+  }
+
+  .heading h2 {
+    font-size: 21px;
+  }
+
+  .heading p:last-child {
+    font-size: 12px;
+  }
+
+  .referenceCard {
+    margin-top: 11px;
+    padding: 11px 15px;
+  }
+
+  .referenceCard strong {
+    font-size: 17px;
+  }
+
+  .priceCard {
+    padding: 9px 14px;
+  }
+
+  .priceCard strong {
+    font-size: 19px;
+  }
+
+  .priceHint {
+    font-size: 10.5px;
+  }
+
+  .message {
+    margin-top: 10px;
+    font-size: 12px;
+    line-height: 1.65;
+  }
+
+  .doneButton {
+    margin-top: 11px;
+  }
+}
+
+/* =========================================================
+   VERY NARROW SCREENS
+   ========================================================= */
+
+@media (max-width: 360px) {
+  .step {
+    padding: 12px 11px;
+  }
+
+  .successIcon {
+    width: 54px;
+    height: 54px;
+  }
+
+  .successIcon span {
+    font-size: 31px;
+  }
+
+  .heading {
+    margin-top: 13px;
+  }
+
+  .heading h2 {
+    font-size: 19px;
+  }
+
+  .eyebrow {
+    font-size: 9px;
+  }
+
+  .referenceLabel,
+  .priceLabel {
+    font-size: 9px;
+  }
+
+  .referenceCard strong {
+    font-size: 16px;
+    letter-spacing: 0.035em;
+  }
+
+  .priceCard strong {
+    font-size: 18px;
+  }
+
+  .message {
+    font-size: 11.5px;
+  }
+
+  .doneButton {
+    min-height: 40px;
+    font-size: 13px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION ACCESSIBILITY
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .doneButton {
+    transition: none;
+  }
+
+  .doneButton:hover,
+  .doneButton:active {
+    transform: none;
+  }
+}

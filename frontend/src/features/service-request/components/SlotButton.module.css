@@ -1,0 +1,112 @@
+.slotButton {
+  width: 100%;
+  min-height: 48px;
+
+  padding: 6px 8px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 2px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff 0%,
+      #ecfdf5 50%,
+      #f5f3ff 100%
+    );
+
+  cursor: pointer;
+
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.slotButton:hover:not(:disabled) {
+  border-color: #22c1c3;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ecfeff 0%,
+      #d1fae5 50%,
+      #ede9fe 100%
+    );
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 4px 10px rgba(20, 184, 166, 0.12);
+}
+
+.slotButton.selected {
+  border-color: #14b8a6;
+
+  background:
+    linear-gradient(
+      135deg,
+      #cffafe 0%,
+      #d1fae5 50%,
+      #ede9fe 100%
+    );
+
+  box-shadow:
+    0 0 0 2px rgba(20, 184, 166, 0.11);
+}
+
+.slotButton.unavailable {
+  background: #f1f5f9;
+
+  border-color: #e2e8f0;
+
+  color: #94a3b8;
+
+  cursor: not-allowed;
+
+  opacity: 0.62;
+}
+
+.time {
+  color: #334155;
+
+  font-size: 13px;
+  line-height: 1.1;
+
+  font-weight: 900;
+}
+
+.selected .time {
+  color: #047857;
+}
+
+.unavailable .time {
+  color: #94a3b8;
+}
+
+.status {
+  color: #64748b;
+
+  font-size: 9px;
+  line-height: 1.1;
+
+  font-weight: 700;
+}
+
+.selected .status {
+  color: #059669;
+}
+
+.unavailable .status {
+  color: #94a3b8;
+}

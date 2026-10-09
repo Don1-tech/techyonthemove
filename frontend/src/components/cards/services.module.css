@@ -1,0 +1,318 @@
+/* =========================================================
+   TECHY ON THE MOVE
+   SERVICES
+   ========================================================= */
+
+
+/* =========================================================
+   MAIN SECTION
+   ========================================================= */
+
+.services {
+  position: relative;
+
+  width: 100%;
+  height: 720px;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      90deg,
+      #dff6e9 0%,
+      #d7f3f7 30%,
+      #cfe4f8 60%,
+      #b8cfee 100%
+    );
+}
+
+
+/* =========================================================
+   MAIN DESIGN PANEL
+   ========================================================= */
+
+.servicesInner {
+  position: relative;
+
+  width: 1184px;
+  height: 670px;
+
+  margin: 25px auto 0;
+
+  border-radius: 30px;
+
+  border: 1px solid rgba(255, 255, 255, 0.45);
+
+  background: rgba(255, 255, 255, 0.08);
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   TITLE
+   ========================================================= */
+
+.sectionTitle {
+  position: absolute;
+
+  top: 25px;
+  left: 0;
+
+  width: 100%;
+
+  margin: 0;
+
+  text-align: center;
+
+  font-size: 21px;
+  font-weight: 800;
+
+  letter-spacing: 0.8px;
+
+  line-height: 1.15;
+
+  color: #222;
+
+  text-transform: uppercase;
+}
+
+.sectionTitle::after {
+  content: "";
+
+  display: block;
+
+  width: 52px;
+  height: 2px;
+
+  margin: 8px auto 0;
+
+  border-radius: 999px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #9b7bea,
+      #48d4dc,
+      #5ba8ed
+    );
+}
+
+
+/* =========================================================
+   FREE-POSITION SERVICES CANVAS
+   ========================================================= */
+
+.servicesCanvas {
+  position: absolute;
+
+  left: 0;
+  top: 0;
+
+  width: 100%;
+  height: 100%;
+}
+
+
+/* =========================================================
+   BASE CARD
+   ========================================================= */
+
+.serviceCard {
+  position: absolute;
+
+  overflow: hidden;
+
+  border-radius: 22px;
+
+  border: 1px solid rgba(255, 255, 255, 0.55);
+
+  background: #dcecf3;
+
+  box-sizing: border-box;
+
+  box-shadow:
+    0 10px 28px rgba(60, 100, 125, 0.13);
+}
+
+
+/* =========================================================
+   CARD 1
+   ========================================================= */
+
+.card1 {
+  left: 40px;
+  top: 105px;
+
+  width: 345px;
+  height: 235px;
+}
+
+
+/* =========================================================
+   CARD 2
+   ========================================================= */
+
+.card2 {
+  left: 419px;
+  top: 105px;
+
+  width: 345px;
+  height: 235px;
+}
+
+
+/* =========================================================
+   CARD 3
+   ========================================================= */
+
+.card3 {
+  left: 798px;
+  top: 105px;
+
+  width: 345px;
+  height: 235px;
+}
+
+
+/* =========================================================
+   CARD 4
+   ========================================================= */
+
+.card4 {
+  left: 40px;
+  top: 375px;
+
+  width: 535px;
+  height: 235px;
+}
+
+
+/* =========================================================
+   CARD 5
+   ========================================================= */
+
+.card5 {
+  left: 603px;
+  top: 375px;
+
+  width: 540px;
+  height: 235px;
+}
+
+
+/* =========================================================
+   CARD IMAGE
+   ========================================================= */
+
+.cardImage {
+  position: absolute;
+
+  left: 0;
+  top: 0;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  display: block;
+
+  z-index: 0;
+}
+
+
+/* =========================================================
+   IMAGE OVERLAY
+   ========================================================= */
+
+.cardOverlay {
+  position: absolute;
+
+  left: 0;
+  top: 0;
+
+  width: 100%;
+  height: 100%;
+
+  z-index: 1;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.64) 0%,
+      rgba(0, 0, 0, 0.40) 38%,
+      rgba(0, 0, 0, 0.12) 72%,
+      rgba(0, 0, 0, 0) 100%
+    );
+}
+
+
+/* =========================================================
+   TEXT ON IMAGE
+   ========================================================= */
+
+.cardContent {
+  position: absolute;
+
+  left: 24px;
+  top: 50%;
+
+  width: 48%;
+
+  transform: translateY(-50%);
+
+  z-index: 2;
+}
+
+
+/* =========================================================
+   CARD TITLE
+   ========================================================= */
+
+.cardContent h3 {
+  margin: 0 0 10px;
+
+  font-size: 17px;
+
+  font-weight: 800;
+
+  line-height: 1.25;
+
+  letter-spacing: 0.1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #d8c0ff 0%,
+      #72e2e6 50%,
+      #a0d0ff 100%
+    );
+
+  -webkit-background-clip: text;
+  background-clip: text;
+
+  -webkit-text-fill-color: transparent;
+
+  color: transparent;
+}
+
+
+/* =========================================================
+   CARD DESCRIPTION
+   ========================================================= */
+
+.cardContent p {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 11.5px;
+
+  font-weight: 400;
+
+  line-height: 1.5;
+
+  text-shadow:
+    0 1px 5px rgba(0, 0, 0, 0.55);
+}

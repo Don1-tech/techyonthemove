@@ -1,0 +1,33 @@
+# Private environment files
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+/coverage/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Local editor files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.tsbuildinfo
+
+# Database backups
+*.dump
+*.backup
+
+# Deployment tool state
+.vercel/
+.wrangler/

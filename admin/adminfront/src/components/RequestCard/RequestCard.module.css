@@ -1,0 +1,285 @@
+
+/* =========================================================
+   REQUEST CARD
+   ========================================================= */
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  height: 165px;
+
+
+  width: 70%;
+  min-width: 0;
+  padding: 19px 20px;
+  box-sizing: border-box;
+
+  background: #ffffff;
+  border: 1px solid #7f9cc9;
+  border-radius: 20px;
+
+  box-shadow: 0 4px 14px rgba(18, 26, 46, 0.035);
+
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: 15px;
+  bottom: 15px;
+  left: 0;
+  width: 5px;
+
+  background: linear-gradient(
+    180deg,
+    #a99aff 0%,
+    #83d9e9 40%,
+    #9bcaff 80%
+  );
+
+  border-radius: 0 4px 4px 0;
+}
+
+.card:hover {
+  border-color: #8be9ff;
+  box-shadow:
+    0 0 2px rgba(135, 206, 250, 0.45),
+    0 0 3px rgba(0, 220, 255, 0.30),
+    0 0 5px rgba(200, 162, 255, 0.22),
+    0 2px 4px rgba(18, 26, 46, 0.07);
+
+  transform: translateY(-2px);
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    transform 0.3s ease;
+}
+
+/* =========================================================
+   TOP ROW: REFERENCE AND STATUS
+   ========================================================= */
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  width: 100%;
+  min-width: 0;
+}
+
+/* Clickable request reference */
+
+.reference {
+  display: inline-flex;
+  align-items: center;
+
+  max-width: 100%;
+  min-width: 0;
+  padding: 5px 9px;
+  box-sizing: border-box;
+
+  color: #7770c9;
+  background: #f4f2ff;
+  border: 3px solid #e8e3ff;
+  border-radius: 7px;
+
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.5;
+  letter-spacing: 0.035em;
+  text-align: left;
+
+  overflow-wrap: anywhere;
+  cursor: pointer;
+
+  transition:
+    color 180ms ease,
+    background 180ms ease,
+    border-color 180ms ease;
+}
+
+.reference:hover {
+  color: #5e55b3;
+  background: #ece9ff;
+  border-color: #d8d0ff;
+}
+
+.reference:focus-visible {
+  outline: 2px solid #8acfe9;
+  outline-offset: 3px;
+}
+
+/* =========================================================
+   CUSTOMER NAME
+   ========================================================= */
+
+.customer {
+  min-width: 0;
+  margin: 0;
+
+  color: #121a2e;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.45;
+  letter-spacing: -0.025em;
+
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+/* =========================================================
+   SERVICE AND ISSUE DETAILS
+   ========================================================= */
+
+.serviceRow {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+
+  min-width: 0;
+}
+
+.service {
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+
+  color: #344056;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.6;
+
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.issue {
+  display: -webkit-box;
+  width: 100%;
+  min-width: 0;
+
+  color: #7b8497;
+  font-size: 12px;
+  font-weight: 450;
+  line-height: 1.7;
+
+  overflow-wrap: anywhere;
+  word-break: break-word;
+
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+}
+
+/* =========================================================
+   LOCATION, DATE AND TIME
+   ========================================================= */
+
+.meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+
+  min-width: 0;
+  padding-top: 12px;
+
+  color: #7d8799;
+  border-top: 1px solid #eef0f5;
+
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.7;
+}
+
+.meta > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.metaSeparator {
+  flex: 0 0 auto;
+  color: #b5bcd0;
+  font-size: 12px;
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 700px) {
+  .card {
+    gap: 13px;
+    padding: 16px 17px;
+    border-radius: 13px;
+  }
+
+  .customer {
+    font-size: 15px;
+  }
+
+  .meta {
+    gap: 5px 7px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 400px) {
+  .card {
+    gap: 12px;
+    padding: 15px 14px;
+  }
+
+  .top {
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .reference {
+    font-size: 10px;
+  }
+
+  .customer {
+    font-size: 14px;
+  }
+
+  .service,
+  .issue {
+    font-size: 11px;
+  }
+
+  .meta {
+    font-size: 10px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .reference {
+    transition: none;
+  }
+
+  .card:hover {
+    transform: none;
+  }
+}

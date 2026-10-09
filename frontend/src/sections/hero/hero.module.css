@@ -1,0 +1,271 @@
+/* =========================================================
+   TECHY ON THE MOVE — HERO
+   FIXED 1280px DESIGN CANVAS
+   ========================================================= */
+
+.hero {
+  position: relative;
+
+  width: 100%;
+  height: 700px;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      90deg,
+      #d6f8d6 0%,
+      #c5f0e0 25%,
+      #c2e8f5 45%,
+      #b0d8f5 70%,
+      #9abcf5 100%
+    );
+}
+
+
+/* =========================================================
+   FIXED HERO CANVAS
+   ========================================================= */
+
+.heroInner {
+  position: relative;
+
+  width: 1280px;
+  height: 700px;
+
+  margin: 0 auto;
+  padding: 32px 48px 50px;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   HEADLINE
+   ========================================================= */
+
+.headlineArea {
+  position: relative;
+
+  z-index: 20;
+top: 50px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 1184px;
+
+  text-align: center;
+}
+
+
+.headline {
+  width: 700px;
+
+  margin: 0;
+
+  color: #4a4a4a;
+
+  font-family: inherit;
+
+  font-size: 34px;
+  font-weight: 800;
+
+  letter-spacing: 0.7px;
+  line-height: 1.15;
+
+  text-transform: uppercase;
+}
+
+
+/* =========================================================
+   ROTATING HEADLINE
+   ========================================================= */
+
+.rotatingText {
+  display: inline-block;
+
+  min-height: 1.2em;
+
+  transition:
+    opacity 300ms ease,
+    transform 300ms ease;
+}
+
+
+.rotatingTextHidden {
+  opacity: 0;
+
+  transform: translateY(8px);
+}
+
+
+/* =========================================================
+   HERO VISUAL CANVAS
+   ========================================================= */
+
+.heroVisuals {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 1280px;
+  height: 700px;
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   CENTRAL MASCOT
+   ========================================================= */
+
+.mascot {
+  position: absolute;
+
+  z-index: 10;
+
+  left: 430px;
+  top:170px;
+
+  width: 500px;
+  max-height: 490px;
+
+  object-fit: contain;
+
+  filter:
+    drop-shadow(
+      0 8px 18px rgba(0, 0, 0, 0.14)
+    );
+}
+
+
+/* =========================================================
+   FLOATING GADGETS
+   ========================================================= */
+
+.gadget {
+  position: absolute;
+
+  z-index: 5;
+
+  object-fit: contain;
+
+  filter:
+    drop-shadow(
+      0 8px 20px rgba(0, 0, 0, 0.15)
+    );
+
+  animation:
+    floatGadget 4.5s ease-in-out infinite;
+}
+
+
+/* =========================================================
+   GADGET FLOAT ANIMATION
+   ========================================================= */
+
+@keyframes floatGadget {
+  0% {
+    transform:
+      translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform:
+      translate3d(4px, -8px, 0);
+  }
+
+  100% {
+    transform:
+      translate3d(0, 0, 0);
+  }
+}
+
+
+/* =========================================================
+   LEFT GADGETS
+   Positions calculated from the original 1280px canvas
+   ========================================================= */
+
+.gadgetLeftOne {
+  top: 70px;
+  left: 192px;
+
+  width: 90px;
+
+  animation-delay: 0s;
+}
+
+
+.gadgetLeftTwo {
+  top: 230px;
+  left: 128px;
+
+  width: 140px;
+
+  animation-delay: 0.7s;
+}
+
+
+.gadgetLeftThree {
+  bottom: 155px;
+  left: 230px;
+
+  width: 110px;
+
+  animation-delay: 1.3s;
+}
+
+
+/* =========================================================
+   RIGHT GADGETS
+   Positions calculated from the original 1280px canvas
+   ========================================================= */
+
+.gadgetRightOne {
+  top: 140px;
+  right: 192px;
+
+  width: 100px;
+
+  animation-delay: 0.4s;
+}
+
+
+.gadgetRightTwo {
+  top: 290px;
+  right: 128px;
+
+  width: 85px;
+
+  animation-delay: 1s;
+}
+
+
+.gadgetRightThree {
+  bottom: 165px;
+  right: 154px;
+
+  width: 115px;
+
+  animation-delay: 1.6s;
+}
+
+
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .gadget,
+  .mascot {
+    animation: none;
+  }
+
+  .rotatingText {
+    transition: none;
+  }
+}

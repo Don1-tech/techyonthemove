@@ -1,0 +1,66 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --control-gradient:
+    linear-gradient(
+      135deg,
+      #a99cdc 0%,
+      #a1cfe4 55%,
+      #94e2ebd2 100%
+    );
+  --control-text: #263445;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+
+  min-width: 320px;
+
+  font-family:
+    Inter,
+    Poppins,
+    Montserrat,
+    Arial,
+    sans-serif;
+
+  background: #d6f8d6;
+
+  color: #2e2e2e;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button:not([aria-label]),
+select {
+  color: var(--control-text);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+button:not([aria-pressed]):not(:disabled):not(nav button),
+select {
+  border: 1px solid transparent !important;
+  background:
+    linear-gradient(#ffffff, #ffffff) padding-box,
+    var(--control-gradient) border-box !important;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+img {
+  max-width: 100%;
+}
