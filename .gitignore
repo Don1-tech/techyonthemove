@@ -1,3 +1,4 @@
+
 # Private environment files
 .env
 .env.*
@@ -24,7 +25,7 @@ npm-debug.log*
 Thumbs.db
 *.tsbuildinfo
 
-# Database backups
+# Local database backups
 *.dump
 *.backup
 

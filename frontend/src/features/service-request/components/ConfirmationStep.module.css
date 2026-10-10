@@ -908,3 +908,39 @@
     opacity: 0.8;
   }
 }
+
+.step {
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.summaryCard {
+  flex: 1 1 0;
+  min-width: 0;
+  overscroll-behavior: contain;
+}
+
+.notice,
+.errorMessage {
+  flex: 0 0 auto;
+}
+
+.step > div.actionBar {
+  position: sticky;
+  bottom: 0;
+  background: #ffffff;
+}
+
+.actionBar {
+  order: 2;
+  flex: 0 0 auto;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.waitMessage {
+  order: 1;
+  flex: 0 0 auto;
+}

@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import styles from "./ServiceRequestModal.module.css";
 
@@ -48,6 +48,9 @@ export default function ServiceRequestModal({
 function ServiceRequestDialog({
   onClose,
 }: Pick<ServiceRequestModalProps, "onClose">) {
+  const dialogRef = useRef<HTMLElement | null>(null);
+  const modalBodyRef = useRef<HTMLDivElement | null>(null);
+
   const [currentStep, setCurrentStep] = useState(1);
 
   const [selectedCategory, setSelectedCategory] =
@@ -87,6 +90,124 @@ function ServiceRequestDialog({
 
   const [requestReference, setRequestReference] =
     useState("");
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+
+    if (!dialog) {
+      return;
+    }
+
+    const previouslyFocused =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    const previousBodyOverflow = document.body.style.overflow;
+    const previousRootOverflow =
+      document.documentElement.style.overflow;
+
+    const focusableSelector = [
+      "button:not([disabled])",
+      "a[href]",
+      "input:not([disabled])",
+      "select:not([disabled])",
+      "textarea:not([disabled])",
+      "[tabindex]:not([tabindex='-1'])",
+    ].join(", ");
+
+    const getFocusableElements = () =>
+      Array.from(
+        dialog.querySelectorAll<HTMLElement>(focusableSelector)
+      ).filter(
+        (element) =>
+          element.getAttribute("aria-hidden") !== "true" &&
+          element.getClientRects().length > 0
+      );
+
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+
+    dialog.querySelector<HTMLElement>(
+      '[aria-label="Close request service"]'
+    )?.focus({ preventScroll: true });
+
+    const handleTab = (event: KeyboardEvent) => {
+      if (event.key !== "Tab") {
+        return;
+      }
+
+      const focusableElements = getFocusableElements();
+
+      if (focusableElements.length === 0) {
+        event.preventDefault();
+        return;
+      }
+
+      const firstElement = focusableElements[0];
+      const lastElement =
+        focusableElements[focusableElements.length - 1];
+      const activeElement = document.activeElement;
+
+      if (
+        event.shiftKey &&
+        (activeElement === firstElement ||
+          !dialog.contains(activeElement))
+      ) {
+        event.preventDefault();
+        lastElement.focus();
+      } else if (
+        !event.shiftKey &&
+        (activeElement === lastElement ||
+          !dialog.contains(activeElement))
+      ) {
+        event.preventDefault();
+        firstElement.focus();
+      }
+    };
+
+    const handleFocusIn = (event: FocusEvent) => {
+      if (
+        event.target instanceof Node &&
+        !dialog.contains(event.target)
+      ) {
+        dialog
+          .querySelector<HTMLElement>(
+            '[aria-label="Close request service"]'
+          )
+          ?.focus({ preventScroll: true });
+      }
+    };
+
+    document.addEventListener("keydown", handleTab);
+    document.addEventListener("focusin", handleFocusIn);
+
+    return () => {
+      document.removeEventListener("keydown", handleTab);
+      document.removeEventListener("focusin", handleFocusIn);
+      document.body.style.overflow = previousBodyOverflow;
+      document.documentElement.style.overflow =
+        previousRootOverflow;
+
+      if (previouslyFocused?.isConnected) {
+        previouslyFocused.focus({ preventScroll: true });
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const firstStepControl =
+      modalBodyRef.current?.querySelector<HTMLElement>(
+        [
+          "button:not([disabled])",
+          "input:not([disabled])",
+          "select:not([disabled])",
+          "textarea:not([disabled])",
+          "[tabindex]:not([tabindex='-1'])",
+        ].join(", ")
+      );
+
+    firstStepControl?.focus({ preventScroll: true });
+  }, [currentStep]);
 
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
@@ -256,10 +377,12 @@ function ServiceRequestDialog({
       role="presentation"
     >
       <section
+        ref={dialogRef}
         className={styles.modal}
         role="dialog"
         aria-modal="true"
         aria-labelledby="request-service-title"
+        aria-label="Request a service"
       >
         <ServiceRequestHeader onClose={onClose} />
 
@@ -268,7 +391,7 @@ function ServiceRequestDialog({
           totalSteps={6}
         />
 
-        <div className={styles.modalBody}>
+        <div ref={modalBodyRef} className={styles.modalBody}>
           {/* =================================================
               STEP 1
               ================================================= */}

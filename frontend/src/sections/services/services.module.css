@@ -205,3 +205,68 @@
   line-height: 1.5;
   text-shadow: 0 1px 5px rgba(0, 0, 0, 0.55);
 }
+
+@media (max-width: 980px) {
+  .services {
+    padding: 50px 16px;
+  }
+
+  .servicesCanvas,
+  .servicesGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto;
+    gap: 20px;
+  }
+
+  .serviceCard:nth-child(n) {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .serviceCard {
+    min-height: 280px;
+  }
+
+  .cardContent {
+    width: 52%;
+    top: 50%;
+    left: 18px;
+  }
+}
+
+@media (max-width: 640px) {
+  .services {
+    padding: 42px 14px 52px;
+  }
+
+  .sectionTitle {
+    margin-bottom: 24px;
+    font-size: 22px;
+  }
+
+  .servicesCanvas,
+  .servicesGrid {
+    grid-template-columns: 1fr;
+    row-gap: 18px;
+  }
+
+  .serviceCard {
+    min-height: 250px;
+  }
+
+  .cardContent {
+    left: 14px;
+    width: 62%;
+    top: 50%;
+  }
+
+  .cardContent h3 {
+    margin-bottom: 8px;
+    font-size: 16px;
+  }
+
+  .cardContent p {
+    font-size: 11px;
+    line-height: 1.4;
+  }
+}

@@ -1,5 +1,6 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 import ReviewCard from "../../components/cards/ReviewCard";
 import { useReviews } from "../../hooks/useReviews";
@@ -16,9 +17,12 @@ const serviceCategories = [
   "Network Troubleshooting & Optimization",
 ];
 
-const REVIEWS_PER_LOAD = 3;
+const REVIEWS_PER_LOAD = 2;
 
 export default function ReviewsList() {
+  const reviewTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const reviewDialogRef = useRef<HTMLElement | null>(null);
+
   const {
     reviews,
     isLoading,
@@ -40,6 +44,120 @@ export default function ReviewsList() {
 
   const [showSuccessToast, setShowSuccessToast] =
     useState(false);
+
+  useEffect(() => {
+    if (!showForm) {
+      return;
+    }
+
+    const dialog = reviewDialogRef.current;
+
+    if (!dialog) {
+      return;
+    }
+
+    const previousBodyOverflow = document.body.style.overflow;
+    const previousRootOverflow =
+      document.documentElement.style.overflow;
+    const focusableSelector = [
+      "button:not([disabled])",
+      "a[href]",
+      "input:not([disabled])",
+      "select:not([disabled])",
+      "textarea:not([disabled])",
+      "[tabindex]:not([tabindex='-1'])",
+    ].join(", ");
+
+    const getFocusableElements = () =>
+      Array.from(
+        dialog.querySelectorAll<HTMLElement>(focusableSelector)
+      ).filter(
+        (element) =>
+          element.getAttribute("aria-hidden") !== "true" &&
+          element.getClientRects().length > 0
+      );
+
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+    dialog.querySelector<HTMLInputElement>("input")?.focus({
+      preventScroll: true,
+    });
+
+    const handleTab = (event: KeyboardEvent) => {
+      if (event.key !== "Tab") {
+        return;
+      }
+
+      const focusableElements = getFocusableElements();
+
+      if (focusableElements.length === 0) {
+        event.preventDefault();
+        return;
+      }
+
+      const firstElement = focusableElements[0];
+      const lastElement =
+        focusableElements[focusableElements.length - 1];
+      const activeElement = document.activeElement;
+
+      if (
+        event.shiftKey &&
+        (activeElement === firstElement ||
+          !dialog.contains(activeElement))
+      ) {
+        event.preventDefault();
+        lastElement.focus();
+      } else if (
+        !event.shiftKey &&
+        (activeElement === lastElement ||
+          !dialog.contains(activeElement))
+      ) {
+        event.preventDefault();
+        firstElement.focus();
+      }
+    };
+
+    const handleFocusIn = (event: FocusEvent) => {
+      if (
+        event.target instanceof Node &&
+        !dialog.contains(event.target)
+      ) {
+        dialog.querySelector<HTMLInputElement>("input")?.focus({
+          preventScroll: true,
+        });
+      }
+    };
+
+    document.addEventListener("keydown", handleTab);
+    document.addEventListener("focusin", handleFocusIn);
+
+    return () => {
+      document.removeEventListener("keydown", handleTab);
+      document.removeEventListener("focusin", handleFocusIn);
+      document.body.style.overflow = previousBodyOverflow;
+      document.documentElement.style.overflow =
+        previousRootOverflow;
+      reviewTriggerRef.current?.focus({ preventScroll: true });
+    };
+  }, [showForm]);
+
+  useEffect(() => {
+    if (!showForm) {
+      return;
+    }
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && !isSubmitting) {
+        setShowForm(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [showForm, isSubmitting]);
 
   /*
    * Hide the success toast automatically.
@@ -187,6 +305,7 @@ export default function ReviewsList() {
           <div className={styles.reviewActions}>
             <button
               type="button"
+              ref={reviewTriggerRef}
               className={styles.addReviewButton}
               onClick={openReviewForm}
             >
@@ -223,6 +342,7 @@ export default function ReviewsList() {
             <div className={styles.reviewActions}>
               <button
                 type="button"
+                ref={reviewTriggerRef}
                 className={styles.addReviewButton}
                 onClick={openReviewForm}
               >
@@ -233,153 +353,156 @@ export default function ReviewsList() {
           )}
       </div>
 
-      {showForm && (
-        <div
-          className={styles.reviewModalOverlay}
-          role="presentation"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) {
-              closeReviewForm();
-            }
-          }}
-        >
-          <section
-            className={styles.reviewModal}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="review-modal-title"
+      {showForm &&
+        createPortal(
+          <div
+            className={styles.reviewModalOverlay}
+            role="presentation"
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) {
+                closeReviewForm();
+              }
+            }}
           >
-            <div className={styles.reviewModalHeader}>
-              <div>
-                <h3 id="review-modal-title">
-                  ADD YOUR REVIEW
-                </h3>
+            <section
+              ref={reviewDialogRef}
+              className={styles.reviewModal}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="review-modal-title"
+            >
+              <div className={styles.reviewModalHeader}>
+                <div>
+                  <h3 id="review-modal-title">
+                    ADD YOUR REVIEW
+                  </h3>
 
-                <p>
-                  Share your experience with Techy On The Move.
-                </p>
+                  <p>
+                    Share your experience with Techy On The Move.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  className={styles.closeReviewForm}
+                  onClick={closeReviewForm}
+                  disabled={isSubmitting}
+                  aria-label="Close review form"
+                >
+                  ×
+                </button>
               </div>
 
-              <button
-                type="button"
-                className={styles.closeReviewForm}
-                onClick={closeReviewForm}
-                disabled={isSubmitting}
-                aria-label="Close review form"
+              <form
+                className={styles.reviewForm}
+                onSubmit={handleSubmit}
               >
-                ×
-              </button>
-            </div>
+                <label className={styles.reviewField}>
+                  <span>Your Name</span>
 
-            <form
-              className={styles.reviewForm}
-              onSubmit={handleSubmit}
-            >
-              <label className={styles.reviewField}>
-                <span>Your Name</span>
+                  <input
+                    type="text"
+                    value={customerName}
+                    onChange={(event) =>
+                      setCustomerName(event.target.value)
+                    }
+                    minLength={2}
+                    maxLength={120}
+                    required
+                    placeholder="Enter your name"
+                  />
+                </label>
 
-                <input
-                  type="text"
-                  value={customerName}
-                  onChange={(event) =>
-                    setCustomerName(event.target.value)
-                  }
-                  minLength={2}
-                  maxLength={120}
-                  required
-                  placeholder="Enter your name"
-                />
-              </label>
+                <label className={styles.reviewField}>
+                  <span>Service Category</span>
 
-              <label className={styles.reviewField}>
-                <span>Service Category</span>
-
-                <select
-                  value={serviceCategory}
-                  onChange={(event) =>
-                    setServiceCategory(event.target.value)
-                  }
-                  required
-                >
-                  <option value="" disabled>
-                    Select the service you received
-                  </option>
-
-                  {serviceCategories.map((category) => (
-                    <option
-                      key={category}
-                      value={category}
-                    >
-                      {category}
+                  <select
+                    value={serviceCategory}
+                    onChange={(event) =>
+                      setServiceCategory(event.target.value)
+                    }
+                    required
+                  >
+                    <option value="" disabled>
+                      Select the service you received
                     </option>
-                  ))}
-                </select>
-              </label>
 
-              <fieldset className={styles.ratingField}>
-                <legend>Your Rating</legend>
+                    {serviceCategories.map((category) => (
+                      <option
+                        key={category}
+                        value={category}
+                      >
+                        {category}
+                      </option>
+                    ))}
+                  </select>
+                </label>
 
-                <div className={styles.ratingStars}>
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      className={
-                        star <= rating
-                          ? styles.ratingStarActive
-                          : styles.ratingStar
-                      }
-                      onClick={() => setRating(star)}
-                      aria-label={`${star} star${
-                        star === 1 ? "" : "s"
-                      }`}
-                      aria-pressed={star === rating}
-                    >
-                      ★
-                    </button>
-                  ))}
-                </div>
-              </fieldset>
+                <fieldset className={styles.ratingField}>
+                  <legend>Your Rating</legend>
 
-              <label className={styles.reviewField}>
-                <span>Your Review</span>
+                  <div className={styles.ratingStars}>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        className={
+                          star <= rating
+                            ? styles.ratingStarActive
+                            : styles.ratingStar
+                        }
+                        onClick={() => setRating(star)}
+                        aria-label={`${star} star${
+                          star === 1 ? "" : "s"
+                        }`}
+                        aria-pressed={star === rating}
+                      >
+                        ★
+                      </button>
+                    ))}
+                  </div>
+                </fieldset>
 
-                <textarea
-                  value={reviewText}
-                  onChange={(event) =>
-                    setReviewText(event.target.value)
+                <label className={styles.reviewField}>
+                  <span>Your Review</span>
+
+                  <textarea
+                    value={reviewText}
+                    onChange={(event) =>
+                      setReviewText(event.target.value)
+                    }
+                    minLength={5}
+                    maxLength={1000}
+                    required
+                    placeholder="Tell us about your experience..."
+                    rows={5}
+                  />
+                </label>
+
+                {error && (
+                  <p className={styles.reviewError}>
+                    {error}
+                  </p>
+                )}
+
+                <button
+                  type="submit"
+                  className={styles.submitReviewButton}
+                  disabled={
+                    isSubmitting ||
+                    rating === 0 ||
+                    !serviceCategory
                   }
-                  minLength={5}
-                  maxLength={1000}
-                  required
-                  placeholder="Tell us about your experience..."
-                  rows={5}
-                />
-              </label>
-
-              {error && (
-                <p className={styles.reviewError}>
-                  {error}
-                </p>
-              )}
-
-              <button
-                type="submit"
-                className={styles.submitReviewButton}
-                disabled={
-                  isSubmitting ||
-                  rating === 0 ||
-                  !serviceCategory
-                }
-              >
-                {isSubmitting
-                  ? "Submitting Review..."
-                  : "Submit Review"}
-              </button>
-            </form>
-          </section>
-        </div>
-      )}
+                >
+                  {isSubmitting
+                    ? "Submitting Review..."
+                    : "Submit Review"}
+                </button>
+              </form>
+            </section>
+          </div>,
+          document.body
+        )}
 
       {showSuccessToast && (
         <div

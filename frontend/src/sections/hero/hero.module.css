@@ -256,8 +256,86 @@ top: 50px;
 
 
 /* =========================================================
-   ACCESSIBILITY
+   RESPONSIVE ADJUSTMENTS
    ========================================================= */
+
+@media (max-width: 1279px) {
+  .hero {
+    height: 700px;
+  }
+
+  .heroInner {
+    width: 100%;
+    height: 700px;
+    padding: 88px 18px 36px;
+  }
+
+  .headlineArea {
+    top: 0;
+    width: 100%;
+  }
+
+  .headline {
+    width: min(100%, 620px);
+    font-size: clamp(1.75rem, 4vw, 2.6rem);
+  }
+
+  .mascot {
+    left: 50%;
+    top: 200px;
+    width: min(72vw, 420px);
+    max-height: 475px;
+    transform: translateX(-50%);
+  }
+
+  .heroVisuals {
+    width: 100%;
+    height: 100%;
+  }
+
+  .gadgetLeftOne { width: 68px; left: 14%; top: 85px; }
+  .gadgetLeftTwo { width: 100px; left: 6%; top: 210px; }
+  .gadgetLeftThree { width: 82px; left: 18%; bottom: 120px; }
+
+  .gadgetRightOne { width: 74px; right: 15%; top: 150px; }
+  .gadgetRightTwo { width: 68px; right: 8%; top: 255px; }
+  .gadgetRightThree { width: 82px; right: 15%; bottom: 120px; }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    height: 560px;
+  }
+
+  .heroInner {
+    height: 560px;
+    padding: 88px 12px 24px;
+  }
+
+  .headlineArea {
+    top: 0;
+  }
+
+  .headline {
+    width: 100%;
+    font-size: clamp(1.35rem, 6.5vw, 2rem);
+    letter-spacing: 0.35px;
+  }
+
+  .mascot {
+    top: 158px;
+    width: min(76vw, 300px);
+    max-height: 380px;
+  }
+
+  .gadgetLeftOne { width: 42px; left: 8%; top: 162px; }
+  .gadgetLeftTwo { width: 60px; left: 2%; top: 208px; }
+  .gadgetLeftThree { width: 50px; left: 9%; bottom: 40px; }
+
+  .gadgetRightOne { width: 46px; right: 8%; top: 165px; }
+  .gadgetRightTwo { width: 46px; right: 2%; top: 258px; }
+  .gadgetRightThree { width: 56px; right: 9%; bottom: 40px; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .gadget,

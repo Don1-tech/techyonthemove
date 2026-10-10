@@ -8,20 +8,23 @@
   z-index: 50;
   display: flex;
   align-items: center;
-  height: 100px;
   justify-content: space-between;
-  gap: 24px;
+  flex: 0 0 auto;
+  gap: 20px;
   width: 100%;
   min-width: 0;
-  padding: 0 0 22px;
+  min-height: 84px;
+  padding: 16px 32px;
   box-sizing: border-box;
 
   background: linear-gradient(
     110deg,
-    #71ADAD 0%,
-    #87cefa 65%,
-    #C9C9C9 100%
+    #e8f4ff 0%,
+    #e8faff 36%,
+    #f0ecff 70%,
+    #e7f1ff 100%
   );
+  border-bottom: 1px solid #8796aa;
 }
 
 /* =========================================================
@@ -29,25 +32,29 @@
    ========================================================= */
 
 .searchWrapper {
-  top: 10px;
   position: relative;
   display: flex;
   align-items: center;
-  flex: 1 1 440px;
-  width: 70%;
-  max-width: 400px;
+  flex: 1 1 360px;
+  width: 100%;
+  max-width: 520px;
   min-width: 0;
-  left: 900px;
-  height: 56px;
+  height: 48px;
   padding: 0 14px;
   box-sizing: border-box;
   background: #ffffff;
-  border: 3px solid #7f9cc9;
+  border: 1px solid #68788e;
   border-radius: 12px;
+  box-shadow: 0 2px 7px rgb(18 26 46 / 9%);
   transition:
     border-color 180ms ease,
     box-shadow 180ms ease,
     background 180ms ease;
+}
+
+.searchWrapper:focus-within {
+  border-color: #0284c7;
+  box-shadow: 0 0 0 3px rgb(2 132 199 / 20%);
 }
 
 
@@ -60,7 +67,7 @@
   width: 19px;
   height: 19px;
   margin-right: 11px;
-  color: #929bb0;
+  color: #334d6b;
 }
 
 .searchIcon::before {
@@ -98,13 +105,13 @@
   border: none;
   outline: none;
   font-family: inherit;
-  font-size: 16px; /* Increased from 12px */
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 550;
   line-height: 1.5;
 }
 
 .searchInput::placeholder {
-  color: #a0a8b8;
+  color: #58677c;
   opacity: 1;
 }
 
@@ -153,21 +160,19 @@
 }
 
 .notificationButton {
-  top: 7px;
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex: 0 0 44px;
-  right: 90px;
   width: 44px;
   height: 44px;
   padding: 0;
-  color: #0000e2;
+  color: #263b56;
   background: #ffffff;
-  border: 3px solid #87CEEB;
+  border: 1px solid #68788e;
   border-radius: 12px;
-  box-shadow: 0 3px 12px rgba(18, 26, 46, 0.025);
+  box-shadow: 0 2px 8px rgb(18 26 46 / 9%);
   cursor: pointer;
   transition:
     color 180ms ease,
@@ -179,10 +184,10 @@
 
 .notificationButton:hover,
 .notificationButtonActive {
-  color: #7568d6;
-  background: #f8f7ff;
-  border-color: #dcd6ff;
-  box-shadow: 0 4px 14px rgba(117, 104, 214, 0.09);
+  color: #4b3ca8;
+  background: #e9f6ff;
+  border-color: #477eaa;
+  box-shadow: 0 4px 14px rgb(71 126 170 / 18%);
 }
 
 .notificationButton:active {
@@ -190,7 +195,7 @@
 }
 
 .notificationButton:focus-visible {
-  outline: 2px solid #8acfe9;
+  outline: 3px solid #0284c7;
   outline-offset: 3px;
 }
 
@@ -199,18 +204,18 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 19px;
-  height: 21px;
+  width: 24px;
+  height: 25px;
 }
 
 .bellIcon::before {
   content: "";
   position: absolute;
   top: 3px;
-  left: 4px;
-  width: 11px;
-  height: 12px;
-  border: 1.7px solid currentColor;
+  left: 5px;
+  width: 14px;
+  height: 16px;
+  border: 2px solid currentColor;
   border-radius: 8px 8px 4px 4px;
 }
 
@@ -219,7 +224,7 @@
   position: absolute;
   bottom: 2px;
   left: 2px;
-  width: 15px;
+  width: 20px;
   height: 2px;
   background: currentColor;
   border-radius: 3px;
@@ -228,7 +233,7 @@
 .bellIcon span {
   position: absolute;
   bottom: 0;
-  left: 8px;
+  left: 10px;
   width: 4px;
   height: 3px;
   background: currentColor;
@@ -237,8 +242,8 @@
 
 .notificationCount {
   position: absolute;
-  top: -6px;
-  right: -6px;
+  top: -5px;
+  right: -5px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -692,15 +697,14 @@
 
 @media (max-width: 700px) {
   .topbar {
-    gap: 13px;
-    padding-bottom: 18px;
+    gap: 12px;
+    min-height: 70px;
+    padding: 12px 16px;
   }
 
   .searchWrapper {
-    flex-basis: 0;
-    height: 43px;
-    padding-right: 11px;
-    padding-left: 12px;
+    flex-basis: 200px;
+    height: 44px;
   }
 
   .notificationButton {
@@ -724,12 +728,11 @@
 
 @media (max-width: 400px) {
   .topbar {
-    gap: 9px;
+    gap: 8px;
   }
 
   .searchWrapper {
-    gap: 0;
-    padding-right: 8px;
+    padding-right: 9px;
     padding-left: 10px;
     border-radius: 10px;
   }
@@ -739,7 +742,7 @@
   }
 
   .searchInput {
-    font-size: 11px;
+    font-size: 13px;
   }
 
   .notificationButton {

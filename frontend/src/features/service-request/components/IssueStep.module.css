@@ -773,3 +773,14 @@
     min-width: 125px;
   }
 }
+
+.content {
+  min-width: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.actionBar {
+  flex: 0 0 auto;
+  margin-top: auto;
+}

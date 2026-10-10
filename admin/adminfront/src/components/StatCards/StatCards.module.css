@@ -3,29 +3,31 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: stretch;
-  gap: 18px;
-  width: 30%;
-  margin-left: -60px;
+  gap: 9px;
+  width: 100%;
   min-width: 0;
+  padding: 8px;
+  background: #e1e7ef;
+  border: 1px solid #68788e;
+  border-radius: 16px;
 }
 
 .card {
   position: relative;
-  left: 60px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
   min-width: 0;
-  min-height: 112px;
-  padding: 18px 20px;
+  min-height: 100px;
+  padding: 16px 18px;
   box-sizing: border-box;
   overflow: hidden;
 
   background: #ffffff;
-  border: 1px solid #e5e8f0;
-  border-radius: 14px;
-  box-shadow: 0 4px 14px rgba(18, 26, 46, 0.045);
+  border: 1px solid #7c8ba0;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgb(18 26 46 / 7%);
 
   transition:
     transform 180ms ease,
@@ -82,9 +84,9 @@
   display: block;
   margin-bottom: 10px;
 
-  color: #7b8497;
-  font-size: 12px;
-  font-weight: 650;
+  color: #46546a;
+  font-size: 13px;
+  font-weight: 700;
   line-height: 1.4;
   letter-spacing: 0.02em;
 }
@@ -94,8 +96,8 @@
   z-index: 1;
   display: block;
 
-  color: #121a2e;
-  font-size: 30px;
+  color: #0f172a;
+  font-size: 32px;
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.04em;
@@ -106,41 +108,56 @@
 
 @media (max-width: 700px) {
   .container {
-    gap: 10px;
+    gap: 7px;
+    padding: 6px;
+    border-radius: 14px;
   }
 
   .card {
-    min-height: 94px;
-    padding: 14px 12px;
-    border-radius: 12px;
+    min-height: 90px;
+    padding: 13px 11px;
+    border-radius: 10px;
   }
 
   .label {
     margin-bottom: 8px;
-    font-size: 11px;
+    font-size: 12px;
   }
 
   .value {
-    font-size: 25px;
+    font-size: 26px;
   }
 }
 
 @media (max-width: 400px) {
   .container {
-    gap: 7px;
+    gap: 6px;
+    padding: 5px;
   }
 
   .card {
     min-height: 82px;
-    padding: 12px 9px;
+    padding: 12px 7px;
   }
 
   .label {
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .value {
-    font-size: 22px;
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 340px) {
+  .container {
+    grid-template-columns: 1fr;
+    gap: 7px;
+  }
+
+  .card {
+    min-height: 70px;
+    padding: 10px 13px;
   }
 }
 

@@ -7,20 +7,17 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 1px;
-  height: 165px;
-
-
-  width: 70%;
+  gap: 10px;
+  width: 100%;
   min-width: 0;
-  padding: 19px 20px;
+  padding: 19px 21px;
   box-sizing: border-box;
 
   background: #ffffff;
-  border: 1px solid #7f9cc9;
-  border-radius: 20px;
+  border: 1px solid #68788e;
+  border-radius: 14px;
 
-  box-shadow: 0 4px 14px rgba(18, 26, 46, 0.035);
+  box-shadow: 0 3px 10px rgb(18 26 46 / 8%);
 
   transition:
     border-color 180ms ease,
@@ -47,18 +44,9 @@
 }
 
 .card:hover {
-  border-color: #8be9ff;
-  box-shadow:
-    0 0 2px rgba(135, 206, 250, 0.45),
-    0 0 3px rgba(0, 220, 255, 0.30),
-    0 0 5px rgba(200, 162, 255, 0.22),
-    0 2px 4px rgba(18, 26, 46, 0.07);
-
+  border-color: #334155;
+  box-shadow: 0 6px 16px rgb(18 26 46 / 12%);
   transform: translateY(-2px);
-  transition:
-    border-color 0.3s ease,
-    box-shadow 0.3s ease,
-    transform 0.3s ease;
 }
 
 /* =========================================================
@@ -89,11 +77,11 @@
 
   color: #7770c9;
   background: #f4f2ff;
-  border: 3px solid #e8e3ff;
+  border: 1px solid #9285dc;
   border-radius: 7px;
 
   font-family: inherit;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   line-height: 1.5;
   letter-spacing: 0.035em;
@@ -169,9 +157,9 @@
   width: 100%;
   min-width: 0;
 
-  color: #7b8497;
-  font-size: 12px;
-  font-weight: 450;
+  color: #46546a;
+  font-size: 13px;
+  font-weight: 500;
   line-height: 1.7;
 
   overflow-wrap: anywhere;
@@ -194,13 +182,13 @@
   gap: 6px 8px;
 
   min-width: 0;
-  padding-top: 12px;
+  padding-top: 13px;
 
-  color: #7d8799;
-  border-top: 1px solid #eef0f5;
+  color: #46546a;
+  border-top: 1px solid #a3afbf;
 
-  font-size: 10px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 650;
   line-height: 1.7;
 }
 
@@ -222,13 +210,13 @@
 
 @media (max-width: 700px) {
   .card {
-    gap: 13px;
+    gap: 11px;
     padding: 16px 17px;
     border-radius: 13px;
   }
 
   .customer {
-    font-size: 15px;
+    font-size: 16px;
   }
 
   .meta {
@@ -242,7 +230,7 @@
 
 @media (max-width: 400px) {
   .card {
-    gap: 12px;
+    gap: 10px;
     padding: 15px 14px;
   }
 
@@ -252,20 +240,20 @@
   }
 
   .reference {
-    font-size: 10px;
+    font-size: 11px;
   }
 
   .customer {
-    font-size: 14px;
+    font-size: 15px;
   }
 
   .service,
   .issue {
-    font-size: 11px;
+    font-size: 12px;
   }
 
   .meta {
-    font-size: 10px;
+    font-size: 11px;
   }
 }
 

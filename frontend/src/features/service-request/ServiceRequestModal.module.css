@@ -7,19 +7,23 @@
   inset: 0;
 
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
 
-  padding: 90px 20px 20px;
+  padding:
+    max(14px, env(safe-area-inset-top))
+    max(14px, env(safe-area-inset-right))
+    max(14px, env(safe-area-inset-bottom))
+    max(14px, env(safe-area-inset-left));
 
-  background: rgba(8, 15, 30, 0.34);
+  background: rgba(8, 15, 30, 0.48);
 
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 
   box-sizing: border-box;
 
-z-index: 100;
+  z-index: 20000;
 }
 
 
@@ -31,8 +35,11 @@ z-index: 100;
   display: flex;
   flex-direction: column;
 
-  width: min(820px, calc(100vw - 40px));
-  height: min(620px, calc(100vh - 40px));
+  width: min(820px, 100%);
+  height: min(620px, calc(100vh - 28px));
+  height: min(620px, calc(100dvh - 28px));
+  min-width: 0;
+  min-height: 0;
 
   overflow: hidden;
 
@@ -111,8 +118,10 @@ z-index: 100;
   top: 18px;
   right: 22px;
 
-  width: 32px;
-  height: 32px;
+  z-index: 1;
+
+  width: 44px;
+  height: 44px;
 
   display: flex;
   align-items: center;
@@ -142,6 +151,11 @@ z-index: 100;
     border-color 160ms ease;
 }
 
+.closeButton:focus-visible {
+  outline: 3px solid rgba(56, 189, 248, 0.85);
+  outline-offset: 3px;
+}
+
 .closeButton:hover {
   background: #e0f2fe;
   border-color: #bae6fd;
@@ -160,7 +174,7 @@ z-index: 100;
 .progressArea {
   flex: 0 0 auto;
 
-  padding: 8px 28px 18px;
+  padding: 34px 28px 18px;
 
   box-sizing: border-box;
 }
@@ -298,12 +312,72 @@ z-index: 100;
   flex: 1 1 auto;
 
   min-height: 0;
+  min-width: 0;
 
-  padding: 0 28px 20px;
+  display: flex;
+  flex-direction: column;
+
+  padding: 0 28px 12px;
 
   overflow: hidden;
 
   box-sizing: border-box;
+}
+
+.modalBody > * {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+}
+
+.modalBody [class*="actionBar"] {
+  position: relative;
+  z-index: 1;
+
+  flex: 0 0 auto;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  margin-top: auto;
+  padding: 12px 0 4px;
+
+  border-top: 1px solid #e2e8f0;
+  background: #ffffff;
+}
+
+.modalBody [class*="actionBar"] > button {
+  min-height: 44px;
+  height: auto;
+  width: auto;
+  box-sizing: border-box;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.modalBody [class*="actionBar"] > button:first-child {
+  flex: 0 1 auto;
+  min-width: 88px;
+}
+
+.modalBody [class*="actionBar"] > button:last-child {
+  flex: 0 1 auto;
+  min-width: 150px;
+  max-width: calc(100% - 96px);
+  white-space: normal;
+}
+
+.modalBody [class*="actionBar"] > button:only-child {
+  min-width: 140px;
+  max-width: 100%;
+}
+
+.modalBody [class*="actionBar"] > button:focus-visible {
+  outline: 3px solid rgba(56, 189, 248, 0.85);
+  outline-offset: 3px;
 }
 
 
@@ -313,12 +387,17 @@ z-index: 100;
 
 @media (max-width: 800px) {
   .modalOverlay {
-    padding: 14px;
+    padding:
+      max(10px, env(safe-area-inset-top))
+      max(10px, env(safe-area-inset-right))
+      max(10px, env(safe-area-inset-bottom))
+      max(10px, env(safe-area-inset-left));
   }
 
   .modal {
-    width: calc(100vw - 28px);
-    height: calc(100vh - 28px);
+    width: 100%;
+    height: calc(100vh - 20px);
+    height: calc(100dvh - 20px);
 
     border-radius: 20px;
   }
@@ -336,10 +415,28 @@ z-index: 100;
   .modalBody {
     padding-left: 20px;
     padding-right: 20px;
+    padding-bottom: 10px;
   }
 
   .progressLine {
     margin-left: 5px;
     margin-right: 5px;
+  }
+}
+
+@media (max-width: 380px) {
+  .modalHeader {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .progressArea {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .modalBody {
+    padding-left: 14px;
+    padding-right: 14px;
   }
 }

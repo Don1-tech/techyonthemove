@@ -442,7 +442,7 @@
    MOBILE
    ========================================================= */
 
-@media (max-width: 768px) {
+@media (max-width: 1100px) {
   .navbar {
     height: 70px;
   }
@@ -453,7 +453,7 @@
   }
 
   .logoImage {
-    width: 175px;
+    width: clamp(130px, 42vw, 175px);
   }
 
   .navigation {
@@ -466,5 +466,78 @@
 
   .menuButton {
     display: flex;
+  }
+}
+
+:global([role="dialog"][aria-label="Mobile navigation"]) {
+  position: fixed;
+  top: 70px;
+  right: 0;
+  left: 0;
+  z-index: 9999;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  max-height: calc(100vh - 70px);
+  max-height: calc(100dvh - 70px);
+  overflow-y: auto;
+  padding: 12px 16px 20px;
+  box-sizing: border-box;
+
+  background: #d4f1d4;
+  box-shadow: 0 12px 24px rgba(38, 62, 75, 0.2);
+}
+
+:global([role="dialog"][aria-label="Mobile navigation"] > button:not(:disabled)) {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 8px;
+  border: 0 !important;
+  border-radius: 8px;
+  background: transparent !important;
+  background-image: none !important;
+  color: #2e2e2e;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: left;
+  cursor: pointer;
+}
+
+:global([role="dialog"][aria-label="Mobile navigation"] > button:not(:disabled):hover),
+:global([role="dialog"][aria-label="Mobile navigation"] > button:not(:disabled):focus-visible) {
+  background: rgba(255, 255, 255, 0.55) !important;
+  outline: 2px solid rgba(91, 168, 237, 0.7);
+  outline-offset: -2px;
+}
+
+:global([role="dialog"][aria-label="Mobile navigation"] > button:last-child) {
+  justify-content: center;
+  min-height: 48px;
+  margin-top: 8px;
+  border: 1.5px solid transparent !important;
+  border-radius: 9999px;
+  background:
+    linear-gradient(110deg, rgba(196, 165, 235, 0.85), rgba(142, 224, 239, 0.78) 45%, rgba(155, 205, 247, 0.82)) padding-box,
+    linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(150, 210, 255, 0.4), rgba(196, 165, 235, 0.8)) border-box !important;
+  color: #17212b;
+  font-weight: 700;
+  text-align: center;
+  box-shadow: 0 0 18px rgba(142, 224, 239, 0.35), 0 4px 12px rgba(30, 80, 120, 0.15);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :global([role="dialog"][aria-label="Mobile navigation"] > button:not(:disabled)) {
+    transition: none;
+  }
+}
+
+@media (min-width: 1101px) {
+  :global([role="dialog"][aria-label="Mobile navigation"]) {
+    display: none;
   }
 }

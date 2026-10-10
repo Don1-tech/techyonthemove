@@ -340,3 +340,46 @@
   text-shadow:
     0 1px 1px rgba(255, 255, 255, 0.25);
 }
+
+@media (max-width: 980px) {
+  .howItWorks {
+    padding: 52px 16px;
+  }
+
+  .stepsCanvas,
+  .stepsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .howItWorks {
+    padding: 42px 14px 52px;
+  }
+
+  .stepsCanvas,
+  .stepsGrid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .stepCard {
+    max-width: none;
+    min-height: 220px;
+    padding: 22px 18px 28px;
+  }
+
+  .stepNumber {
+    font-size: 24px;
+  }
+
+  .stepContent h3 {
+    font-size: 18px;
+  }
+
+  .stepContent p {
+    font-size: 12px;
+  }
+}

@@ -5,10 +5,17 @@
 .footer {
   width: 100%;
   box-sizing: border-box;
+  margin: 0;
 
   min-height: 300px;
 
+
   padding: 30px 32px 32px;
+
+  color: #e0e0e0;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
 
   background:
     linear-gradient(
@@ -19,7 +26,7 @@
       #344052 100%
     );
 
-  border-radius: 18px 18px 0 0;
+  border-radius: 0;
 }
 
 
@@ -30,7 +37,7 @@
 .footerInner {
   width: min(100%, 1180px);
 
-  height: 188px;
+  height: auto;
 
   margin: 0 auto;
 
@@ -62,7 +69,7 @@
 
   min-width: 0;
 
-  height: 188px;
+  height: auto;
 }
 
 
@@ -72,6 +79,9 @@
 
 .brandColumn {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 
@@ -80,14 +90,15 @@
    ========================================================= */
 
 .logoLink {
-  position: absolute;
-
+  position: relative;
   top: -80px;
-  left: 0;
 
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
 
   width: max-content;
+  margin-bottom: 16px;
 
   text-decoration: none;
 }
@@ -108,23 +119,19 @@
    ========================================================= */
 
 .tagline {
-  position: absolute;
+  width: min(100%, 220px);
+  bottom: 190px;
 
-  top: 62px;
-  left: 2px;
-
-  width: 205px;
-
-  margin: 0;
+  margin: 0 0 18px;
 
   color: #e0e0e0;
 
   font-family: inherit;
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 400;
 
-  line-height: 1.45;
-  letter-spacing: 0.1px;
+  line-height: 1.5;
+  letter-spacing: 0.08px;
 }
 
 
@@ -133,10 +140,8 @@
    ========================================================= */
 
 .requestButton {
-  position: absolute;
-
-  top: 143px;
-  left: 2px;
+  position: relative;
+  bottom: 160px;
 
   width: 140px;
   height: 45px;
@@ -163,7 +168,7 @@
 
   font-family: inherit;
   font-size: 12.5px;
-  font-weight: 700;
+  font-weight: 600;
 
   line-height: 1;
 
@@ -296,25 +301,22 @@
    ========================================================= */
 
 .columnHeading {
-  position: absolute;
+  position: relative;
 
-  top: 0;
-  left: 0;
-
-  margin: 0;
+  margin: 0 0 18px;
 
   width: 100%;
 
-  color: #d0d0d0;
+  color: #e0e0e0;
 
   font-family: inherit;
 
-  font-size: 10.5px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 700;
 
-  line-height: 1.3;
+  line-height: 1.5;
 
-  letter-spacing: 0.2px;
+  letter-spacing: 0.12em;
 
   text-transform: uppercase;
 }
@@ -334,25 +336,20 @@
    --------------------------------------------------------- */
 
 .coverageSubheading {
-  position: absolute;
+  width: min(100%, 205px);
 
-  top: 37px;
-  left: 0;
+  margin: 0 0 12px;
 
-  width: 205px;
-
-  margin: 0;
-
-  color: #ffffff;
+  color: #e0e0e0;
 
   font-family: inherit;
 
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 400;
 
-  line-height: 1.35;
+  line-height: 1.5;
 
-  letter-spacing: 0.2px;
+  letter-spacing: 0.08px;
 }
 
 
@@ -361,11 +358,6 @@
    --------------------------------------------------------- */
 
 .locations {
-  position: absolute;
-
-  top: 92px;
-  left: 0;
-
   display: flex;
   flex-direction: column;
 
@@ -384,12 +376,12 @@
 
   color: #e0e0e0;
 
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 400;
 
-  line-height: 1.2;
+  line-height: 1.5;
 
-  letter-spacing: 0.1px;
+  letter-spacing: 0.08px;
 }
 
 
@@ -417,11 +409,6 @@
    --------------------------------------------------------- */
 
 .quickLinks {
-  position: absolute;
-
-  top: 37px;
-  left: 0;
-
   display: flex;
   flex-direction: column;
 
@@ -437,7 +424,7 @@
    INDIVIDUAL QUICK LINK
    --------------------------------------------------------- */
 
-.quickLink {
+.footer .quickLinksColumn .quickLink {
   padding: 0;
 
   border: 0;
@@ -448,12 +435,12 @@
 
   font-family: inherit;
 
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 400;
 
-  line-height: 1.2;
+  line-height: 1.5;
 
-  letter-spacing: 0.1px;
+  letter-spacing: 0.08px;
 
   text-decoration: none;
 
@@ -465,8 +452,8 @@
 }
 
 
-.quickLink:hover {
-  color: #ffffff;
+.footer .quickLinksColumn .quickLink:hover {
+  color: #f4f6f8;
 
   transform: translateX(2px);
 }
@@ -486,11 +473,6 @@
    --------------------------------------------------------- */
 
 .contactItems {
-  position: absolute;
-
-  top: 37px;
-  left: 0;
-
   display: flex;
   flex-direction: column;
 
@@ -513,10 +495,10 @@
 
   color: #e0e0e0;
 
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 400;
 
-  line-height: 1.2;
+  line-height: 1.5;
 
   text-decoration: none;
 
@@ -527,7 +509,7 @@
 
 
 .contactItem:hover {
-  color: #ffffff;
+  color: #f4f6f8;
 }
 
 
@@ -572,19 +554,21 @@
    LEGAL LINK POSITIONS
    --------------------------------------------------------- */
 
-.legalLink:nth-child(1) {
-  position: absolute;
+.legalColumn {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 14px;
+}
 
-  top: 0;
-  left: 0;
+
+.legalLink:nth-child(1) {
+  position: static;
 }
 
 
 .legalLink:nth-child(2) {
-  position: absolute;
-
-  top: 35px;
-  left: 0;
+  position: static;
 }
 
 
@@ -592,7 +576,7 @@
    LEGAL LINK BASE
    --------------------------------------------------------- */
 
-.legalLink {
+.footer .legalColumn .legalLink {
   display: block;
 
   width: max-content;
@@ -601,21 +585,22 @@
 
   padding: 0;
 
-  border: 0;
+  border: 0 !important;
 
   outline: none;
 
-  background: transparent;
+  background: transparent !important;
+  background-image: none !important;
 
   box-shadow: none;
 
-  color: #1c1818;
+  color: #e0e0e0;
 
   font-family: inherit;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 400;
 
-  line-height: 1.2;
+  line-height: 1.5;
 
   text-align: left;
 
@@ -645,7 +630,7 @@
    --------------------------------------------------------- */
 
 .legalLink:visited {
-  color: #ed4e4e;
+  color: #ffffff;
 
   text-decoration: none;
 }
@@ -655,8 +640,8 @@
    LEGAL LINK — HOVER
    --------------------------------------------------------- */
 
-.legalLink:hover {
-  color: #080404;
+.footer .legalColumn .legalLink:hover {
+  color: #f4f6f8;
 
   text-decoration: none;
 
@@ -669,7 +654,7 @@
    --------------------------------------------------------- */
 
 .legalLink:active {
-  color: #e7dfdf;
+  color: #f4f6f8;
 
   text-decoration: none;
 
@@ -686,7 +671,7 @@
    --------------------------------------------------------- */
 
 .legalLink:focus {
-  color: #0f0606;
+  color: #ffffff;
 
   text-decoration: none;
 
@@ -701,7 +686,7 @@
    --------------------------------------------------------- */
 
 .legalLink:focus-visible {
-  color: #140d0d;
+  color: #ffffff;
 
   text-decoration: none;
 
@@ -716,108 +701,33 @@
    ========================================================= */
 
 @media (max-width: 1023px) {
-
   .footer {
     min-height: 350px;
-
     padding: 30px 32px 34px;
   }
 
-
   .footerInner {
     width: min(100%, 760px);
-
     height: auto;
-
-    grid-template-columns:
-      repeat(3, minmax(0, 1fr));
-
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     column-gap: 28px;
     row-gap: 40px;
   }
-
 
   .brandColumn,
   .coverageColumn,
   .quickLinksColumn,
   .contactColumn,
   .legalColumn {
-    height: 150px;
+    height: auto;
   }
-
-
-  /* =======================================================
-     TABLET BRAND
-     ======================================================= */
-
-  .logoLink {
-    top: 0;
-  }
-
 
   .logo {
     width: 175px;
   }
 
-
   .tagline {
-    top: 58px;
-
     width: 190px;
-  }
-
-
-  .requestButton {
-    top: 125px;
-  }
-
-
-  /* =======================================================
-     TABLET COVERAGE
-     ======================================================= */
-
-  .coverageSubheading {
-    top: 35px;
-
-    width: 190px;
-  }
-
-
-  .locations {
-    top: 88px;
-  }
-
-
-  /* =======================================================
-     TABLET CONTACT
-     ======================================================= */
-
-  .contactColumn {
-    grid-column: 1;
-  }
-
-
-  .contactItems {
-    top: 35px;
-  }
-
-
-  /* =======================================================
-     TABLET LEGAL
-     ======================================================= */
-
-  .legalColumn {
-    grid-column: 2;
-  }
-
-
-  .legalLink:nth-child(1) {
-    top: 0;
-  }
-
-
-  .legalLink:nth-child(2) {
-    top: 32px;
   }
 }
 
@@ -827,27 +737,19 @@
    ========================================================= */
 
 @media (max-width: 767px) {
-
   .footer {
     min-height: auto;
-
     padding: 30px 20px 40px;
-
-    border-radius: 16px 16px 0 0;
+    border-radius: 0;
   }
-
 
   .footerInner {
     width: min(100%, 400px);
-
     height: auto;
-
     display: flex;
     flex-direction: column;
-
     gap: 34px;
   }
-
 
   .brandColumn,
   .coverageColumn,
@@ -855,258 +757,16 @@
   .contactColumn,
   .legalColumn {
     position: relative;
-
     width: 100%;
-
     height: auto;
-
     min-height: 0;
   }
-
-
-  /* =======================================================
-     MOBILE BRAND
-     ======================================================= */
-
-  .brandColumn {
-    min-height: 215px;
-  }
-
-
-  .logoLink {
-    position: absolute;
-
-    top: 0;
-    left: 0;
-  }
-
 
   .logo {
     width: 180px;
   }
 
-
   .tagline {
-    position: absolute;
-
-    top: 72px;
-    left: 0;
-
     width: min(100%, 320px);
   }
-
-
-  .requestButton {
-    position: absolute;
-
-    top: 150px;
-    left: 0;
-  }
-
-
-  /* =======================================================
-     MOBILE COVERAGE
-     ======================================================= */
-
-  .coverageColumn {
-    min-height: 175px;
-  }
-
-
-  .coverageSubheading {
-    top: 37px;
-    left: 0;
-
-    width: min(100%, 300px);
-  }
-
-
-  .locations {
-    top: 91px;
-    left: 0;
-  }
-
-
-  /* =======================================================
-     MOBILE QUICK LINKS
-     ======================================================= */
-
-  .quickLinksColumn {
-    min-height: 220px;
-  }
-
-
-  .quickLinks {
-    top: 37px;
-    left: 0;
-
-    gap: 13px;
-  }
-
-
-  /* =======================================================
-     MOBILE CONTACT
-     ======================================================= */
-
-  .contactColumn {
-    min-height: 145px;
-  }
-
-
-  .contactItems {
-    top: 37px;
-    left: 0;
-
-    gap: 20px;
-  }
-
-
-  /* =======================================================
-     MOBILE LEGAL
-     ======================================================= */
-
-  .legalColumn {
-    min-height: 90px;
-  }
-
-
-  .legalLink:nth-child(1) {
-    top: 0;
-    left: 0;
-  }
-
-
-  .legalLink:nth-child(2) {
-    top: 34px;
-    left: 0;
-  }
-}
-/* =========================================================
-   FOOTER TEXT REFINEMENT
-   Grey text throughout; underline headings only.
-   Logo and request button remain unchanged.
-   ========================================================= */
-
-/* =========================================================
-   COLUMN HEADINGS
-   ========================================================= */
-
-.columnHeading {
-  color: #d6d6d6;
-  text-decoration: underline;
-  text-decoration-color: #aeb3b9;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 5px;
-}
-
-/* Coverage subheading */
-
-.coverageSubheading {
-  color: #d0d0d0;
-  text-decoration: underline;
-  text-decoration-color: #aeb3b9;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 4px;
-}
-
-/* =========================================================
-   BRAND TAGLINE
-   ========================================================= */
-
-.tagline {
-  color: #c9c9c9;
-}
-
-/* =========================================================
-   COVERAGE LOCATIONS
-   ========================================================= */
-
-.locationItem {
-  color: #c9c9c9;
-}
-
-/* =========================================================
-   QUICK LINKS
-   Grey text with no underline or colored highlights.
-   ========================================================= */
-
-.quickLink {
-  color: #c9c9c9;
-  text-decoration: none;
-}
-
-.quickLink:hover {
-  color: #e0e0e0;
-  text-decoration: none;
-}
-
-.quickLink:visited {
-  color: #c9c9c9;
-  text-decoration: none;
-}
-
-.quickLink:active {
-  color: #bdbdbd;
-  text-decoration: none;
-}
-
-/* =========================================================
-   CONTACT DETAILS
-   ========================================================= */
-
-.contactItem {
-  color: #c9c9c9;
-  text-decoration: none;
-}
-
-.contactItem:hover {
-  color: #e0e0e0;
-  text-decoration: none;
-}
-
-/* =========================================================
-   LEGAL LINKS
-   Grey in every state; no underlining.
-   ========================================================= */
-
-.legalLink {
-  color: #c9c9c9;
-  text-decoration: none;
-}
-
-.legalLink:visited {
-  color: #c9c9c9;
-  text-decoration: none;
-}
-
-.legalLink:hover {
-  color: #e0e0e0;
-  text-decoration: none;
-  transform: none;
-}
-
-.legalLink:active {
-  color: #bdbdbd;
-  text-decoration: none;
-}
-
-.legalLink:focus {
-  color: #d0d0d0;
-  text-decoration: none;
-}
-
-.legalLink:focus-visible {
-  color: #e0e0e0;
-  text-decoration: none;
-}
-
-/* =========================================================
-   ALL FOOTER TEXT HOVER STATES
-   Keep non-heading text decoration-free.
-   ========================================================= */
-
-.quickLink,
-.contactItem,
-.legalLink {
-  text-decoration-line: none;
 }

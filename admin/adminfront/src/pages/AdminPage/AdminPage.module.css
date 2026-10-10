@@ -7,8 +7,8 @@
   --page-bg: #eef0f5;
   --surface: #ffffff;
   --text-primary: #172033;
-  --text-secondary: #778197;
-  --border-color: #e8ebf2;
+  --text-secondary: #4b586d;
+  --border-color: #a3afbf;
   --accent: #8b7cf6;
   --accent-light: #f0edff;
 
@@ -106,7 +106,7 @@
   min-width: 0;
 
   padding: 0 0 20px;
-  border-bottom: 1px solid #dfe3ec;
+  border-bottom: 1px solid #9aa7b8;
 }
 
 .toolbar > div:first-child {
@@ -130,7 +130,7 @@
   margin: 8px 0 0;
 
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.65;
 
   overflow-wrap: anywhere;
@@ -158,14 +158,14 @@
   min-height: 37px;
   padding: 9px 15px;
 
-  border: 1px solid #e1e5ee;
+  border: 1px solid #8795a8;
   border-radius: 10px;
 
   background: #ffffff;
-  color: #69748a;
+  color: #3f4d62;
 
   font-family: inherit;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 650;
   line-height: 1.2;
   white-space: nowrap;
@@ -181,9 +181,9 @@
 }
 
 .filterPill:hover {
-  border-color: #c8c0ff;
-  background: #f8f7ff;
-  color: #6656d9;
+  border-color: #526783;
+  background: #edf5ff;
+  color: #40328d;
 }
 
 .filterPill:active {
@@ -196,7 +196,7 @@
 }
 
 .active {
-  border-color: transparent;
+  border-color: #526783;
 
   background: linear-gradient(
     115deg,
@@ -210,7 +210,7 @@
 }
 
 .active:hover {
-  border-color: transparent;
+border-color: #526783;
 
   background: linear-gradient(
     115deg,
@@ -240,21 +240,21 @@
 
   margin-top: -10px;
 
-  color: #7a8498;
-  font-size: 12px;
+  color: #4b586d;
+  font-size: 13px;
   font-weight: 600;
 }
 
 .resultsBar > span:first-child {
-  color: #47536a;
+  color: #263449;
 }
 
 .historyHint {
   max-width: 100%;
 
-  color: #8b7cf6;
-  font-size: 12px;
-  font-weight: 550;
+  color: #5546b7;
+  font-size: 13px;
+  font-weight: 650;
 
   overflow-wrap: anywhere;
 }
@@ -311,7 +311,8 @@
   border: 1px solid var(--border-color);
   border-radius: 18px;
 
-  box-shadow: 0 5px 22px rgb(25 35 65 / 3%);
+  border-color: #a3afbf;
+  box-shadow: 0 5px 22px rgb(25 35 65 / 6%);
 }
 
 .empty > div {
@@ -344,7 +345,7 @@
   margin: 9px 0 0;
 
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.7;
 }
 
@@ -371,25 +372,28 @@
    MOBILE
 ========================================= */
 
-@media (max-width: 700px) {
+@media (max-width: 600px) {
   .shell {
+    flex-direction: column;
     height: 100vh;
     height: 100dvh;
     min-height: 0;
   }
 
   .main {
-    height: 100%;
+    flex: 1 1 0;
+    width: 100%;
+    height: auto;
     min-height: 0;
   }
 
   .content {
     flex: 1 1 auto;
-    height: 100%;
+    height: auto;
     min-height: 0;
 
-    padding: 20px 16px 16px;
-    gap: 22px;
+    padding: 18px 16px 16px;
+    gap: 18px;
   }
 
   .toolbar {
@@ -457,8 +461,8 @@
 
 @media (max-width: 380px) {
   .content {
-    padding: 16px 12px 12px;
-    gap: 18px;
+    padding: 15px 12px 12px;
+    gap: 16px;
   }
 
   .toolbar h2 {
