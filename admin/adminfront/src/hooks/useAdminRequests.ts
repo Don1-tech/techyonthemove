@@ -1,3 +1,9 @@
+
+import {
+  getAuthToken,
+  notifyUnauthorized,
+} from "../auth/auth";
+
 import {
   useCallback,
   useEffect,
@@ -56,47 +62,26 @@ interface UseAdminRequestsResult {
   reload: () => Promise<void>;
 }
 
-
 /* =========================================================
    WEBSOCKET URL
    ========================================================= */
 
-const getWebSocketUrl = () => {
+const getWebSocketUrl = (): string => {
   const apiUrl =
     import.meta.env.VITE_ADMIN_API_URL ??
     "http://localhost:4100";
 
-  const url = new URL(
-    "/ws/requests",
-    apiUrl,
-  );
+  const url = new URL("/ws/requests", apiUrl);
 
   url.protocol =
-    url.protocol === "https:"
-      ? "wss:"
-      : "ws:";
+    url.protocol === "https:" ? "wss:" : "ws:";
 
   return url.toString();
 };
 
-
 /* =========================================================
    TECHY NOTIFICATION ASSETS
    ========================================================= */
-
-/*
- * The Techy logo is stored in:
- *
- * adminfront/public/LOGO.png
- *
- * Using window.location.origin creates the
- * complete URL, for example:
- *
- * http://localhost:5174/LOGO.png
- *
- * This is more reliable for browser notifications
- * than using only "/LOGO.png".
- */
 
 const getTechyLogoUrl = (): string => {
   return new URL(
@@ -105,25 +90,15 @@ const getTechyLogoUrl = (): string => {
   ).href;
 };
 
-
 /* =========================================================
    SERVICE CATEGORY DISPLAY
    ========================================================= */
-
-/*
- * The realtime request may contain serviceName,
- * but the backend can also provide only serviceId.
- *
- * This function makes sure the notification NEVER
- * says "undefined".
- */
 
 const getServiceCategory = (
   request: ServiceRequest,
 ): string => {
   const serviceName =
-    typeof request.serviceName ===
-    "string"
+    typeof request.serviceName === "string"
       ? request.serviceName.trim()
       : "";
 
@@ -132,8 +107,7 @@ const getServiceCategory = (
   }
 
   const serviceId =
-    typeof request.serviceId ===
-    "string"
+    typeof request.serviceId === "string"
       ? request.serviceId.trim()
       : "";
 
@@ -141,71 +115,34 @@ const getServiceCategory = (
     return "service";
   }
 
-  /*
-   * Convert backend service IDs into
-   * friendly notification text.
-   */
-
-  const serviceNames: Record<
-    string,
-    string
-  > = {
-    "wifi-internet":
-      "Wi-Fi & Internet",
-
-    "network-issues":
-      "Network Issues",
-
-    "pc-laptops":
-      "PC & Laptops",
-
-    "entertainment-other-tv":
-      "Entertainment & TV",
-
-    "smart-home":
-      "Smart Home",
-
-    "smart-devices":
-      "Smart Devices",
-
-    cctv:
-      "CCTV",
-
-    "other-repairs":
-      "Other Repairs",
+  const serviceNames: Record<string, string> = {
+    "wifi-internet": "Wi-Fi & Internet",
+    "network-issues": "Network Issues",
+    "pc-laptops": "PC & Laptops",
+    "entertainment-other-tv": "Entertainment & TV",
+    "tv-entertainment": "TV & Entertainment",
+    "smart-home": "Smart Home",
+    "smart-devices": "Smart Devices",
+    cctv: "CCTV",
+    "other-repairs": "Other Repairs",
   };
 
-  if (
-    serviceNames[serviceId]
-  ) {
-    return serviceNames[
-      serviceId
-    ];
+  if (serviceNames[serviceId]) {
+    return serviceNames[serviceId];
   }
-
-  /*
-   * Generic fallback for any future
-   * service IDs added to the database.
-   */
 
   return serviceId
     .replace(/[-_]+/g, " ")
-    .replace(
-      /\b\w/g,
-      (character) =>
-        character.toUpperCase(),
+    .replace(/\b\w/g, (character) =>
+      character.toUpperCase(),
     );
 };
-
 
 /* =========================================================
    AUDIO NOTIFICATION SYSTEM
    ========================================================= */
 
-let notificationAudioContext:
-  | AudioContext
-  | null = null;
-
+let notificationAudioContext: AudioContext | null = null;
 
 const getAudioContext = (): AudioContext | null => {
   try {
@@ -232,141 +169,67 @@ const getAudioContext = (): AudioContext | null => {
   }
 };
 
-
-/*
- * Unlock the browser audio system after
- * an actual administrator interaction.
- */
-
-const unlockNotificationAudio =
-  async () => {
-    try {
-      const audioContext =
-        getAudioContext();
-
-      if (!audioContext) {
-        return;
-      }
-
-      if (
-        audioContext.state ===
-        "suspended"
-      ) {
-        await audioContext.resume();
-      }
-    } catch {
-      /*
-       * Audio problems must never
-       * break the dashboard.
-       */
-    }
-  };
-
-
-/*
- * Play the new-request notification sound.
- */
-
-const playNotificationSound = () => {
+const unlockNotificationAudio = async (): Promise<void> => {
   try {
-    const audioContext =
-      getAudioContext();
+    const audioContext = getAudioContext();
 
     if (!audioContext) {
       return;
     }
 
+    if (audioContext.state === "suspended") {
+      await audioContext.resume();
+    }
+  } catch {
+    // Audio failures must not break the dashboard.
+  }
+};
+
+const playNotificationSound = (): void => {
+  try {
+    const audioContext = getAudioContext();
+
     if (
-      audioContext.state ===
-      "suspended"
+      !audioContext ||
+      audioContext.state !== "running"
     ) {
       return;
     }
 
-    const now =
-      audioContext.currentTime;
-
-    const oscillator =
-      audioContext.createOscillator();
-
-    const gain =
-      audioContext.createGain();
+    const now = audioContext.currentTime;
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
 
     oscillator.type = "sine";
 
-    /*
-     * Two-tone notification sound.
-     */
+    oscillator.frequency.setValueAtTime(660, now);
+    oscillator.frequency.setValueAtTime(880, now + 0.1);
+    oscillator.frequency.setValueAtTime(660, now + 0.2);
 
-    oscillator.frequency.setValueAtTime(
-      660,
-      now,
-    );
-
-    oscillator.frequency.setValueAtTime(
-      880,
-      now + 0.10,
-    );
-
-    oscillator.frequency.setValueAtTime(
-      660,
-      now + 0.20,
-    );
-
-    /*
-     * Start almost silent.
-     */
-
-    gain.gain.setValueAtTime(
-      0.0001,
-      now,
-    );
-
-    /*
-     * Increase volume.
-     */
-
+    gain.gain.setValueAtTime(0.0001, now);
     gain.gain.exponentialRampToValueAtTime(
       0.22,
       now + 0.025,
     );
-
-    /*
-     * Fade out.
-     */
-
     gain.gain.exponentialRampToValueAtTime(
       0.0001,
       now + 0.35,
     );
 
     oscillator.connect(gain);
-
-    gain.connect(
-      audioContext.destination,
-    );
+    gain.connect(audioContext.destination);
 
     oscillator.start(now);
+    oscillator.stop(now + 0.36);
 
-    oscillator.stop(
-      now + 0.36,
-    );
-
-    oscillator.addEventListener(
-      "ended",
-      () => {
-        oscillator.disconnect();
-        gain.disconnect();
-      },
-    );
+    oscillator.addEventListener("ended", () => {
+      oscillator.disconnect();
+      gain.disconnect();
+    });
   } catch {
-    /*
-     * Never allow sound errors
-     * to break the application.
-     */
+    // Audio failures must not break the dashboard.
   }
 };
-
 
 /* =========================================================
    DESKTOP / BROWSER NOTIFICATIONS
@@ -375,128 +238,58 @@ const playNotificationSound = () => {
 const requestBrowserNotificationPermission =
   async (): Promise<boolean> => {
     try {
-      if (
-        !("Notification" in window)
-      ) {
+      if (!("Notification" in window)) {
         return false;
       }
 
-      if (
-        Notification.permission ===
-        "granted"
-      ) {
+      if (Notification.permission === "granted") {
         return true;
       }
 
-      if (
-        Notification.permission ===
-        "denied"
-      ) {
+      if (Notification.permission === "denied") {
         return false;
       }
 
       const permission =
         await Notification.requestPermission();
 
-      return (
-        permission ===
-        "granted"
-      );
+      return permission === "granted";
     } catch {
       return false;
     }
   };
 
-
 const showBrowserNotification = (
   request: ServiceRequest,
-) => {
+): void => {
   try {
     if (
-      !("Notification" in window)
+      !("Notification" in window) ||
+      Notification.permission !== "granted"
     ) {
       return;
     }
-
-    if (
-      Notification.permission !==
-      "granted"
-    ) {
-      return;
-    }
-
-    /*
-     * Resolve the service category safely.
-     */
 
     const serviceCategory =
-      getServiceCategory(
-        request,
-      );
+      getServiceCategory(request);
 
-    /*
-     * Full Techy logo URL.
-     */
+    const techyLogoUrl = getTechyLogoUrl();
 
-    const techyLogoUrl =
-      getTechyLogoUrl();
+    const notification = new Notification(
+      "New Techy On The Move Request",
+      {
+        body:
+          `${request.fullName} submitted ` +
+          `a request for ${serviceCategory}. ` +
+          `Reference: ${request.reference}`,
 
-    console.log(
-      "Techy notification icon:",
-      techyLogoUrl,
+        icon: techyLogoUrl,
+        badge: techyLogoUrl,
+        tag: `techy-request-${request.id}`,
+        silent: false,
+        requireInteraction: true,
+      },
     );
-
-    const notification =
-      new Notification(
-        "New Techy On The Move Request",
-        {
-          /*
-           * Example:
-           *
-           * Edward Doe submitted a request
-           * for Network Issues.
-           */
-
-          body:
-            `${request.fullName} submitted ` +
-            `a request for ${serviceCategory}. ` +
-            `Reference: ${request.reference}`,
-
-          /*
-           * Use the Techy logo instead of
-           * the Chrome favicon.
-           */
-
-          icon: techyLogoUrl,
-
-          /*
-           * Badge used by supported systems.
-           */
-
-          badge: techyLogoUrl,
-
-          /*
-           * Unique notification tag for
-           * each Techy request.
-           */
-
-          tag:
-            `techy-request-${request.id}`,
-
-          /*
-           * Do not make the notification silent.
-           */
-
-          silent: false,
-
-          /*
-           * Keep the notification visible
-           * until the administrator interacts.
-           */
-
-          requireInteraction: true,
-        },
-      );
 
     notification.onclick = () => {
       window.focus();
@@ -507,67 +300,37 @@ const showBrowserNotification = (
       "Could not show browser notification:",
       error,
     );
-
-    /*
-     * Desktop notifications are optional.
-     * The in-app notification bell continues
-     * working if desktop notifications fail.
-     */
   }
 };
-
 
 /* =========================================================
    REQUEST NORMALIZATION
    ========================================================= */
 
-const normalizeDate = (
-  value: unknown,
-): string => {
-  if (
-    typeof value !== "string"
-  ) {
+const normalizeDate = (value: unknown): string => {
+  if (typeof value !== "string") {
     return "";
   }
 
-  const trimmed =
-    value.trim();
+  const trimmed = value.trim();
 
   if (!trimmed) {
     return "";
   }
 
-  /*
-   * Accept:
-   *
-   * 2026-10-08
-   *
-   * or:
-   *
-   * 2026-10-08T00:00:00.000Z
-   */
-
-  const match =
-    /^(\d{4}-\d{2}-\d{2})/.exec(
-      trimmed,
-    );
+  const match = /^(\d{4}-\d{2}-\d{2})/.exec(trimmed);
 
   if (!match) {
     return "";
   }
 
-  const date =
-    match[1];
+  const date = match[1];
 
-  const parsed =
-    new Date(
-      `${date}T00:00:00`,
-    );
+  const parsed = new Date(`${date}T00:00:00`);
 
   if (
-    Number.isNaN(
-      parsed.getTime(),
-    )
+    Number.isNaN(parsed.getTime()) ||
+    parsed.toISOString().slice(0, 10) !== date
   ) {
     return "";
   }
@@ -575,194 +338,122 @@ const normalizeDate = (
   return date;
 };
 
-
-const normalizeTime = (
-  value: unknown,
-): string => {
-  if (
-    typeof value !== "string"
-  ) {
+const normalizeTime = (value: unknown): string => {
+  if (typeof value !== "string") {
     return "";
   }
 
   return value.trim();
 };
 
-
 const normalizeRequest = (
   request: ServiceRequest,
 ): ServiceRequest => ({
   ...request,
-
-  requestedDate:
-    normalizeDate(
-      request.requestedDate,
-    ),
-
-  requestedTime:
-    normalizeTime(
-      request.requestedTime,
-    ),
+  requestedDate: normalizeDate(request.requestedDate),
+  requestedTime: normalizeTime(request.requestedTime),
 });
-
 
 /* =========================================================
    HOOK
    ========================================================= */
 
 export function useAdminRequests(): UseAdminRequestsResult {
-  const [
-    requests,
-    setRequests,
-  ] = useState<ServiceRequest[]>([]);
+  const [requests, setRequests] =
+    useState<ServiceRequest[]>([]);
 
-  const [
-    filter,
-    setFilter,
-  ] = useState<RequestFilter>(
-    "pending",
+  const [filter, setFilter] =
+    useState<RequestFilter>("pending");
+
+  const [search, setSearch] = useState("");
+
+  const [loading, setLoading] = useState(true);
+
+  const [error, setError] =
+    useState<string | null>(null);
+
+  const [notificationMap, setNotificationMap] =
+    useState<Map<string, NotificationRequest>>(
+      new Map(),
+    );
+
+  const knownRequestIds = useRef<Set<string>>(
+    new Set(),
   );
 
-  const [
-    search,
-    setSearch,
-  ] = useState("");
+  const mountedRef = useRef(false);
 
-  const [
-    loading,
-    setLoading,
-  ] = useState(true);
-
-  const [
-    error,
-    setError,
-  ] = useState<string | null>(
+  const websocketRef = useRef<WebSocket | null>(
     null,
   );
 
-  const [
-    notificationMap,
-    setNotificationMap,
-  ] = useState<
-    Map<string, NotificationRequest>
-  >(new Map());
-
-  const knownRequestIds =
-    useRef<Set<string>>(
-      new Set(),
-    );
-
-  const mountedRef =
-    useRef(true);
-
-  const websocketRef =
-    useRef<WebSocket | null>(
+  const reconnectTimerRef =
+    useRef<ReturnType<typeof setTimeout> | null>(
       null,
     );
-
-  const reconnectTimerRef =
-    useRef<
-      ReturnType<
-        typeof setTimeout
-      > | null
-    >(null);
-
 
   /* =======================================================
      LOAD REQUESTS
      ======================================================= */
 
-  const reload = useCallback(
-    async () => {
-      try {
-        setLoading(true);
-        setError(null);
+  const reload = useCallback(async (): Promise<void> => {
+    try {
+      setLoading(true);
+      setError(null);
 
-        const data =
-          await getRequests();
+      const data = await getRequests();
 
-        if (
-          !mountedRef.current
-        ) {
-          return;
-        }
-
-        const normalized =
-          data.map(
-            normalizeRequest,
-          );
-
-        setRequests(
-          normalized,
-        );
-
-        normalized.forEach(
-          (request) => {
-            knownRequestIds.current.add(
-              request.id,
-            );
-          },
-        );
-      } catch (err) {
-        if (
-          !mountedRef.current
-        ) {
-          return;
-        }
-
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Failed to load requests.",
-        );
-      } finally {
-        if (
-          mountedRef.current
-        ) {
-          setLoading(false);
-        }
+      if (!mountedRef.current) {
+        return;
       }
-    },
-    [],
-  );
 
+      const normalized = data.map(normalizeRequest);
+
+      setRequests(normalized);
+
+      normalized.forEach((request) => {
+        knownRequestIds.current.add(request.id);
+      });
+    } catch (err) {
+      if (!mountedRef.current) {
+        return;
+      }
+
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to load requests.",
+      );
+    } finally {
+      if (mountedRef.current) {
+        setLoading(false);
+      }
+    }
+  }, []);
 
   /* =======================================================
      ENABLE AUDIO + DESKTOP NOTIFICATIONS
      ======================================================= */
 
   useEffect(() => {
-    let handled =
-      false;
+    let handled = false;
 
-    /*
-     * Chrome requires a user gesture before
-     * audio can be played automatically.
-     *
-     * The first click/touch on the admin page:
-     *
-     * 1. Unlocks AudioContext.
-     * 2. Requests desktop notification permission.
-     */
+    const handleFirstUserGesture = () => {
+      if (handled) {
+        return;
+      }
 
-    const handleFirstUserGesture =
-      () => {
-        if (handled) {
-          return;
-        }
+      handled = true;
 
-        handled = true;
+      void unlockNotificationAudio();
+      void requestBrowserNotificationPermission();
 
-        void unlockNotificationAudio();
-
-        void requestBrowserNotificationPermission();
-
-        document.removeEventListener(
-          "pointerdown",
-          handleFirstUserGesture,
-          true,
-        );
-      };
+      document.removeEventListener(
+        "pointerdown",
+        handleFirstUserGesture,
+        true,
+      );
+    };
 
     document.addEventListener(
       "pointerdown",
@@ -779,175 +470,87 @@ export function useAdminRequests(): UseAdminRequestsResult {
     };
   }, []);
 
-
-  /*
-   * If desktop notifications were already
-   * allowed from a previous visit, initialize
-   * the audio context.
-   */
-
   useEffect(() => {
     if (
       "Notification" in window &&
-      Notification.permission ===
-        "granted"
+      Notification.permission === "granted"
     ) {
       void unlockNotificationAudio();
     }
   }, []);
 
-
   /* =======================================================
      MARK NOTIFICATION AS READ
      ======================================================= */
 
-  const markNotificationRead =
-    useCallback(
-      (
-        requestId: string,
-      ) => {
-        setNotificationMap(
-          (current) => {
-            if (
-              !current.has(
-                requestId,
-              )
-            ) {
-              return current;
-            }
+  const markNotificationRead = useCallback(
+    (requestId: string) => {
+      setNotificationMap((current) => {
+        if (!current.has(requestId)) {
+          return current;
+        }
 
-            const next =
-              new Map(
-                current,
-              );
+        const next = new Map(current);
+        next.delete(requestId);
 
-            next.delete(
-              requestId,
-            );
-
-            return next;
-          },
-        );
-      },
-      [],
-    );
-
+        return next;
+      });
+    },
+    [],
+  );
 
   /* =======================================================
      HANDLE NEW REQUEST
      ======================================================= */
 
-  const handleNewRequest =
-    useCallback(
-      (
-        incomingRequest: ServiceRequest,
-      ) => {
-        const request =
-          normalizeRequest(
-            incomingRequest,
-          );
+  const handleNewRequest = useCallback(
+    (incomingRequest: ServiceRequest) => {
+      const request = normalizeRequest(incomingRequest);
 
-        /*
-         * Every realtime request must have
-         * an ID so duplicate messages can
-         * be prevented.
-         */
-
-        if (!request.id) {
-          console.error(
-            "Realtime request has no ID:",
-            request,
-          );
-
-          return;
-        }
-
-        /*
-         * Prevent duplicate notifications
-         * for the same request.
-         */
-
-        if (
-          knownRequestIds.current.has(
-            request.id,
-          )
-        ) {
-          return;
-        }
-
-        knownRequestIds.current.add(
-          request.id,
-        );
-
-
-        /* -----------------------------------------------
-           ADD REQUEST TO DASHBOARD
-           ----------------------------------------------- */
-
-        setRequests(
-          (current) => {
-            const exists =
-              current.some(
-                (item) =>
-                  item.id ===
-                  request.id,
-              );
-
-            if (exists) {
-              return current;
-            }
-
-            return [
-              request,
-              ...current,
-            ];
-          },
-        );
-
-
-        /* -----------------------------------------------
-           ADD TO BELL NOTIFICATIONS
-           ----------------------------------------------- */
-
-        setNotificationMap(
-          (current) => {
-            const next =
-              new Map(
-                current,
-              );
-
-            next.set(
-              request.id,
-              {
-                request,
-                createdAt:
-                  Date.now(),
-              },
-            );
-
-            return next;
-          },
-        );
-
-
-        /* -----------------------------------------------
-           PLAY SOUND
-           ----------------------------------------------- */
-
-        playNotificationSound();
-
-
-        /* -----------------------------------------------
-           SHOW DESKTOP NOTIFICATION
-           ----------------------------------------------- */
-
-        showBrowserNotification(
+      if (!request.id) {
+        console.error(
+          "Realtime request has no ID:",
           request,
         );
-      },
-      [],
-    );
 
+        return;
+      }
+
+      // Prevent duplicate notifications for the same request.
+      if (knownRequestIds.current.has(request.id)) {
+        return;
+      }
+
+      knownRequestIds.current.add(request.id);
+
+      setRequests((current) => {
+        if (
+          current.some(
+            (item) => item.id === request.id,
+          )
+        ) {
+          return current;
+        }
+
+        return [request, ...current];
+      });
+
+      setNotificationMap((current) => {
+        const next = new Map(current);
+
+        next.set(request.id, {
+          request,
+          createdAt: Date.now(),
+        });
+
+        return next;
+      });
+
+      playNotificationSound();
+      showBrowserNotification(request);
+    },
+    [],
+  );
 
   /* =======================================================
      WEBSOCKET CONNECTION
@@ -959,77 +562,129 @@ export function useAdminRequests(): UseAdminRequestsResult {
     void reload();
 
     let reconnectAttempts = 0;
+    let disposed = false;
+
+    const clearReconnectTimer = () => {
+      if (reconnectTimerRef.current !== null) {
+        clearTimeout(reconnectTimerRef.current);
+        reconnectTimerRef.current = null;
+      }
+    };
+
+    const scheduleReconnect = () => {
+      if (
+        disposed ||
+        !mountedRef.current ||
+        !getAuthToken()
+      ) {
+        return;
+      }
+
+      clearReconnectTimer();
+
+      reconnectAttempts += 1;
+
+      const delay = Math.min(
+        1000 * 2 ** Math.min(reconnectAttempts, 5),
+        10000,
+      );
+
+      reconnectTimerRef.current = setTimeout(() => {
+        reconnectTimerRef.current = null;
+        connect();
+      }, delay);
+    };
 
     const connect = () => {
       if (
+        disposed ||
         !mountedRef.current
       ) {
         return;
       }
 
+      // Never open or reconnect a socket without a token.
+      const token = getAuthToken();
+
+      if (!token) {
+        notifyUnauthorized();
+        return;
+      }
+
       try {
-        const socket =
-          new WebSocket(
-            getWebSocketUrl(),
-          );
+        const socket = new WebSocket(getWebSocketUrl());
 
-        websocketRef.current =
-          socket;
-
+        websocketRef.current = socket;
 
         socket.onopen = () => {
-          reconnectAttempts = 0;
+          if (
+            disposed ||
+            websocketRef.current !== socket
+          ) {
+            socket.close();
+            return;
+          }
+
+          const currentToken = getAuthToken();
+
+          if (!currentToken) {
+            socket.close(1008, "Login required");
+            notifyUnauthorized();
+            return;
+          }
+
+          /*
+           * The backend expects this authentication
+           * message before registering the socket for
+           * realtime notifications.
+           */
+          socket.send(
+            JSON.stringify({
+              type: "authenticate",
+              token: currentToken,
+            }),
+          );
 
           console.log(
-            "Admin realtime connection established.",
+            "Admin WebSocket connected; authentication sent.",
           );
         };
 
-
-        socket.onmessage = (
-          event,
-        ) => {
+        socket.onmessage = (event: MessageEvent) => {
           try {
-            const message =
-              JSON.parse(
-                event.data,
-              );
-
+            const message = JSON.parse(event.data);
 
             /*
-             * NEW REQUEST
+             * The backend sends "connected" after
+             * successful authentication. No further
+             * action is needed for that message.
              */
+            if (message.type === "connected") {
+              reconnectAttempts = 0;
 
-            if (
-              message.type ===
-                "request.created" &&
-              message.request
-            ) {
-              handleNewRequest(
-                message.request,
+              console.log(
+                "Admin realtime authentication successful.",
               );
 
               return;
             }
 
-
-            /*
-             * UPDATED REQUEST
-             */
+            if (
+              message.type === "request.created" &&
+              message.request
+            ) {
+              handleNewRequest(message.request);
+              return;
+            }
 
             if (
-              message.type ===
-                "request.updated" &&
+              message.type === "request.updated" &&
               message.request
             ) {
               const updatedRequest =
-                normalizeRequest(
-                  message.request,
-                );
+                normalizeRequest(message.request);
 
-              if (
-                !updatedRequest.id
-              ) {
+              if (!updatedRequest.id) {
                 return;
               }
 
@@ -1037,53 +692,34 @@ export function useAdminRequests(): UseAdminRequestsResult {
                 updatedRequest.id,
               );
 
-              setRequests(
-                (current) =>
-                  current.map(
-                    (request) =>
-                      request.id ===
-                      updatedRequest.id
-                        ? updatedRequest
-                        : request,
-                  ),
+              setRequests((current) =>
+                current.map((request) =>
+                  request.id === updatedRequest.id
+                    ? updatedRequest
+                    : request,
+                ),
               );
 
+              // Update an existing unread notification,
+              // without creating another notification.
+              setNotificationMap((current) => {
+                const existing = current.get(
+                  updatedRequest.id,
+                );
 
-              /*
-               * If the request is already
-               * unread, update its notification
-               * data without creating a new
-               * notification.
-               */
+                if (!existing) {
+                  return current;
+                }
 
-              setNotificationMap(
-                (current) => {
-                  const existing =
-                    current.get(
-                      updatedRequest.id,
-                    );
+                const next = new Map(current);
 
-                  if (!existing) {
-                    return current;
-                  }
+                next.set(updatedRequest.id, {
+                  ...existing,
+                  request: updatedRequest,
+                });
 
-                  const next =
-                    new Map(
-                      current,
-                    );
-
-                  next.set(
-                    updatedRequest.id,
-                    {
-                      ...existing,
-                      request:
-                        updatedRequest,
-                    },
-                  );
-
-                  return next;
-                },
-              );
+                return next;
+              });
             }
           } catch (messageError) {
             console.error(
@@ -1093,51 +729,45 @@ export function useAdminRequests(): UseAdminRequestsResult {
           }
         };
 
-
-        socket.onerror = (
-          socketError,
-        ) => {
+        socket.onerror = (socketError) => {
           console.error(
             "Admin WebSocket error:",
             socketError,
           );
 
+          // onclose handles reconnection and cleanup.
           if (
-            socket.readyState ===
-            WebSocket.OPEN
+            socket.readyState === WebSocket.CONNECTING ||
+            socket.readyState === WebSocket.OPEN
           ) {
-            return;
+            socket.close();
           }
-
-          socket.close();
         };
 
+        socket.onclose = (event: CloseEvent) => {
+          if (websocketRef.current === socket) {
+            websocketRef.current = null;
+          }
 
-        socket.onclose = () => {
           if (
+            disposed ||
             !mountedRef.current
           ) {
             return;
           }
 
-          reconnectAttempts += 1;
+          /*
+           * Close code 1008 is used by the backend
+           * when authentication is missing, invalid,
+           * or expired. Do not retry with a bad token.
+           */
+          if (event.code === 1008) {
+            clearReconnectTimer();
+            notifyUnauthorized();
+            return;
+          }
 
-          const delay =
-            Math.min(
-              1000 *
-                2 **
-                  Math.min(
-                    reconnectAttempts,
-                    5,
-                  ),
-              10000,
-            );
-
-          reconnectTimerRef.current =
-            setTimeout(
-              connect,
-              delay,
-            );
+          scheduleReconnect();
         };
       } catch (socketError) {
         console.error(
@@ -1145,243 +775,167 @@ export function useAdminRequests(): UseAdminRequestsResult {
           socketError,
         );
 
-        reconnectAttempts += 1;
-
-        reconnectTimerRef.current =
-          setTimeout(
-            connect,
-            3000,
-          );
+        scheduleReconnect();
       }
     };
-
 
     connect();
 
-
     return () => {
+      disposed = true;
       mountedRef.current = false;
 
-      if (
-        reconnectTimerRef.current
-      ) {
-        clearTimeout(
-          reconnectTimerRef.current,
-        );
+      clearReconnectTimer();
 
-        reconnectTimerRef.current =
-          null;
-      }
+      const socket = websocketRef.current;
+      websocketRef.current = null;
 
-      if (
-        websocketRef.current
-      ) {
-        websocketRef.current.close();
+      if (socket) {
+        socket.onopen = null;
+        socket.onmessage = null;
+        socket.onerror = null;
+        socket.onclose = null;
 
-        websocketRef.current =
-          null;
+        if (
+          socket.readyState === WebSocket.CONNECTING ||
+          socket.readyState === WebSocket.OPEN
+        ) {
+          socket.close();
+        }
       }
     };
-  }, [
-    handleNewRequest,
-    reload,
-  ]);
-
+  }, [handleNewRequest, reload]);
 
   /* =======================================================
      REQUEST STATUS UPDATE
      ======================================================= */
 
-  const changeStatus =
-    useCallback(
-      async (
-        id: string,
-        status: RequestStatus,
-      ) => {
-        try {
-          setError(null);
+  const changeStatus = useCallback(
+    async (
+      id: string,
+      status: RequestStatus,
+    ): Promise<void> => {
+      try {
+        setError(null);
 
-          const updated =
-            await updateRequestStatus(
-              id,
-              status,
-            );
+        const updated = await updateRequestStatus(
+          id,
+          status,
+        );
 
-          const normalized =
-            normalizeRequest(
-              updated,
-            );
+        const normalized = normalizeRequest(updated);
 
-          setRequests(
-            (current) =>
-              current.map(
-                (request) =>
-                  request.id === id
-                    ? normalized
-                    : request,
-              ),
-          );
-        } catch (err) {
-          const message =
-            err instanceof Error
-              ? err.message
-              : "Failed to update request status.";
+        setRequests((current) =>
+          current.map((request) =>
+            request.id === id
+              ? normalized
+              : request,
+          ),
+        );
+      } catch (err) {
+        const message =
+          err instanceof Error
+            ? err.message
+            : "Failed to update request status.";
 
-          setError(message);
-
-          throw err;
-        }
-      },
-      [],
-    );
-
+        setError(message);
+        throw err;
+      }
+    },
+    [],
+  );
 
   /* =======================================================
      FILTER + SEARCH
      ======================================================= */
 
-  const filteredRequests =
-    useMemo(() => {
-      const normalizedSearch =
-        search
-          .trim()
-          .toLowerCase();
+  const filteredRequests = useMemo(() => {
+    const normalizedSearch = search
+      .trim()
+      .toLowerCase();
 
-      return requests
-        .filter((request) => {
-          if (
-            filter !== "all" &&
-            request.status !==
-              filter
-          ) {
-            return false;
-          }
+    return requests
+      .filter((request) => {
+        if (
+          filter !== "all" &&
+          request.status !== filter
+        ) {
+          return false;
+        }
 
-          if (
-            !normalizedSearch
-          ) {
-            return true;
-          }
+        if (!normalizedSearch) {
+          return true;
+        }
 
-          return [
-            request.phone,
-            request.fullName,
-            request.email,
-            request.reference,
-            request.serviceId,
-            request.location,
-          ]
-            .filter(Boolean)
-            .some(
-              (value) =>
-                value
-                  ?.toLowerCase()
-                  .includes(
-                    normalizedSearch,
-                  ),
-            );
-        })
-        .sort(
-          (a, b) => {
-            const aTime =
-              new Date(
-                a.createdAt,
-              ).getTime();
-
-            const bTime =
-              new Date(
-                b.createdAt,
-              ).getTime();
-
-            if (
-              Number.isNaN(
-                aTime,
-              )
-            ) {
-              return 1;
-            }
-
-            if (
-              Number.isNaN(
-                bTime,
-              )
-            ) {
-              return -1;
-            }
-
-            return (
-              bTime - aTime
-            );
-          },
-        );
-    }, [
-      requests,
-      filter,
-      search,
-    ]);
-
-
-  /* =======================================================
-     COUNTS
-     ======================================================= */
-
-  const counts =
-    useMemo(
-      () => ({
-        pending:
-          requests.filter(
-            (request) =>
-              request.status ===
-              "pending",
-          ).length,
-
-        confirmed:
-          requests.filter(
-            (request) =>
-              request.status ===
-              "confirmed",
-          ).length,
-
-        completed:
-          requests.filter(
-            (request) =>
-              request.status ===
-              "completed",
-          ).length,
-
-        cancelled:
-          requests.filter(
-            (request) =>
-              request.status ===
-              "cancelled",
-          ).length,
-      }),
-      [requests],
-    );
-
-
-  /* =======================================================
-     NOTIFICATIONS
-     ======================================================= */
-
-  const notifications =
-    useMemo(
-      () =>
-        Array.from(
-          notificationMap.values(),
-        )
-          .sort(
-            (a, b) =>
-              b.createdAt -
-              a.createdAt,
+        return [
+          request.phone,
+          request.fullName,
+          request.email,
+          request.reference,
+          request.serviceId,
+          request.location,
+        ]
+          .filter(
+            (value): value is string =>
+              typeof value === "string" &&
+              value.length > 0,
           )
-          .map(
-            (item) =>
-              item.request,
-          ),
-      [notificationMap],
-    );
+          .some((value) =>
+            value.toLowerCase().includes(normalizedSearch),
+          );
+      })
+      .sort((a, b) => {
+        const aTime = new Date(a.createdAt).getTime();
+        const bTime = new Date(b.createdAt).getTime();
 
+        if (Number.isNaN(aTime)) {
+          return 1;
+        }
+
+        if (Number.isNaN(bTime)) {
+          return -1;
+        }
+
+        return bTime - aTime;
+      });
+  }, [requests, filter, search]);
+
+  /* =======================================================
+     STATUS COUNTS
+     ======================================================= */
+
+  const counts = useMemo(
+    () => ({
+      pending: requests.filter(
+        (request) => request.status === "pending",
+      ).length,
+
+      confirmed: requests.filter(
+        (request) => request.status === "confirmed",
+      ).length,
+
+      completed: requests.filter(
+        (request) => request.status === "completed",
+      ).length,
+
+      cancelled: requests.filter(
+        (request) => request.status === "cancelled",
+      ).length,
+    }),
+    [requests],
+  );
+
+  /* =======================================================
+     UNREAD NOTIFICATIONS
+     ======================================================= */
+
+  const notifications = useMemo(
+    () =>
+      Array.from(notificationMap.values())
+        .sort((a, b) => b.createdAt - a.createdAt)
+        .map((item) => item.request),
+    [notificationMap],
+  );
 
   /* =======================================================
      RETURN
@@ -1389,9 +943,7 @@ export function useAdminRequests(): UseAdminRequestsResult {
 
   return {
     requests,
-
     filteredRequests,
-
     counts,
 
     filter,

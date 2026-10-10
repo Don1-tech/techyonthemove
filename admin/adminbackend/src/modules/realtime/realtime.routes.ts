@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 
+import { env } from "../../config/env.js";
 import { notificationHub } from "./notificationHub.js";
-import type { ServiceRequest } from "../requests/requests.types.js";
 
 export async function realtimeRoutes(
   app: FastifyInstance,
@@ -10,44 +10,59 @@ export async function realtimeRoutes(
     "/ws/requests",
     { websocket: true },
     (socket) => {
-      notificationHub.add(socket);
+      let authenticated = false;
 
-      socket.send(
-        JSON.stringify({
-          type: "connected",
-          message:
-            "Admin realtime connection established.",
-        }),
-      );
-    },
-  );
+      // Close unauthenticated connections if they do not
+      // provide a token promptly.
+      const authTimeout = setTimeout(() => {
+        if (!authenticated) {
+          socket.close(1008, "Authentication required");
+        }
+      }, 5000);
 
-  /**
-   * Internal endpoint used by the main Techy application backend.
-   *
-   * The main backend calls this after a new request has
-   * successfully been inserted into PostgreSQL.
-   */
-  app.post(
-    "/api/internal/requests/created",
-    async (request, reply) => {
-      const body = request.body as {
-        request?: ServiceRequest;
-      };
+      socket.once("message", (rawMessage) => {
+        clearTimeout(authTimeout);
 
-      if (!body.request) {
-        return reply.code(400).send({
-          message: "Request payload is required.",
-        });
-      }
+        try {
+          const message = JSON.parse(rawMessage.toString()) as {
+            type?: string;
+            token?: string;
+          };
 
-      notificationHub.broadcast({
-        type: "request.created",
-        request: body.request,
+          if (
+            message.type !== "authenticate" ||
+            typeof message.token !== "string" ||
+            message.token.length === 0
+          ) {
+            socket.close(1008, "Invalid authentication message");
+            return;
+          }
+
+          const user = app.jwt.verify<{ sub?: string }>(
+            message.token,
+          );
+
+          if (user.sub !== env.ADMIN_USERNAME) {
+            socket.close(1008, "Unauthorized");
+            return;
+          }
+
+          authenticated = true;
+          notificationHub.add(socket);
+
+          socket.send(
+            JSON.stringify({
+              type: "connected",
+              message: "Admin realtime connection established.",
+            }),
+          );
+        } catch {
+          socket.close(1008, "Invalid or expired token");
+        }
       });
 
-      return reply.code(200).send({
-        success: true,
+      socket.on("close", () => {
+        clearTimeout(authTimeout);
       });
     },
   );

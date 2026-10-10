@@ -13,65 +13,87 @@ interface RequestNotificationPayload {
 
 let listener: pg.Client | null = null;
 
-export async function startPostgresNotifications() {
-  listener = new Client({
-    connectionString: env.DATABASE_URL,
-  });
-
-  await listener.connect();
-  await listener.query("LISTEN techy_requests");
-
-  listener.on("notification", (message) => {
-    if (!message.payload) {
-      return;
-    }
-
-    try {
-      const payload =
-        JSON.parse(message.payload) as RequestNotificationPayload;
-
-      if (payload.event === "created") {
-        notificationHub.broadcast({
-          type: "request.created",
-          request: payload.request,
-        });
-      }
-
-      if (payload.event === "updated") {
-        notificationHub.broadcast({
-          type: "request.updated",
-          request: payload.request,
-        });
-      }
-    } catch (error) {
-      console.error(
-        "Could not process PostgreSQL notification:",
-        error,
-      );
-    }
-  });
-
-  listener.on("error", (error) => {
-    console.error(
-      "PostgreSQL notification listener error:",
-      error,
-    );
-  });
-
-  console.log(
-    "PostgreSQL realtime listener is listening on techy_requests.",
-  );
-}
-
-export async function stopPostgresNotifications() {
-  if (!listener) {
+export async function startPostgresNotifications(): Promise<void> {
+  if (listener) {
     return;
   }
 
+  const client = new Client({
+    connectionString:
+      env.DATABASE_DIRECT_URL ?? env.DATABASE_URL,
+    connectionTimeoutMillis: 10000,
+    keepAlive: true,
+  });
+
   try {
-    await listener.query("UNLISTEN techy_requests");
-    await listener.end();
-  } finally {
-    listener = null;
+    await client.connect();
+    await client.query("LISTEN techy_requests");
+
+    client.on("notification", (message) => {
+      if (!message.payload) {
+        return;
+      }
+
+      try {
+        const payload = JSON.parse(
+          message.payload,
+        ) as RequestNotificationPayload;
+
+        if (!payload.request || !payload.event) {
+          return;
+        }
+
+        if (payload.event === "created") {
+          notificationHub.broadcast({
+            type: "request.created",
+            request: payload.request,
+          });
+        } else if (payload.event === "updated") {
+          notificationHub.broadcast({
+            type: "request.updated",
+            request: payload.request,
+          });
+        }
+      } catch (error) {
+        console.error(
+          "Could not process PostgreSQL notification:",
+          error,
+        );
+      }
+    });
+
+    client.on("error", (error) => {
+      console.error(
+        "PostgreSQL notification listener error:",
+        error,
+      );
+    });
+
+    listener = client;
+
+    console.log(
+      "PostgreSQL realtime listener is listening on techy_requests.",
+    );
+  } catch (error) {
+    await client.end().catch(() => undefined);
+    throw error;
   }
+}
+
+export async function stopPostgresNotifications(): Promise<void> {
+  const client = listener;
+
+  if (!client) {
+    return;
+  }
+
+  listener = null;
+
+  try {
+    await client.query("UNLISTEN techy_requests");
+  } catch {
+    // The connection may already be closed.
+  }
+
+  await client.end().catch(() => undefined);
 }

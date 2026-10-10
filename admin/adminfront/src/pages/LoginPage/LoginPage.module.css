@@ -1,0 +1,227 @@
+.page {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+  padding: 32px 20px 64px;
+  color: #172033;
+  background:
+    radial-gradient(ellipse at 12% 12%, #d9f3ff 0, transparent 40%),
+    radial-gradient(ellipse at 90% 85%, #e8e2ff 0, transparent 38%),
+    #eef2f8;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.glow {
+  position: absolute;
+  z-index: -1;
+  top: 12%;
+  left: 50%;
+  width: min(640px, 90vw);
+  height: 640px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: linear-gradient(135deg, #b8eaff, #d7d0ff, #c8f6ff);
+  filter: blur(100px);
+  opacity: 0.48;
+}
+
+.card {
+  width: 100%;
+  max-width: 450px;
+  padding: 38px;
+  border: 1px solid rgb(142 159 187 / 28%);
+  border-radius: 24px;
+  background: rgb(255 255 255 / 92%);
+  box-shadow: 0 24px 80px rgb(34 51 84 / 12%);
+  backdrop-filter: blur(18px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 42px;
+}
+
+.brandMark {
+  display: grid;
+  place-items: center;
+  width: 43px;
+  height: 43px;
+  border-radius: 13px;
+  color: white;
+  font-size: 23px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #168fc8, #8172ee);
+  box-shadow: 0 7px 20px rgb(86 130 231 / 25%);
+}
+
+.brand strong,
+.brand span {
+  display: block;
+  letter-spacing: 1.3px;
+}
+
+.brand strong {
+  font-size: 16px;
+  font-weight: 850;
+}
+
+.brand span {
+  margin-top: 3px;
+  color: #718096;
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #5e6c84;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #35a9d6;
+  box-shadow: 0 0 0 4px #dff5ff;
+}
+
+.card h1 {
+  margin: 19px 0 10px;
+  font-size: clamp(30px, 6vw, 38px);
+  letter-spacing: -1.6px;
+  line-height: 1.15;
+}
+
+.description {
+  margin: 0;
+  color: #68758a;
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.form {
+  display: grid;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+.form label {
+  margin-top: 9px;
+  color: #354259;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.form input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid #d4dce8;
+  border-radius: 11px;
+  outline: none;
+  background: #fbfcff;
+  color: #172033;
+  font-size: 14px;
+  transition: border-color 160ms, box-shadow 160ms;
+}
+
+.form input:focus {
+  border-color: #36a9d8;
+  box-shadow: 0 0 0 4px rgb(54 169 216 / 13%);
+}
+
+.form input::placeholder {
+  color: #a1acbc;
+}
+
+.form button {
+  min-height: 51px;
+  margin-top: 13px;
+  border: 0;
+  border-radius: 12px;
+  color: #fff;
+  background: linear-gradient(105deg, #238fc7, #657fe9 58%, #8d75ed);
+  box-shadow: 0 8px 20px rgb(94 126 222 / 25%);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 750;
+  transition: transform 160ms, box-shadow 160ms;
+}
+
+.form button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgb(94 126 222 / 32%);
+}
+
+.form button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.error {
+  margin: 8px 0 0;
+  padding: 11px 12px;
+  border: 1px solid #f2c6d0;
+  border-radius: 9px;
+  background: #fff1f4;
+  color: #a52c4a;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.securityNote {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 26px;
+  color: #7a879a;
+  font-size: 10px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.securityNote span {
+  color: #6c79e9;
+  font-size: 16px;
+}
+
+.footer {
+  position: absolute;
+  right: 16px;
+  bottom: 20px;
+  left: 16px;
+  margin: 0;
+  color: #8390a3;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.footer span {
+  padding: 0 5px;
+  color: #8b7cf6;
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 28px 23px;
+    border-radius: 20px;
+  }
+
+  .brand {
+    margin-bottom: 34px;
+  }
+}

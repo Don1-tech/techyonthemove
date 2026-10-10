@@ -5,10 +5,9 @@ import {
   getRequestById,
   getRequests,
 } from "./requests.service.js";
-import type {
-  RequestStatus,
-} from "./requests.types.js";
-import { notificationHub } from "../realtime/notificationHub.js";
+
+import type { RequestStatus } from "./requests.types.js";
+import { env } from "../../config/env.js";
 
 const statuses: RequestStatus[] = [
   "pending",
@@ -28,16 +27,31 @@ function isRequestStatus(
 export async function requestsRoutes(
   app: FastifyInstance,
 ) {
+  app.addHook("preHandler", async (request, reply) => {
+    try {
+      await request.jwtVerify();
+
+      const user = request.user as { sub?: string };
+
+      if (user.sub !== env.ADMIN_USERNAME) {
+        return reply.code(401).send({
+          message: "Admin authentication required.",
+        });
+      }
+    } catch {
+      return reply.code(401).send({
+        message: "Your session is invalid or expired. Please log in again.",
+      });
+    }
+  });
+
   app.get("/api/admin/requests", async (request, reply) => {
     const query = request.query as {
       status?: string;
       search?: string;
     };
 
-    if (
-      query.status &&
-      !isRequestStatus(query.status)
-    ) {
+    if (query.status && !isRequestStatus(query.status)) {
       return reply.code(400).send({
         message:
           "Invalid status. Use pending, confirmed, completed, or cancelled.",
@@ -49,9 +63,7 @@ export async function requestsRoutes(
       query.search,
     );
 
-    return {
-      requests,
-    };
+    return { requests };
   });
 
   app.get(
@@ -67,9 +79,7 @@ export async function requestsRoutes(
         });
       }
 
-      return {
-        request: found,
-      };
+      return { request: found };
     },
   );
 
@@ -77,14 +87,9 @@ export async function requestsRoutes(
     "/api/admin/requests/:id/status",
     async (request, reply) => {
       const params = request.params as { id: string };
-      const body = request.body as {
-        status?: string;
-      };
+      const body = request.body as { status?: string } | null;
 
-      if (
-        !body.status ||
-        !isRequestStatus(body.status)
-      ) {
+      if (!body?.status || !isRequestStatus(body.status)) {
         return reply.code(400).send({
           message:
             "Invalid status. Use pending, confirmed, completed, or cancelled.",
@@ -114,14 +119,10 @@ export async function requestsRoutes(
         });
       }
 
-      notificationHub.broadcast({
-        type: "request.updated",
-        request: result.request,
-      });
+      // PostgreSQL's trigger publishes the status change.
+      // Do not broadcast it here as well, or notifications duplicate.
 
-      return {
-        request: result.request,
-      };
+      return { request: result.request };
     },
   );
 }

@@ -1,37 +1,68 @@
 import { buildApp } from "./app.js";
 import { env } from "./config/env.js";
-import { checkDatabaseConnection } from "./db/pool.js";
+import {
+  checkDatabaseConnection,
+  pool,
+} from "./db/pool.js";
+import {
+  startPostgresNotifications,
+  stopPostgresNotifications,
+} from "./modules/realtime/postgresNotifications.js";
 
 const app = buildApp();
 
-async function start() {
+let shuttingDown = false;
+
+async function start(): Promise<void> {
   try {
     await checkDatabaseConnection();
+    await startPostgresNotifications();
 
     await app.listen({
       port: env.PORT,
       host: env.HOST,
     });
 
-    console.log(
-      `Admin backend running at http://localhost:${env.PORT}`,
+    app.log.info(
+      `Admin backend listening on port ${env.PORT}`,
     );
-
-    console.log(
-      `Admin WebSocket running at ws://localhost:${env.PORT}/ws/requests`,
-    );
+    app.log.info("Admin WebSocket endpoint: /ws/requests");
   } catch (error) {
     app.log.error(error);
-    process.exit(1);
+
+    await stopPostgresNotifications();
+    await pool.end().catch(() => undefined);
+    await app.close().catch(() => undefined);
+
+    process.exitCode = 1;
   }
 }
 
-async function shutdown() {
-  await app.close();
-  process.exit(0);
+async function shutdown(): Promise<void> {
+  if (shuttingDown) {
+    return;
+  }
+
+  shuttingDown = true;
+
+  try {
+    await app.close();
+    await stopPostgresNotifications();
+    await pool.end();
+
+    app.log.info("Admin backend shut down cleanly.");
+  } catch (error) {
+    app.log.error(error);
+    process.exitCode = 1;
+  }
 }
 
-process.on("SIGINT", shutdown);
-process.on("SIGTERM", shutdown);
+process.once("SIGINT", () => {
+  void shutdown();
+});
+
+process.once("SIGTERM", () => {
+  void shutdown();
+});
 
 void start();

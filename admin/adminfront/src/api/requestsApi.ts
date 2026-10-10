@@ -1,11 +1,17 @@
+import {
+  getAuthToken,
+  notifyUnauthorized,
+} from "../auth/auth";
+
 import type {
   RequestStatus,
   ServiceRequest,
 } from "../types/request";
 
-const API_BASE_URL =
+export const API_BASE_URL = (
   import.meta.env.VITE_ADMIN_API_URL ??
-  "http://localhost:4100";
+  "http://localhost:4100"
+).replace(/\/+$/, "");
 
 interface AdminRequestsResponse {
   requests: ServiceRequest[];
@@ -15,9 +21,7 @@ interface AdminRequestResponse {
   request: ServiceRequest;
 }
 
-function getServiceName(
-  serviceId: string,
-): string {
+function getServiceName(serviceId: string): string {
   const names: Record<string, string> = {
     "wifi-internet": "Wi-Fi & Internet",
     "network-issues": "Network Issues",
@@ -33,9 +37,7 @@ function getServiceName(
     names[serviceId] ??
     serviceId
       .replace(/-/g, " ")
-      .replace(/\b\w/g, (letter) =>
-        letter.toUpperCase(),
-      )
+      .replace(/\b\w/g, (letter) => letter.toUpperCase())
   );
 }
 
@@ -45,9 +47,35 @@ function normalizeRequest(
   return {
     ...request,
     serviceName:
-      request.serviceName ||
-      getServiceName(request.serviceId),
+      request.serviceName || getServiceName(request.serviceId),
   };
+}
+
+async function authorizedFetch(
+  path: string,
+  init: RequestInit = {},
+): Promise<Response> {
+  const token = getAuthToken();
+
+  if (!token) {
+    notifyUnauthorized();
+    throw new Error("Please log in to continue.");
+  }
+
+  const headers = new Headers(init.headers);
+  headers.set("Authorization", `Bearer ${token}`);
+
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    ...init,
+    headers,
+  });
+
+  if (response.status === 401) {
+    notifyUnauthorized();
+    throw new Error("Your session expired. Please log in again.");
+  }
+
+  return response;
 }
 
 export async function getRequests(
@@ -56,26 +84,17 @@ export async function getRequests(
 ): Promise<ServiceRequest[]> {
   const params = new URLSearchParams();
 
-  if (status) {
-    params.set("status", status);
-  }
-
-  if (search?.trim()) {
-    params.set("search", search.trim());
-  }
+  if (status) params.set("status", status);
+  if (search?.trim()) params.set("search", search.trim());
 
   const query = params.toString();
 
-  const response = await fetch(
-    `${API_BASE_URL}/api/admin/requests${
-      query ? `?${query}` : ""
-    }`,
+  const response = await authorizedFetch(
+    `/api/admin/requests${query ? `?${query}` : ""}`,
   );
 
   if (!response.ok) {
-    throw new Error(
-      "Failed to load admin requests.",
-    );
+    throw new Error("Failed to load admin requests.");
   }
 
   const data =
@@ -88,29 +107,22 @@ export async function updateRequestStatus(
   id: string,
   status: RequestStatus,
 ): Promise<ServiceRequest> {
-  const response = await fetch(
-    `${API_BASE_URL}/api/admin/requests/${encodeURIComponent(
-      id,
-    )}/status`,
+  const response = await authorizedFetch(
+    `/api/admin/requests/${encodeURIComponent(id)}/status`,
     {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        status,
-      }),
+      body: JSON.stringify({ status }),
     },
   );
 
   if (!response.ok) {
-    const data = await response
-      .json()
-      .catch(() => null);
+    const data = await response.json().catch(() => null);
 
     throw new Error(
-      data?.message ??
-        "Failed to update request status.",
+      data?.message ?? "Failed to update request status.",
     );
   }
 
