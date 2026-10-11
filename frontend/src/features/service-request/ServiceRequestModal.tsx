@@ -1,5 +1,5 @@
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import styles from "./ServiceRequestModal.module.css";
 
@@ -19,7 +19,14 @@ import SuccessStep from "./components/SuccessStep";
 
 import ServiceRequestHeader from "./components/ServiceRequestHeader";
 import ServiceRequestProgress from "./components/ServiceRequestProgress";
-import { createRequest } from "../../api/requestsApi";
+import {
+  cancelRequestVerification,
+  resendRequestVerification,
+  startRequestVerification,
+  verifyRequestPhone,
+  type VerificationChallenge,
+} from "../../api/requestsApi";
+import PhoneVerificationModal from "./components/PhoneVerificationModal";
 
 interface ServiceRequestModalProps {
   open: boolean;
@@ -68,7 +75,6 @@ function ServiceRequestDialog({
     });
 
   const [selectedDate, setSelectedDate] = useState("");
-
   const [selectedTime, setSelectedTime] = useState("");
 
   /*
@@ -91,6 +97,34 @@ function ServiceRequestDialog({
   const [requestReference, setRequestReference] =
     useState("");
 
+  const [verificationChallenge, setVerificationChallenge] =
+    useState<
+      (VerificationChallenge & { idempotencyKey: string }) | null
+    >(null);
+  const [verificationError, setVerificationError] = useState("");
+
+  const handleCloseRequest = useCallback(async () => {
+    if (isSubmitting) {
+      return;
+    }
+
+    if (verificationChallenge) {
+      try {
+        await cancelRequestVerification(
+          verificationChallenge.verificationId
+        );
+      } catch {
+        setVerificationError(
+          "We couldn't cancel verification. No request was created; the code will expire automatically. Please try Cancel again."
+        );
+        return;
+      }
+      setVerificationChallenge(null);
+    }
+
+    onClose();
+  }, [isSubmitting, onClose, verificationChallenge]);
+
   useEffect(() => {
     const dialog = dialogRef.current;
 
@@ -102,7 +136,9 @@ function ServiceRequestDialog({
       document.activeElement instanceof HTMLElement
         ? document.activeElement
         : null;
+
     const previousBodyOverflow = document.body.style.overflow;
+
     const previousRootOverflow =
       document.documentElement.style.overflow;
 
@@ -127,9 +163,11 @@ function ServiceRequestDialog({
     document.body.style.overflow = "hidden";
     document.documentElement.style.overflow = "hidden";
 
-    dialog.querySelector<HTMLElement>(
-      '[aria-label="Close request service"]'
-    )?.focus({ preventScroll: true });
+    dialog
+      .querySelector<HTMLElement>(
+        '[aria-label="Close request service"]'
+      )
+      ?.focus({ preventScroll: true });
 
     const handleTab = (event: KeyboardEvent) => {
       if (event.key !== "Tab") {
@@ -144,8 +182,10 @@ function ServiceRequestDialog({
       }
 
       const firstElement = focusableElements[0];
+
       const lastElement =
         focusableElements[focusableElements.length - 1];
+
       const activeElement = document.activeElement;
 
       if (
@@ -184,7 +224,9 @@ function ServiceRequestDialog({
     return () => {
       document.removeEventListener("keydown", handleTab);
       document.removeEventListener("focusin", handleFocusIn);
+
       document.body.style.overflow = previousBodyOverflow;
+
       document.documentElement.style.overflow =
         previousRootOverflow;
 
@@ -216,7 +258,7 @@ function ServiceRequestDialog({
        * a request is actively being submitted.
        */
       if (event.key === "Escape" && !isSubmitting) {
-        onClose();
+        void handleCloseRequest();
       }
     };
 
@@ -225,7 +267,7 @@ function ServiceRequestDialog({
     return () => {
       document.removeEventListener("keydown", handleEscape);
     };
-  }, [onClose, isSubmitting]);
+  }, [handleCloseRequest, isSubmitting]);
 
   const handleOverlayClick = (
     event: React.MouseEvent<HTMLDivElement>
@@ -238,7 +280,7 @@ function ServiceRequestDialog({
       event.target === event.currentTarget &&
       !isSubmitting
     ) {
-      onClose();
+      void handleCloseRequest();
     }
   };
 
@@ -326,13 +368,16 @@ function ServiceRequestDialog({
 
     setIsSubmitting(true);
     setSubmitError("");
+    setVerificationError("");
 
     try {
       if (!selectedCategory) {
-        throw new Error("Select a service before confirming your request.");
+        throw new Error(
+          "Select a service before confirming your request."
+        );
       }
 
-      const createdRequest = await createRequest({
+      const challenge = await startRequestVerification({
         serviceId: selectedCategory.id,
         issueDetails,
         fullName: customerInformation.fullName,
@@ -344,9 +389,10 @@ function ServiceRequestDialog({
         requestedTime: selectedTime,
       });
 
-      setRequestReference(createdRequest.reference);
-
-      setCurrentStep(6);
+      setVerificationChallenge({
+        ...challenge,
+        idempotencyKey: crypto.randomUUID(),
+      });
     } catch (error) {
       setSubmitError(
         error instanceof Error
@@ -358,12 +404,91 @@ function ServiceRequestDialog({
     }
   };
 
+  const handleVerifyCode = async (code: string) => {
+    if (!verificationChallenge || isSubmitting) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setVerificationError("");
+
+    try {
+      const createdRequest = await verifyRequestPhone(
+        verificationChallenge.verificationId,
+        code,
+        verificationChallenge.idempotencyKey
+      );
+      setRequestReference(createdRequest.reference);
+      setApproximatePrice(createdRequest.approximatePrice);
+      setVerificationChallenge(null);
+      setCurrentStep(6);
+    } catch (error) {
+      setVerificationError(
+        error instanceof Error
+          ? error.message
+          : "We could not verify your phone number. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    if (!verificationChallenge || isSubmitting) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setVerificationError("");
+
+    try {
+      const challenge = await resendRequestVerification(
+        verificationChallenge.verificationId
+      );
+      setVerificationChallenge({
+        ...challenge,
+        idempotencyKey: verificationChallenge.idempotencyKey,
+      });
+    } catch (error) {
+      setVerificationError(
+        error instanceof Error
+          ? error.message
+          : "We could not resend the verification code."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCancelVerification = async () => {
+    if (!verificationChallenge || isSubmitting) {
+      return;
+    }
+
+    try {
+      await cancelRequestVerification(
+        verificationChallenge.verificationId
+      );
+      setVerificationChallenge(null);
+      setVerificationError("");
+      setSubmitError(
+        "Phone verification was cancelled. Your request has not been submitted."
+      );
+    } catch (error) {
+      setVerificationError(
+        error instanceof Error
+          ? error.message
+          : "We couldn't cancel verification. Please try again."
+      );
+    }
+  };
+
   /* =========================================================
      STEP 6 — SUCCESS
      ========================================================= */
 
   const handleSuccessDone = () => {
-    onClose();
+    void handleCloseRequest();
   };
 
   /* =========================================================
@@ -384,7 +509,7 @@ function ServiceRequestDialog({
         aria-labelledby="request-service-title"
         aria-label="Request a service"
       >
-        <ServiceRequestHeader onClose={onClose} />
+        <ServiceRequestHeader onClose={() => void handleCloseRequest()} />
 
         <ServiceRequestProgress
           currentStep={currentStep}
@@ -393,21 +518,19 @@ function ServiceRequestDialog({
 
         <div ref={modalBodyRef} className={styles.modalBody}>
           {/* =================================================
-              STEP 1
+              STEP 1 — SERVICE CATEGORY
               ================================================= */}
 
           {currentStep === 1 && (
             <CategoryStep
-              selectedCategory={
-                selectedCategory?.id ?? null
-              }
+              selectedCategory={selectedCategory?.id ?? null}
               onSelectCategory={handleCategorySelect}
               onContinue={handleCategoryContinue}
             />
           )}
 
           {/* =================================================
-              STEP 2
+              STEP 2 — ISSUE
               ================================================= */}
 
           {currentStep === 2 && (
@@ -419,7 +542,7 @@ function ServiceRequestDialog({
           )}
 
           {/* =================================================
-              STEP 3
+              STEP 3 — CUSTOMER INFORMATION & LOCATION
               ================================================= */}
 
           {currentStep === 3 && (
@@ -441,9 +564,7 @@ function ServiceRequestDialog({
                 time: selectedTime,
               }}
               onBack={handleAvailabilityBack}
-              onContinue={
-                handleAvailabilityContinue
-              }
+              onContinue={handleAvailabilityContinue}
             />
           )}
 
@@ -453,21 +574,13 @@ function ServiceRequestDialog({
 
           {currentStep === 5 && (
             <ConfirmationStep
-              serviceName={
-                selectedCategory?.name ?? ""
-              }
+              serviceName={selectedCategory?.name ?? ""}
               issueDetails={issueDetails}
-              fullName={
-                customerInformation.fullName
-              }
+              fullName={customerInformation.fullName}
               phone={customerInformation.phone}
               email={customerInformation.email}
-              location={
-                customerInformation.location
-              }
-              directions={
-                customerInformation.directions
-              }
+              location={customerInformation.location}
+              directions={customerInformation.directions}
               selectedDate={selectedDate}
               selectedTime={selectedTime}
               approximatePrice={approximatePrice}
@@ -485,11 +598,25 @@ function ServiceRequestDialog({
           {currentStep === 6 && (
             <SuccessStep
               requestReference={requestReference}
-              email={customerInformation.email}
+              phoneNumber={customerInformation.phone}
+              approximatePrice={approximatePrice ?? undefined}
               onDone={handleSuccessDone}
             />
           )}
         </div>
+
+        {verificationChallenge && (
+          <PhoneVerificationModal
+            key={verificationChallenge.expiresAt}
+            challenge={verificationChallenge}
+            phoneNumber={customerInformation.phone}
+            error={verificationError}
+            busy={isSubmitting}
+            onVerify={handleVerifyCode}
+            onResend={handleResendCode}
+            onCancel={handleCancelVerification}
+          />
+        )}
       </section>
     </div>
   );

@@ -9,6 +9,7 @@ export interface Review {
 
 export interface CreateReviewInput {
   customerName: string;
+  phone: string;
   serviceCategory: string;
   rating: number;
   reviewText: string;

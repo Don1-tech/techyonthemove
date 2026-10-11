@@ -11,11 +11,10 @@ export default function ServiceRequestHeader({
     <header className={styles.modalHeader}>
       <div className={styles.headerText}>
         <span className={styles.headerLabel}>
-          Requesting  Service
+          Request a service
         </span>
 
-      
-       
+        <h2>Techy service booking</h2>
       </div>
 
       <button
@@ -24,7 +23,7 @@ export default function ServiceRequestHeader({
         onClick={onClose}
         aria-label="Close request service"
       >
-        X
+        ×
       </button>
     </header>
   );

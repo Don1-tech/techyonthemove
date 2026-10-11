@@ -505,6 +505,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: nowrap;
   gap: 10px;
 
   margin-top: 7px;
@@ -993,7 +994,8 @@
 
   .backButton,
   .continueButton {
-    height: 38px;
+    min-height: 44px;
+    height: auto;
     padding: 0 14px;
     font-size: 12px;
   }

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import styles from "./IssueStep.module.css";
 
@@ -13,37 +14,52 @@ export default function IssueDetailsStep({
   onContinue,
 }: IssueDetailsStepProps) {
   const [details, setDetails] = useState(value);
+  const [additionalInformation, setAdditionalInformation] = useState("");
 
   const canContinue = details.trim().length > 0;
 
   const handleContinue = () => {
     if (!canContinue) return;
 
-    onContinue(details.trim());
+    const combinedDetails = [
+      details.trim(),
+      additionalInformation.trim()
+        ? `Additional information: ${additionalInformation.trim()}`
+        : "",
+    ]
+      .filter(Boolean)
+      .join("\n\n");
+
+    onContinue(combinedDetails);
   };
 
   return (
     <div className={styles.step}>
-      {/* =====================================================
-          HEADING
-          ===================================================== */}
-
       <div className={styles.heading}>
         <h2>Tell us about the issue</h2>
-
-      
       </div>
-
-      {/* =====================================================
-          CONTENT
-          ===================================================== */}
 
       <div className={styles.content}>
         <div className={styles.fieldGroup}>
-          <label htmlFor="issue-details">
-            What is the problem?
-            <span className={styles.required}>*</span>
-          </label>
+          <div className={styles.labelRow}>
+            <label htmlFor="issue-details">
+              What is the problem?
+              <span className={styles.required}>*</span>
+            </label>
+
+            <div
+              className={styles.hardwareTip}
+              role="note"
+              title="Mention any extra hardware or materials you may need."
+            >
+              <span className={styles.infoIcon} aria-hidden="true">
+                i
+              </span>
+              <span>
+                Need extra hardware or materials? Tell us for a fuller quote.
+              </span>
+            </div>
+          </div>
 
           <textarea
             id="issue-details"
@@ -53,11 +69,14 @@ export default function IssueDetailsStep({
             placeholder="For example: My Wi-Fi keeps disconnecting every few minutes..."
             rows={7}
             maxLength={1000}
+            required
           />
 
           <div className={styles.fieldFooter}>
             <div className={styles.hintPill}>
-              <span className={styles.infoIcon}>i</span>
+              <span className={styles.infoIcon} aria-hidden="true">
+                i
+              </span>
 
               <span>
                 Include error codes, warning messages, or things you've already
@@ -71,30 +90,28 @@ export default function IssueDetailsStep({
           </div>
         </div>
 
-        {/* ===================================================
-            ADDITIONAL INFORMATION
-            =================================================== */}
-
         <div className={styles.fieldGroup}>
-          <label htmlFor="additional-information">
-            Additional information
-            <span className={styles.optional}>(optional)</span>
-          </label>
+        
 
           <textarea
             id="additional-information"
             className={`${styles.textarea} ${styles.smallTextarea}`}
-            placeholder="Anything else that may help the technician..."
+            value={additionalInformation}
+            onChange={(event) =>
+              setAdditionalInformation(event.target.value)
+            }
+            placeholder="List extra hardware, materials, quantities, or anything else the technician should know..."
             rows={3}
             maxLength={500}
           />
 
+          <div className={styles.fieldFooter}>
+            <span className={styles.characterCount}>
+              {additionalInformation.length}/500
+            </span>
+          </div>
         </div>
       </div>
-
-      {/* =====================================================
-          ACTION BAR
-          ===================================================== */}
 
       <div className={styles.actionBar}>
         <button

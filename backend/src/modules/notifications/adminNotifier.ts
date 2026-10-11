@@ -22,10 +22,8 @@ export async function notifyAdminRequestCreated(
     );
 
     if (!response.ok) {
-      const body = await response.text();
-
       console.error(
-        `Admin notification failed: ${response.status} ${body}`
+        `Admin notification failed with status ${response.status}.`
       );
 
       return;

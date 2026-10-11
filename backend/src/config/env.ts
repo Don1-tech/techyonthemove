@@ -21,4 +21,17 @@ export const env = {
   databaseUrl: process.env.DATABASE_URL!,
 
   businessEmail: process.env.BUSINESS_EMAIL!,
+
+  otpHmacSecret: process.env.OTP_HMAC_SECRET,
+
+  africaTalkingUsername: process.env.AFRICASTALKING_USERNAME,
+
+  africaTalkingApiKey: process.env.AFRICASTALKING_API_KEY,
+
+  africaTalkingSenderId: process.env.AFRICASTALKING_SENDER_ID,
+
+  africaTalkingEnvironment:
+    process.env.AFRICASTALKING_ENVIRONMENT === "production"
+      ? "production"
+      : "sandbox",
 };

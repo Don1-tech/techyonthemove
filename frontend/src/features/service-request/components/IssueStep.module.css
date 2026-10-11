@@ -5,6 +5,7 @@
 .step {
   width: 100%;
   height: 100%;
+  min-width: 0;
   min-height: 0;
 
   display: flex;
@@ -51,18 +52,19 @@
 
 .content {
   width: 100%;
+  min-width: 0;
   min-height: 0;
 
   display: flex;
   flex-direction: column;
-
   gap: 14px;
 
   flex: 1 1 auto;
 
   box-sizing: border-box;
 
-  overflow: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 
@@ -72,6 +74,7 @@
 
 .fieldGroup {
   width: 100%;
+  min-width: 0;
   min-height: 0;
 
   display: flex;
@@ -81,7 +84,7 @@
 }
 
 .fieldGroup:first-child {
-  flex: 1 1 auto;
+  flex: 1 0 auto;
   min-height: 0;
 }
 
@@ -99,6 +102,18 @@
   font-size: 14px;
   line-height: 1.4;
   font-weight: 600;
+}
+
+.labelRow {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.labelRow label {
+  margin-bottom: 0;
 }
 
 .required {
@@ -126,13 +141,14 @@
 .textarea {
   width: 100%;
   min-width: 0;
-  min-height: 0;
+  min-height: 120px;
+  height: clamp(120px, 28vh, 220px);
 
   padding: 13px 14px;
 
   box-sizing: border-box;
 
-  resize: none;
+  resize: vertical;
 
   border: 1.5px solid #cbd5e1;
   border-radius: 14px;
@@ -169,7 +185,6 @@
 
 .fieldGroup:first-child .textarea {
   flex: 1 1 auto;
-
   min-height: 120px;
 }
 
@@ -179,10 +194,9 @@
    ========================================================= */
 
 .smallTextarea {
-  height: 76px;
-  min-height: 76px;
-
-  flex: 0 0 76px;
+  height: clamp(84px, 12vh, 110px);
+  min-height: 84px;
+  flex: 0 0 auto;
 }
 
 
@@ -237,8 +251,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
 
-  gap: 10px;
+  gap: 8px 10px;
 
   margin-top: 5px;
 
@@ -253,12 +268,12 @@
    ========================================================= */
 
 .hintPill {
-  max-width: 620px;
+  flex: 1 1 auto;
   min-width: 0;
+  max-width: 100%;
 
   display: inline-flex;
   align-items: center;
-
   gap: 7px;
 
   padding: 5px 9px 5px 6px;
@@ -282,18 +297,49 @@
   font-weight: 600;
 }
 
+.hardwareTip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: fit-content;
+  min-width: 0;
+  max-width: 100%;
+
+  padding: 7px 11px;
+
+  border: 1px solid rgba(105, 153, 230, 0.3);
+  border-radius: 999px;
+
+  background: linear-gradient(
+    110deg,
+    rgba(218, 239, 255, 0.75),
+    rgba(238, 229, 255, 0.8)
+  );
+
+  color: #405879;
+
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.hintPill > span:last-child,
+.hardwareTip > span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 
 /* =========================================================
    INFO ICON
    ========================================================= */
 
 .infoIcon {
-  width: 20px;
-  height: 20px;
+  width: 17px;
+  height: 17px;
 
-  flex: 0 0 20px;
+  flex: 0 0 17px;
 
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
 
@@ -302,13 +348,13 @@
   border: 1px solid #7dd3fc;
   border-radius: 50%;
 
-  background: #e0f2fe;
+  background: linear-gradient(135deg, #62c7ed, #a99bf4);
 
-  color: #0369a1;
+  color: #ffffff;
 
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 
@@ -318,6 +364,7 @@
 
 .characterCount {
   flex: 0 0 auto;
+  margin-left: auto;
 
   color: #94a3b8;
 
@@ -338,9 +385,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: nowrap;
+  gap: 10px;
 
-  margin-top: 8px;
-  padding-top: 10px;
+  margin-top: auto;
+  padding-top: 12px;
 
   border-top: 1px solid #e2e8f0;
 
@@ -707,80 +756,71 @@
    ========================================================= */
 
 @media (max-width: 560px) {
-
   .heading {
     margin-bottom: 12px;
   }
-
 
   .heading h2 {
     font-size: 19px;
     font-weight: 600;
   }
 
-
   .content {
     gap: 11px;
   }
 
-
   .fieldGroup:first-child .textarea {
-    min-height: 100px;
+    min-height: 112px;
   }
-
 
   .smallTextarea {
-    height: 68px;
-    min-height: 68px;
+    height: 74px;
+    min-height: 74px;
   }
-
 
   .fieldFooter {
     align-items: flex-start;
   }
-
 
   .hintPill {
     font-size: 10px;
     font-weight: 500;
   }
 
-
   .actionBar {
     margin-top: 5px;
-
     padding-top: 8px;
   }
 
-
   .backButton,
   .continueButton {
-    height: 40px;
-
+    min-height: 44px;
+    height: auto;
     padding: 0 16px;
-
     font-size: 13px;
     font-weight: 700;
   }
+}
 
-
-  .backButton {
-    min-width: 100px;
+@media (max-width: 420px) {
+  .fieldFooter {
+    flex-direction: column;
+    align-items: stretch;
   }
 
+  .characterCount {
+    align-self: flex-end;
+  }
 
+  .hardwareTip {
+    width: 100%;
+    border-radius: 12px;
+  }
+
+  .backButton,
   .continueButton {
-    min-width: 125px;
+    height: auto;
+    min-height: 44px;
+    min-width: 0;
   }
-}
-
-.content {
-  min-width: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-
-.actionBar {
-  flex: 0 0 auto;
-  margin-top: auto;
 }

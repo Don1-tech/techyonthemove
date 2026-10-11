@@ -286,15 +286,15 @@ export default function LegalDocument({
 
                 <p>
                   Email:{" "}
-                  <a href="mailto:techy@move.gmail.com">
-                    techy@move.gmail.com
+                  <a href="mailto:athmanlaure@gmail.com">
+                   athmanlaure@gmail.com
                   </a>
                 </p>
 
                 <p>
                   Phone:{" "}
-                  <a href="tel:0720200500">
-                    0720200500
+                  <a href="tel:0757000390">
+                    0757000390
                   </a>
                 </p>
               </section>
@@ -500,17 +500,17 @@ export default function LegalDocument({
                   please contact Techy On The Move.
                 </p>
 
-                <p>
+                 <p>
                   Email:{" "}
-                  <a href="mailto:techy@move.gmail.com">
-                    techy@move.gmail.com
+                  <a href="mailto:athmanlaure@gmail.com">
+                   athmanlaure@gmail.com
                   </a>
                 </p>
 
                 <p>
                   Phone:{" "}
-                  <a href="tel:0720200500">
-                    0720200500
+                  <a href="tel:0757000390">
+                    0757000390
                   </a>
                 </p>
               </section>

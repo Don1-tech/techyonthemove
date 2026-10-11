@@ -32,6 +32,7 @@
    ========================================================= */
 
 .modal {
+  position: relative;
   display: flex;
   flex-direction: column;
 
@@ -331,48 +332,51 @@
 }
 
 .modalBody [class*="actionBar"] {
-  position: relative;
-  z-index: 1;
-
   flex: 0 0 auto;
+  min-width: 0;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  flex-wrap: nowrap;
+  gap: clamp(6px, 2vw, 12px);
 
   margin-top: auto;
-  padding: 12px 0 4px;
+  padding: 12px clamp(0px, 1vw, 8px) 4px;
 
   border-top: 1px solid #e2e8f0;
   background: #ffffff;
+  box-sizing: border-box;
 }
 
 .modalBody [class*="actionBar"] > button {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: calc(50% - 4px);
   min-height: 44px;
   height: auto;
   width: auto;
   box-sizing: border-box;
-  padding: 10px 14px;
+  padding: 9px clamp(10px, 2vw, 14px);
   font-size: 13px;
   font-weight: 700;
   line-height: 1.25;
+  text-align: center;
+  overflow-wrap: anywhere;
 }
 
-.modalBody [class*="actionBar"] > button:first-child {
-  flex: 0 1 auto;
-  min-width: 88px;
+.modalBody [class*="actionBar"] > button:first-child:not(:last-child) {
+  margin-right: auto;
 }
 
 .modalBody [class*="actionBar"] > button:last-child {
-  flex: 0 1 auto;
-  min-width: 150px;
-  max-width: calc(100% - 96px);
-  white-space: normal;
+  margin-left: auto;
 }
 
 .modalBody [class*="actionBar"] > button:only-child {
+  flex: 0 0 auto;
   min-width: 140px;
   max-width: 100%;
+  margin-left: auto;
 }
 
 .modalBody [class*="actionBar"] > button:focus-visible {
@@ -438,5 +442,38 @@
   .modalBody {
     padding-left: 14px;
     padding-right: 14px;
+  }
+
+  .progressStepper {
+    gap: 2px;
+  }
+
+  .progressItem {
+    min-width: 0;
+  }
+
+  .progressCircle {
+    width: 24px;
+    height: 24px;
+    flex-basis: 24px;
+  }
+
+  .progressLine {
+    min-width: 12px;
+    margin: 0 4px;
+  }
+}
+
+@media (max-width: 360px) {
+  .modalBody [class*="actionBar"] {
+    gap: 6px;
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  .modalBody [class*="actionBar"] > button {
+    padding-right: 8px;
+    padding-left: 8px;
+    font-size: 12px;
   }
 }

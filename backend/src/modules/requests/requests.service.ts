@@ -5,29 +5,77 @@ import {
 } from "../services/services.repository";
 
 import {
-  createRequest,
-} from "./requests.repository";
-
-import {
-  generateRequestReference,
-} from "./requestReference";
-
-import {
   getAvailability,
 } from "../availability/availability.service";
 
-import {
-  notifyAdminRequestCreated,
-} from "../notifications/adminNotifier";
-
 import type {
   CreateRequestInput,
-  Request,
 } from "./requests.types";
 
-export async function submitRequest(
+export class RequestValidationError extends Error {
+  constructor(
+    message: string,
+    readonly statusCode: number
+  ) {
+    super(message);
+  }
+}
+
+function isWithinBookingWindow(dateValue: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
+    return false;
+  }
+
+  const date = new Date(`${dateValue}T00:00:00.000Z`);
+  if (
+    Number.isNaN(date.getTime()) ||
+    date.toISOString().slice(0, 10) !== dateValue
+  ) {
+    return false;
+  }
+
+  const today = new Date();
+  const todayStart = Date.UTC(
+    today.getUTCFullYear(),
+    today.getUTCMonth(),
+    today.getUTCDate()
+  );
+  const requestedStart = date.getTime();
+
+  return (
+    requestedStart >= todayStart &&
+    requestedStart < todayStart + 7 * 24 * 60 * 60 * 1000
+  );
+}
+
+export async function validateRequest(
   input: CreateRequestInput
-): Promise<Request> {
+): Promise<number | null> {
+  if (
+    input.fullName.trim().length < 2 ||
+    input.location.trim().length < 2 ||
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.email.trim())
+  ) {
+    throw new RequestValidationError(
+      "Check your name, email address, and service location.",
+      400
+    );
+  }
+
+  if (!isWithinBookingWindow(input.requestedDate)) {
+    throw new RequestValidationError(
+      "Choose an available appointment date.",
+      400
+    );
+  }
+
+  if (!["07:00", "11:00", "16:00"].includes(input.requestedTime)) {
+    throw new RequestValidationError(
+      "Choose an available appointment time.",
+      400
+    );
+  }
+
   const availability = await getAvailability(
     input.requestedDate
   );
@@ -37,8 +85,9 @@ export async function submitRequest(
   );
 
   if (!selectedSlot?.available) {
-    throw new Error(
-      "The selected time slot is no longer available."
+    throw new RequestValidationError(
+      "The selected time slot is no longer available.",
+      409
     );
   }
 
@@ -47,8 +96,9 @@ export async function submitRequest(
   );
 
   if (!service) {
-    throw new Error(
-      "The selected service does not exist or is inactive."
+    throw new RequestValidationError(
+      "The selected service does not exist or is inactive.",
+      400
     );
   }
 
@@ -68,24 +118,12 @@ export async function submitRequest(
     );
 
     if (issueResult.rows.length === 0) {
-      throw new Error(
-        "The selected issue does not belong to the selected service."
+      throw new RequestValidationError(
+        "The selected issue does not belong to the selected service.",
+        400
       );
     }
   }
 
-  const reference =
-    generateRequestReference();
-
-  const createdRequest = await createRequest(
-    input,
-    reference,
-    service.basePrice
-  );
-
-  await notifyAdminRequestCreated(
-    createdRequest
-  );
-
-  return createdRequest;
+  return service.basePrice;
 }

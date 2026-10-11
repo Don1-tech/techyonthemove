@@ -3,6 +3,7 @@ export const createReviewSchema = {
     type: "object",
     required: [
       "customerName",
+      "phone",
       "serviceCategory",
       "rating",
       "reviewText",
@@ -13,6 +14,12 @@ export const createReviewSchema = {
         type: "string",
         minLength: 2,
         maxLength: 120,
+      },
+
+      phone: {
+        type: "string",
+        minLength: 7,
+        maxLength: 30,
       },
 
       serviceCategory: {

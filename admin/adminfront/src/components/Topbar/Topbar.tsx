@@ -1,466 +1,182 @@
-
-import {
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useRef, useState } from "react";
 
 import type { ServiceRequest } from "../../types/request";
+import { formatCustomerName } from "../../utils/format";
 import styles from "./Topbar.module.css";
 
 interface TopbarProps {
-  search: string;
-  onSearchChange: (
-    value: string,
-  ) => void;
-
   notifications: ServiceRequest[];
-
-  onNotificationClick: (
-    request: ServiceRequest,
-  ) => void;
+  onNotificationClick: (request: ServiceRequest) => void;
+  onMenuClick: () => void;
+  mobileNavigationOpen: boolean;
+  onLogout: () => void;
 }
 
 export function Topbar({
-  search,
-  onSearchChange,
   notifications,
   onNotificationClick,
+  onMenuClick,
+  mobileNavigationOpen,
+  onLogout,
 }: TopbarProps) {
-  const [
-    notificationOpen,
-    setNotificationOpen,
-  ] = useState(false);
-
-  const [
-    toastRequest,
-    setToastRequest,
-  ] = useState<ServiceRequest | null>(
-    null,
-  );
-
-  const previousNotificationIds =
-    useRef<Set<string>>(
-      new Set(),
-    );
-
-  const toastTimerRef =
-    useRef<ReturnType<
-      typeof setTimeout
-    > | null>(null);
-
-
-  /* =======================================================
-     DETECT NEW NOTIFICATION FOR TOAST
-     ======================================================= */
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [toastRequest, setToastRequest] = useState<ServiceRequest | null>(null);
+  const previousNotificationIds = useRef<Set<string>>(new Set());
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const currentIds =
-      new Set(
-        notifications.map(
-          (request) =>
-            request.id,
-        ),
-      );
-
-    const newRequest =
-      notifications.find(
-        (request) =>
-          !previousNotificationIds.current.has(
-            request.id,
-          ),
-      );
+    const currentIds = new Set(notifications.map((request) => request.id));
+    const newRequest = notifications.find(
+      (request) => !previousNotificationIds.current.has(request.id),
+    );
 
     if (newRequest) {
-      setToastRequest(
-        newRequest,
-      );
-
-      if (
-        toastTimerRef.current
-      ) {
-        clearTimeout(
-          toastTimerRef.current,
-        );
-      }
-
-      toastTimerRef.current =
-        setTimeout(() => {
-          setToastRequest(
-            null,
-          );
-        }, 7000);
+      setToastRequest(newRequest);
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+      toastTimerRef.current = setTimeout(() => setToastRequest(null), 7000);
     }
 
-    previousNotificationIds.current =
-      currentIds;
+    previousNotificationIds.current = currentIds;
   }, [notifications]);
 
-
-  /* =======================================================
-     CLEANUP
-     ======================================================= */
+  useEffect(
+    () => () => {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    },
+    [],
+  );
 
   useEffect(() => {
-    return () => {
-      if (
-        toastTimerRef.current
-      ) {
-        clearTimeout(
-          toastTimerRef.current,
-        );
-      }
+    if (!notificationOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setNotificationOpen(false);
     };
-  }, []);
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [notificationOpen]);
 
-
-  /* =======================================================
-     OPEN REQUEST FROM TOAST
-     ======================================================= */
-
-  const handleToastClick = () => {
-    if (!toastRequest) {
-      return;
-    }
-
-    onNotificationClick(
-      toastRequest,
-    );
-
+  function openRequest(request: ServiceRequest) {
+    onNotificationClick(request);
+    setNotificationOpen(false);
     setToastRequest(null);
-  };
-
-
-  /* =======================================================
-     OPEN REQUEST FROM PANEL
-     ======================================================= */
-
-  const handleNotificationClick = (
-    request: ServiceRequest,
-  ) => {
-    onNotificationClick(
-      request,
-    );
-
-    setNotificationOpen(
-      false,
-    );
-  };
-
-
-  /* =======================================================
-     SEARCH
-     ======================================================= */
-
-  const handleSearchChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    onSearchChange(
-      event.target.value,
-    );
-  };
-
-
-  /* =======================================================
-     CLEAR SEARCH
-     ======================================================= */
-
-  const clearSearch = () => {
-    onSearchChange("");
-  };
-
+  }
 
   return (
     <>
-      <header
-        className={
-          styles.topbar
-        }
-      >
-        {/* SEARCH */}
-        <div
-          className={
-            styles.searchWrapper
-          }
+      <header className={styles.topbar}>
+        <button
+          type="button"
+          className={styles.menuButton}
+          id="admin-navigation-toggle"
+          onClick={() => {
+            onMenuClick();
+            window.setTimeout(() => {
+              document.getElementById("admin-mobile-nav-close")?.focus();
+            }, 0);
+          }}
+          aria-label="Open navigation"
+          aria-expanded={mobileNavigationOpen}
+          aria-controls="admin-mobile-sidebar"
         >
-          <span
-            className={
-              styles.searchIcon
-            }
-            aria-hidden="true"
-          >
-            <span />
-          </span>
-
-          <input
-            type="text"
-            value={search}
-            onChange={
-              handleSearchChange
-            }
-            placeholder="Search requests..."
-            aria-label="Search requests"
-            className={
-              styles.searchInput
-            }
-          />
-
-          {search && (
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <div className={styles.heading}>
+          <strong>Techy Admin</strong>
+          <span>Service operations</span>
+        </div>
+        <div className={styles.actions}>
+          <div className={styles.notificationArea}>
             <button
               type="button"
-              className={
-                styles.clearButton
+              className={`${styles.notificationButton} ${
+                notificationOpen ? styles.notificationButtonActive : ""
+              }`}
+              onClick={() => setNotificationOpen((current) => !current)}
+              aria-label={
+                notifications.length > 0
+                  ? `Notifications, ${notifications.length} new requests`
+                  : "Notifications"
               }
-              onClick={
-                clearSearch
-              }
-              aria-label="Clear search"
+              aria-expanded={notificationOpen}
+              aria-controls="request-notifications"
             >
-              ×
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" />
+              </svg>
+              {notifications.length > 0 && (
+                <span className={styles.notificationCount}>
+                  {notifications.length > 99 ? "99+" : notifications.length}
+                </span>
+              )}
             </button>
-          )}
-        </div>
 
-
-        {/* NOTIFICATION */}
-        <div
-          className={
-            styles.notificationArea
-          }
-        >
+            {notificationOpen && (
+              <section
+                id="request-notifications"
+                className={styles.notificationPanel}
+                aria-label="New request notifications"
+              >
+                <div className={styles.panelHeader}>
+                  <div>
+                    <h2>New requests</h2>
+                    <p>Requests waiting for your attention</p>
+                  </div>
+                  <span className={styles.panelCount}>
+                    {notifications.length}
+                  </span>
+                </div>
+                <div className={styles.notificationList}>
+                  {notifications.length === 0 ? (
+                    <p className={styles.noNotifications}>
+                      You&apos;re all caught up.
+                    </p>
+                  ) : (
+                    notifications.map((request) => (
+                      <button
+                        type="button"
+                        key={request.id}
+                        className={styles.notificationItem}
+                        onClick={() => openRequest(request)}
+                      >
+                        <span className={styles.notificationDot} aria-hidden="true" />
+                        <span className={styles.notificationContent}>
+                          <strong>{formatCustomerName(request.fullName)}</strong>
+                          <span>
+                            {request.serviceName} · {request.reference}
+                          </span>
+                        </span>
+                      </button>
+                    ))
+                  )}
+                </div>
+              </section>
+            )}
+          </div>
           <button
             type="button"
-            className={`${styles.notificationButton} ${
-              notificationOpen
-                ? styles.notificationButtonActive
-                : ""
-            }`}
-            onClick={() =>
-              setNotificationOpen(
-                (current) =>
-                  !current,
-              )
-            }
-            aria-label={
-              notifications.length > 0
-                ? `${notifications.length} new requests`
-                : "Notifications"
-            }
-            aria-expanded={
-              notificationOpen
-            }
+            className={styles.logoutButton}
+            onClick={onLogout}
           >
-            <span
-              className={
-                styles.bellIcon
-              }
-              aria-hidden="true"
-            >
-              <span />
-            </span>
-
-            {notifications.length >
-              0 && (
-              <span
-                className={
-                  styles.notificationCount
-                }
-              >
-                {notifications.length >
-                99
-                  ? "99+"
-                  : notifications.length}
-              </span>
-            )}
+            Sign out
           </button>
-
-
-          {/* NOTIFICATION PANEL */}
-          {notificationOpen && (
-            <div
-              className={
-                styles.notificationPanel
-              }
-            >
-              <div
-                className={
-                  styles.panelHeader
-                }
-              >
-                <div>
-                  <h3>
-                    New requests
-                  </h3>
-
-                  <p>
-                    Requests waiting
-                    for your attention
-                  </p>
-                </div>
-
-                <span
-                  className={
-                    styles.panelCount
-                  }
-                >
-                  {
-                    notifications.length
-                  }
-                </span>
-              </div>
-
-              <div
-                className={
-                  styles.notificationList
-                }
-              >
-                {notifications.length ===
-                  0 && (
-                  <div
-                    className={
-                      styles.noNotifications
-                    }
-                  >
-                    <span
-                      className={
-                        styles.noNotificationIcon
-                      }
-                    >
-                      ✓
-                    </span>
-
-                    <p>
-                      You're all
-                      caught up.
-                    </p>
-                  </div>
-                )}
-
-                {notifications.map(
-                  (request) => (
-                    <button
-                      type="button"
-                      key={
-                        request.id
-                      }
-                      className={
-                        styles.notificationItem
-                      }
-                      onClick={() =>
-                        handleNotificationClick(
-                          request,
-                        )
-                      }
-                    >
-                      <span
-                        className={
-                          styles.notificationDot
-                        }
-                      />
-
-                      <span
-                        className={
-                          styles.notificationContent
-                        }
-                      >
-                        <strong>
-                          New request
-                        </strong>
-
-                        <span>
-                          {
-                            request.fullName
-                          }
-                        </span>
-
-                        <small>
-                          {
-                            request.serviceName
-                          }
-                          {" · "}
-                          {
-                            request.reference
-                          }
-                        </small>
-                      </span>
-
-                      <span
-                        className={
-                          styles.notificationArrow
-                        }
-                      >
-                        →
-                      </span>
-                    </button>
-                  ),
-                )}
-              </div>
-            </div>
-          )}
         </div>
       </header>
-
-
-      {/* ===================================================
-          NEW REQUEST TOAST
-          =================================================== */}
 
       {toastRequest && (
         <button
           type="button"
-          className={
-            styles.toast
-          }
-          onClick={
-            handleToastClick
-          }
-          aria-label="Open new request"
+          className={styles.toast}
+          onClick={() => openRequest(toastRequest)}
+          aria-label={`Open new request from ${toastRequest.fullName}, ${toastRequest.reference}`}
+          aria-live="polite"
         >
-          <span
-            className={
-              styles.toastIcon
-            }
-            aria-hidden="true"
-          >
-            <span />
+          <strong>New request received</strong>
+          <span>
+            {formatCustomerName(toastRequest.fullName)} · {toastRequest.serviceName}
           </span>
-
-          <span
-            className={
-              styles.toastContent
-            }
-          >
-            <strong>
-              New request received
-            </strong>
-
-            <span>
-              {
-                toastRequest.fullName
-              }
-              {" · "}
-              {
-                toastRequest.serviceName
-              }
-            </span>
-
-            <small>
-              {
-                toastRequest.reference
-              }
-              {" · "}
-              Click to view
-            </small>
-          </span>
-
-          <span
-            className={
-              styles.toastClose
-            }
-            aria-hidden="true"
-          >
-            ×
-          </span>
+          <small>{toastRequest.reference} · View details</small>
         </button>
       )}
     </>

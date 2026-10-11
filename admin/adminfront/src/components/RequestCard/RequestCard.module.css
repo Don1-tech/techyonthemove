@@ -1,273 +1,190 @@
-
-/* =========================================================
-   REQUEST CARD
-   ========================================================= */
-
 .card {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 100%;
-  min-width: 0;
-  padding: 19px 21px;
-  box-sizing: border-box;
-
-  background: #ffffff;
-  border: 1px solid #68788e;
-  border-radius: 14px;
-
-  box-shadow: 0 3px 10px rgb(18 26 46 / 8%);
-
-  transition:
-    border-color 180ms ease,
-    box-shadow 180ms ease,
-    transform 180ms ease;
-}
-
-.card::before {
-  content: "";
-  position: absolute;
-  top: 15px;
-  bottom: 15px;
-  left: 0;
-  width: 5px;
-
-  background: linear-gradient(
-    180deg,
-    #a99aff 0%,
-    #83d9e9 40%,
-    #9bcaff 80%
-  );
-
-  border-radius: 0 4px 4px 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px 20px;
+  padding: 18px 20px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(16 35 63 / 4%);
+  transition: border-color 140ms ease, box-shadow 140ms ease;
 }
 
 .card:hover {
-  border-color: #334155;
-  box-shadow: 0 6px 16px rgb(18 26 46 / 12%);
-  transform: translateY(-2px);
+  border-color: #b8c8da;
+  box-shadow: 0 3px 10px rgb(16 35 63 / 6%);
 }
 
-/* =========================================================
-   TOP ROW: REFERENCE AND STATUS
-   ========================================================= */
-
-.top {
+.identity {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 10px;
-
-  width: 100%;
   min-width: 0;
-}
-
-/* Clickable request reference */
-
-.reference {
-  display: inline-flex;
   align-items: center;
-
-  max-width: 100%;
-  min-width: 0;
-  padding: 5px 9px;
-  box-sizing: border-box;
-
-  color: #7770c9;
-  background: #f4f2ff;
-  border: 1px solid #9285dc;
-  border-radius: 7px;
-
-  font-family: inherit;
-  font-size: 12px;
-  font-weight: 800;
-  line-height: 1.5;
-  letter-spacing: 0.035em;
-  text-align: left;
-
-  overflow-wrap: anywhere;
-  cursor: pointer;
-
-  transition:
-    color 180ms ease,
-    background 180ms ease,
-    border-color 180ms ease;
+  gap: 12px;
 }
-
-.reference:hover {
-  color: #5e55b3;
-  background: #ece9ff;
-  border-color: #d8d0ff;
-}
-
-.reference:focus-visible {
-  outline: 2px solid #8acfe9;
-  outline-offset: 3px;
-}
-
-/* =========================================================
-   CUSTOMER NAME
-   ========================================================= */
 
 .customer {
-  min-width: 0;
-  margin: 0;
-
-  color: #121a2e;
-  font-size: 16px;
-  font-weight: 800;
-  line-height: 1.45;
-  letter-spacing: -0.025em;
-
   overflow-wrap: anywhere;
-  word-break: break-word;
+  margin: 0;
+  color: #1d2939;
+  font-size: 15px;
+  font-weight: 650;
+  line-height: 1.4;
 }
 
-/* =========================================================
-   SERVICE AND ISSUE DETAILS
-   ========================================================= */
-
-.serviceRow {
+.metadata {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-
   min-width: 0;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+}
+
+.referenceGroup {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 4px;
+}
+
+.reference {
+  overflow-wrap: anywhere;
+  color: #68778c;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.copyButton {
+  display: inline-grid;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #68778c;
+  cursor: pointer;
+}
+
+.copyButton:hover {
+  background: #f0f4f8;
+  color: #183b63;
+}
+
+.copyButton:focus-visible,
+.primaryAction:focus-visible {
+  outline: 3px solid #70b8f4;
+  outline-offset: 2px;
+}
+
+.copyButton svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.5;
 }
 
 .service {
-  display: block;
   max-width: 100%;
-  min-width: 0;
-
-  color: #344056;
-  font-size: 12px;
-  font-weight: 750;
-  line-height: 1.6;
-
   overflow-wrap: anywhere;
-  word-break: break-word;
+  padding: 5px 9px;
+  border: 1px solid #dce8f5;
+  border-radius: 999px;
+  background: #f3f7fc;
+  color: #35516f;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.25;
 }
 
-.issue {
-  display: -webkit-box;
-  width: 100%;
-  min-width: 0;
-
-  color: #46546a;
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1.7;
-
-  overflow-wrap: anywhere;
-  word-break: break-word;
-
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-  overflow: hidden;
+.actions {
+  grid-column: 2;
+  grid-row: 1 / span 2;
 }
 
-/* =========================================================
-   LOCATION, DATE AND TIME
-   ========================================================= */
-
-.meta {
-  display: flex;
+.primaryAction {
+  display: inline-flex;
+  min-height: 38px;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 6px 8px;
-
-  min-width: 0;
-  padding-top: 13px;
-
-  color: #46546a;
-  border-top: 1px solid #a3afbf;
-
-  font-size: 12px;
-  font-weight: 650;
-  line-height: 1.7;
+  justify-content: center;
+  gap: 9px;
+  padding: 0 14px;
+  border: 1px solid #183b63;
+  border-radius: 8px;
+  background: #183b63;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
-.meta > span {
-  min-width: 0;
-  overflow-wrap: anywhere;
-  word-break: break-word;
+.primaryAction:hover {
+  border-color: #102c4c;
+  background: #102c4c;
 }
 
-.metaSeparator {
-  flex: 0 0 auto;
-  color: #b5bcd0;
-  font-size: 12px;
+.primaryAction span {
+  font-size: 16px;
+  line-height: 1;
 }
 
-/* =========================================================
-   TABLET
-   ========================================================= */
+.copyToast {
+  position: fixed;
+  z-index: 1000;
+  right: 24px;
+  bottom: 24px;
+  padding: 10px 14px;
+  border: 1px solid #b7dfcd;
+  border-radius: 8px;
+  background: #f0faf5;
+  box-shadow: 0 4px 14px rgb(16 35 63 / 12%);
+  color: #185b3a;
+  font-size: 13px;
+  font-weight: 600;
+}
 
-@media (max-width: 700px) {
+.copyError {
+  border-color: #ecc7c7;
+  background: #fff5f5;
+  color: #8d2929;
+}
+
+@media (max-width: 600px) {
   .card {
-    gap: 11px;
-    padding: 16px 17px;
-    border-radius: 13px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    padding: 15px;
   }
 
-  .customer {
-    font-size: 16px;
-  }
-
-  .meta {
-    gap: 5px 7px;
-  }
-}
-
-/* =========================================================
-   MOBILE
-   ========================================================= */
-
-@media (max-width: 400px) {
-  .card {
-    gap: 10px;
-    padding: 15px 14px;
-  }
-
-  .top {
+  .identity {
     align-items: flex-start;
-    gap: 8px;
+    justify-content: space-between;
   }
 
-  .reference {
-    font-size: 11px;
+  .actions {
+    grid-column: 1;
+    grid-row: auto;
   }
 
-  .customer {
-    font-size: 15px;
+  .primaryAction {
+    width: 100%;
   }
 
-  .service,
-  .issue {
-    font-size: 12px;
-  }
-
-  .meta {
-    font-size: 11px;
+  .copyToast {
+    right: 14px;
+    bottom: 14px;
   }
 }
-
-/* =========================================================
-   REDUCED MOTION
-   ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .card,
-  .reference {
+  .card {
     transition: none;
-  }
-
-  .card:hover {
-    transform: none;
   }
 }

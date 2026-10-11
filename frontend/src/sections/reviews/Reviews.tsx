@@ -13,7 +13,7 @@ export default function Reviews() {
           <h2 id="reviews-heading">REVIEWS</h2>
 
           <p>
-            What our customer have to say about their experience with us.
+            What our customers have to say about their experience with us.
           </p>
         </header>
 

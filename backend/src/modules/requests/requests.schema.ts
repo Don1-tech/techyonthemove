@@ -38,6 +38,7 @@ export const createRequestBodySchema = {
       type: "string",
       minLength: 7,
       maxLength: 30,
+      pattern: "^\\+?[0-9 () .-]+$",
     },
 
     email: {
@@ -64,12 +65,8 @@ export const createRequestBodySchema = {
 
     requestedTime: {
       type: "string",
-      pattern: "^\\d{2}:\\d{2}(:\\d{2})?$",
+      enum: ["07:00", "11:00", "16:00"],
     },
 
-    approximatePrice: {
-      type: ["number", "null"],
-      minimum: 0,
-    },
   },
 } as const;

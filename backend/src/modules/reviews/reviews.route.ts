@@ -2,13 +2,12 @@ import type { FastifyInstance } from "fastify";
 
 import {
   createReviewController,
-  deleteReviewController,
   getReviewsController,
+  verifyReviewController,
 } from "./reviews.controller";
 
 import {
   createReviewSchema,
-  reviewIdSchema,
 } from "./reviews.schema";
 
 export default async function reviewsRoutes(
@@ -23,6 +22,15 @@ export default async function reviewsRoutes(
             type: "array",
             items: {
               type: "object",
+              additionalProperties: false,
+              required: [
+                "id",
+                "customerName",
+                "serviceCategory",
+                "rating",
+                "reviewText",
+                "createdAt",
+              ],
               properties: {
                 id: { type: "string" },
                 customerName: { type: "string" },
@@ -43,15 +51,37 @@ export default async function reviewsRoutes(
     "/api/reviews",
     {
       schema: createReviewSchema,
+      config: {
+        rateLimit: {
+          max: 3,
+          timeWindow: "15 minutes",
+        },
+      },
     },
     createReviewController
   );
 
-  fastify.delete(
-    "/api/reviews/:id",
+  fastify.post(
+    "/api/reviews/verification/verify",
     {
-      schema: reviewIdSchema,
+      schema: {
+        body: {
+          type: "object",
+          required: ["verificationId", "code"],
+          additionalProperties: false,
+          properties: {
+            verificationId: { type: "string", format: "uuid" },
+            code: { type: "string", pattern: "^[0-9]{6}$" },
+          },
+        },
+      },
+      config: {
+        rateLimit: {
+          max: 15,
+          timeWindow: "1 minute",
+        },
+      },
     },
-    deleteReviewController
+    verifyReviewController
   );
 }

@@ -1,4 +1,5 @@
 import { db } from "../../db/client";
+import type { PoolClient } from "pg";
 import type { CreateRequestInput, Request } from "./requests.types";
 
 interface RequestRow {
@@ -47,9 +48,11 @@ function mapRequest(row: RequestRow): Request {
 export async function createRequest(
   input: CreateRequestInput,
   reference: string,
-  approximatePrice: number | null
+  approximatePrice: number | null,
+  client?: PoolClient
 ): Promise<Request> {
-  const result = await db.query<RequestRow>(
+  const queryable = client ?? db;
+  const result = await queryable.query<RequestRow>(
     `
       INSERT INTO requests (
         reference,

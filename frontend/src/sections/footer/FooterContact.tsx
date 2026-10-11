@@ -9,7 +9,7 @@ export default function FooterContact() {
 
       <div className={styles.contactItems}>
         <a
-          href="mailto:techy@move.gmail.com"
+          href="athmanlaure@gmail.com"
           className={styles.contactItem}
         >
           <span
@@ -19,11 +19,11 @@ export default function FooterContact() {
             @
           </span>
 
-          <span>techy@move.gmail.com</span>
+          <span>athmanlaure@gmail.com</span>
         </a>
 
         <a
-          href="tel:0720200500"
+          href="tel:0757000390"
           className={styles.contactItem}
         >
           <span
@@ -33,7 +33,7 @@ export default function FooterContact() {
             ☎
           </span>
 
-          <span>0720200500</span>
+          <span>0757000390</span>
         </a>
       </div>
     </div>

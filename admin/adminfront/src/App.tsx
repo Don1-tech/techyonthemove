@@ -49,31 +49,6 @@ export default function App() {
   }
 
   return (
-    <>
-      <AdminPage />
-
-      <button
-        type="button"
-        onClick={handleLogout}
-        aria-label="Log out of admin dashboard"
-        style={{
-          position: "fixed",
-          top: 20,
-          right: 94,
-          zIndex: 100,
-          padding: "10px 14px",
-          border: "1px solid #b8c5d8",
-          borderRadius: 10,
-          background: "#ffffff",
-          color: "#26364e",
-          fontSize: 12,
-          fontWeight: 700,
-          cursor: "pointer",
-          boxShadow: "0 3px 12px rgba(18, 26, 46, 0.08)",
-        }}
-      >
-        Log out
-      </button>
-    </>
+    <AdminPage onLogout={handleLogout} />
   );
 }

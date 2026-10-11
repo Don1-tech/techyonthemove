@@ -4,11 +4,13 @@ import { useCallback, useEffect, useState } from "react";
 import {
   createReview,
   getReviews,
+  verifyReview,
 } from "../api/reviewsApi";
 
 import type {
   CreateReviewInput,
   Review,
+  ReviewChallenge,
 } from "../types/review";
 
 export function useReviews() {
@@ -71,7 +73,7 @@ export function useReviews() {
 
   const submitReview = async (
     input: CreateReviewInput
-  ) => {
+  ): Promise<ReviewChallenge | null> => {
     try {
       setIsSubmitting(true);
       setError(null);
@@ -92,12 +94,33 @@ export function useReviews() {
     }
   };
 
+  const confirmReview = async (
+    verificationId: string,
+    code: string
+  ): Promise<Review | null> => {
+    try {
+      setIsSubmitting(true);
+      setError(null);
+      return await verifyReview(verificationId, code);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to verify review."
+      );
+      return null;
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return {
     reviews,
     isLoading,
     isSubmitting,
     error,
     submitReview,
+    confirmReview,
     reloadReviews: loadReviews,
   };
 }

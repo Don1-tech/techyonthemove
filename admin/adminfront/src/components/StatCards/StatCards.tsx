@@ -3,10 +3,12 @@ import styles from "./StatCards.module.css";
 
 interface StatCardsProps {
   counts: DashboardCounts;
+  state: "loading" | "unavailable" | "ready";
 }
 
 export function StatCards({
   counts,
+  state,
 }: StatCardsProps) {
   const cards = [
     {
@@ -24,23 +26,29 @@ export function StatCards({
       value: counts.completed,
       key: "completed",
     },
+    {
+      label: "Cancelled",
+      value: counts.cancelled,
+      key: "cancelled",
+    },
   ];
 
   return (
-    <section className={styles.container}>
+    <section className={styles.container} aria-label="Request totals by status">
       {cards.map((card) => (
-        <div
+        <article
           key={card.key}
-          className={styles.card}
+          className={`${styles.card} ${styles[card.key]}`}
+          aria-busy={state === "loading"}
         >
           <span className={styles.label}>
+            <span className={styles.marker} aria-hidden="true" />
             {card.label}
           </span>
-
-          <strong className={styles.value}>
-            {card.value}
+          <strong className={styles.value} aria-label={`${card.label} requests`}>
+            {state === "ready" ? card.value : "—"}
           </strong>
-        </div>
+        </article>
       ))}
     </section>
   );

@@ -57,6 +57,8 @@ interface UseAdminRequestsResult {
   ) => void;
 
   loading: boolean;
+  hasLoaded: boolean;
+  searchLoading: boolean;
   error: string | null;
 
   reload: () => Promise<void>;
@@ -77,6 +79,29 @@ const getWebSocketUrl = (): string => {
     url.protocol === "https:" ? "wss:" : "ws:";
 
   return url.toString();
+};
+
+const getRequestErrorMessage = (
+  error: unknown,
+  fallback: string,
+): string => {
+  if (!(error instanceof Error)) {
+    return fallback;
+  }
+
+  if (/^(Please log in to continue|Your session expired)/.test(error.message)) {
+    return error.message;
+  }
+
+  if (/failed to fetch|networkerror|load failed/i.test(error.message)) {
+    return "Unable to connect to the request service. Check your connection and retry.";
+  }
+
+  if (error.message === "Failed to load admin requests.") {
+    return "Could not load requests. Please try again.";
+  }
+
+  return error.message;
 };
 
 /* =========================================================
@@ -307,6 +332,18 @@ const showBrowserNotification = (
    REQUEST NORMALIZATION
    ========================================================= */
 
+/**
+ * Preserves date-only values without converting them
+ * through the browser's local timezone.
+ *
+ * Supported examples:
+ * 2026-10-10
+ * 2026-10-10T00:00:00.000Z
+ * 2026-10-10 00:00:00
+ *
+ * Returns an empty string only when the value is missing
+ * or does not contain a valid ISO calendar date.
+ */
 const normalizeDate = (value: unknown): string => {
   if (typeof value !== "string") {
     return "";
@@ -318,19 +355,35 @@ const normalizeDate = (value: unknown): string => {
     return "";
   }
 
-  const match = /^(\d{4}-\d{2}-\d{2})/.exec(trimmed);
+  const match = /^(\d{4}-\d{2}-\d{2})(?:$|[T\s])/.exec(
+    trimmed,
+  );
 
   if (!match) {
     return "";
   }
 
   const date = match[1];
-
-  const parsed = new Date(`${date}T00:00:00`);
+  const [year, month, day] = date.split("-").map(Number);
 
   if (
-    Number.isNaN(parsed.getTime()) ||
-    parsed.toISOString().slice(0, 10) !== date
+    !Number.isInteger(year) ||
+    !Number.isInteger(month) ||
+    !Number.isInteger(day)
+  ) {
+    return "";
+  }
+
+  // Validate the calendar date using UTC, avoiding
+  // timezone-related changes to date-only values.
+  const parsed = new Date(
+    Date.UTC(year, month - 1, day),
+  );
+
+  if (
+    parsed.getUTCFullYear() !== year ||
+    parsed.getUTCMonth() !== month - 1 ||
+    parsed.getUTCDate() !== day
   ) {
     return "";
   }
@@ -343,7 +396,18 @@ const normalizeTime = (value: unknown): string => {
     return "";
   }
 
-  return value.trim();
+  const trimmed = value.trim();
+
+  if (!trimmed) {
+    return "";
+  }
+
+  // Convert HH:mm:ss to HH:mm for dashboard display.
+  const match = /^(\d{2}:\d{2})(?::\d{2}(?:\.\d+)?)?$/.exec(
+    trimmed,
+  );
+
+  return match ? match[1] : trimmed;
 };
 
 const normalizeRequest = (
@@ -363,13 +427,25 @@ export function useAdminRequests(): UseAdminRequestsResult {
     useState<ServiceRequest[]>([]);
 
   const [filter, setFilter] =
-    useState<RequestFilter>("pending");
+    useState<RequestFilter>("all");
 
   const [search, setSearch] = useState("");
 
-  const [loading, setLoading] = useState(true);
+  const [searchResults, setSearchResults] =
+    useState<ServiceRequest[] | null>(null);
 
-  const [error, setError] =
+  const [searchLoading, setSearchLoading] =
+    useState(false);
+
+  const [searchRefresh, setSearchRefresh] = useState(0);
+
+  const [loading, setLoading] = useState(true);
+  const [hasLoaded, setHasLoaded] = useState(false);
+
+  const [loadError, setLoadError] =
+    useState<string | null>(null);
+
+  const [searchError, setSearchError] =
     useState<string | null>(null);
 
   const [notificationMap, setNotificationMap] =
@@ -382,6 +458,7 @@ export function useAdminRequests(): UseAdminRequestsResult {
   );
 
   const mountedRef = useRef(false);
+  const searchSequenceRef = useRef(0);
 
   const websocketRef = useRef<WebSocket | null>(
     null,
@@ -397,9 +474,10 @@ export function useAdminRequests(): UseAdminRequestsResult {
      ======================================================= */
 
   const reload = useCallback(async (): Promise<void> => {
+    setSearchRefresh((current) => current + 1);
     try {
       setLoading(true);
-      setError(null);
+      setLoadError(null);
 
       const data = await getRequests();
 
@@ -410,6 +488,7 @@ export function useAdminRequests(): UseAdminRequestsResult {
       const normalized = data.map(normalizeRequest);
 
       setRequests(normalized);
+      setHasLoaded(true);
 
       normalized.forEach((request) => {
         knownRequestIds.current.add(request.id);
@@ -419,10 +498,8 @@ export function useAdminRequests(): UseAdminRequestsResult {
         return;
       }
 
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to load requests.",
+      setLoadError(
+        getRequestErrorMessage(err, "Could not load requests. Please try again."),
       );
     } finally {
       if (mountedRef.current) {
@@ -430,6 +507,52 @@ export function useAdminRequests(): UseAdminRequestsResult {
       }
     }
   }, []);
+
+  useEffect(() => {
+    const query = search.trim();
+    const sequence = ++searchSequenceRef.current;
+
+    if (!query) {
+      setSearchResults(null);
+      setSearchLoading(false);
+      setSearchError(null);
+      return;
+    }
+
+    let active = true;
+    setSearchResults([]);
+    setSearchLoading(true);
+    setSearchError(null);
+
+    const timer = setTimeout(() => {
+      void getRequests(undefined, query)
+        .then((data) => {
+          if (active && sequence === searchSequenceRef.current) {
+            setSearchResults(data.map(normalizeRequest));
+          }
+        })
+        .catch((err: unknown) => {
+          if (active && sequence === searchSequenceRef.current) {
+            setSearchError(
+              getRequestErrorMessage(
+                err,
+                "Could not search requests. Please try again.",
+              ),
+            );
+          }
+        })
+        .finally(() => {
+          if (active && sequence === searchSequenceRef.current) {
+            setSearchLoading(false);
+          }
+        });
+    }, 300);
+
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
+  }, [search, searchRefresh]);
 
   /* =======================================================
      ENABLE AUDIO + DESKTOP NOTIFICATIONS
@@ -534,6 +657,7 @@ export function useAdminRequests(): UseAdminRequestsResult {
 
         return [request, ...current];
       });
+      setSearchRefresh((current) => current + 1);
 
       setNotificationMap((current) => {
         const next = new Map(current);
@@ -699,6 +823,7 @@ export function useAdminRequests(): UseAdminRequestsResult {
                     : request,
                 ),
               );
+              setSearchRefresh((current) => current + 1);
 
               // Update an existing unread notification,
               // without creating another notification.
@@ -815,32 +940,20 @@ export function useAdminRequests(): UseAdminRequestsResult {
       id: string,
       status: RequestStatus,
     ): Promise<void> => {
-      try {
-        setError(null);
+      const updated = await updateRequestStatus(id, status);
+      const normalized = normalizeRequest(updated);
 
-        const updated = await updateRequestStatus(
-          id,
-          status,
-        );
-
-        const normalized = normalizeRequest(updated);
-
-        setRequests((current) =>
-          current.map((request) =>
-            request.id === id
-              ? normalized
-              : request,
-          ),
-        );
-      } catch (err) {
-        const message =
-          err instanceof Error
-            ? err.message
-            : "Failed to update request status.";
-
-        setError(message);
-        throw err;
-      }
+      setRequests((current) =>
+        current.map((request) =>
+          request.id === id ? normalized : request,
+        ),
+      );
+      setSearchResults(
+        (current) =>
+          current?.map((request) =>
+            request.id === id ? normalized : request,
+          ) ?? null,
+      );
     },
     [],
   );
@@ -850,11 +963,7 @@ export function useAdminRequests(): UseAdminRequestsResult {
      ======================================================= */
 
   const filteredRequests = useMemo(() => {
-    const normalizedSearch = search
-      .trim()
-      .toLowerCase();
-
-    return requests
+    return (searchResults ?? requests)
       .filter((request) => {
         if (
           filter !== "all" &&
@@ -863,30 +972,15 @@ export function useAdminRequests(): UseAdminRequestsResult {
           return false;
         }
 
-        if (!normalizedSearch) {
-          return true;
-        }
-
-        return [
-          request.phone,
-          request.fullName,
-          request.email,
-          request.reference,
-          request.serviceId,
-          request.location,
-        ]
-          .filter(
-            (value): value is string =>
-              typeof value === "string" &&
-              value.length > 0,
-          )
-          .some((value) =>
-            value.toLowerCase().includes(normalizedSearch),
-          );
+        return true;
       })
       .sort((a, b) => {
         const aTime = new Date(a.createdAt).getTime();
         const bTime = new Date(b.createdAt).getTime();
+
+        if (Number.isNaN(aTime) && Number.isNaN(bTime)) {
+          return a.id.localeCompare(b.id);
+        }
 
         if (Number.isNaN(aTime)) {
           return 1;
@@ -896,9 +990,9 @@ export function useAdminRequests(): UseAdminRequestsResult {
           return -1;
         }
 
-        return bTime - aTime;
+        return bTime - aTime || a.id.localeCompare(b.id);
       });
-  }, [requests, filter, search]);
+  }, [requests, searchResults, filter]);
 
   /* =======================================================
      STATUS COUNTS
@@ -958,7 +1052,9 @@ export function useAdminRequests(): UseAdminRequestsResult {
     markNotificationRead,
 
     loading,
-    error,
+    hasLoaded,
+    searchLoading,
+    error: loadError ?? searchError,
 
     reload,
   };
