@@ -387,7 +387,7 @@ function ServiceRequestDialog({
     } catch (error) {
       setSubmitError(
         error instanceof TypeError
-          ? "We couldn't reach the service. Your details are still here; complete the new security check and retry."
+          ? "Unable to reach the server. Check your connection and retry."
           : error instanceof Error
           ? error.message
           : "We could not submit your request. Please try again."

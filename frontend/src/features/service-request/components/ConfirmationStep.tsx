@@ -260,7 +260,6 @@ export default function ConfirmationStep({
         )}
 
         <div className={styles.securityCheck}>
-          <p>Complete the security check to submit your request.</p>
           <TurnstileWidget
             key={turnstileWidgetKey}
             action="request_create"

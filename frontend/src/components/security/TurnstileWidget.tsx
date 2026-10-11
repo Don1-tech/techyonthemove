@@ -4,25 +4,29 @@ import styles from "./TurnstileWidget.module.css";
 
 interface TurnstileRenderOptions {
   sitekey: string;
-  action: string;
-  theme: "light";
+  action?: string;
+  theme?: "light" | "dark" | "auto";
   callback: (token: string) => void;
-  "expired-callback": () => void;
-  "error-callback": () => void;
-  "timeout-callback": () => void;
+  "expired-callback"?: () => void;
+  "error-callback"?: (errorCode?: string) => void;
+  "timeout-callback"?: () => void;
 }
 
 interface TurnstileApi {
+  ready: (callback: () => void) => void;
   render: (
-    container: HTMLElement,
+    container: HTMLElement | string,
     options: TurnstileRenderOptions
   ) => string;
+  reset: (widgetId?: string) => void;
   remove: (widgetId: string) => void;
+  getResponse?: (widgetId?: string) => string;
 }
 
 declare global {
   interface Window {
     turnstile?: TurnstileApi;
+    __turnstileLoadedCallback?: () => void;
   }
 }
 
@@ -30,60 +34,103 @@ interface TurnstileWidgetProps {
   action: "request_create" | "review_submit";
   siteKey: string;
   onTokenChange: (token: string) => void;
+  onErrorChange?: (error: string) => void;
 }
 
-let turnstileScriptPromise: Promise<TurnstileApi> | null = null;
+let turnstileLoadPromise: Promise<TurnstileApi> | null = null;
 
 function loadTurnstile(): Promise<TurnstileApi> {
-  if (window.turnstile) {
-    return Promise.resolve(window.turnstile);
-  }
-  if (turnstileScriptPromise) {
-    return turnstileScriptPromise;
+  if (typeof window !== "undefined" && window.turnstile?.render) {
+    return new Promise((resolve) => {
+      if (typeof window.turnstile?.ready === "function") {
+        window.turnstile.ready(() => resolve(window.turnstile!));
+      } else {
+        resolve(window.turnstile!);
+      }
+    });
   }
 
-  turnstileScriptPromise = new Promise<TurnstileApi>((resolve, reject) => {
-    const existing = document.querySelector<HTMLScriptElement>(
-      'script[data-turnstile-script="true"]'
-    );
-    const script = existing ?? document.createElement("script");
-    if (!existing) {
-      script.src =
-        "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-      script.async = true;
-      script.defer = true;
-      script.dataset.turnstileScript = "true";
-    }
+  if (turnstileLoadPromise) {
+    return turnstileLoadPromise;
+  }
 
-    const handleLoad = () => {
+  turnstileLoadPromise = new Promise<TurnstileApi>((resolve, reject) => {
+    const callbackName = "__turnstileLoadedCallback";
+
+    const cleanup = () => {
+      delete window.__turnstileLoadedCallback;
+    };
+
+    window.__turnstileLoadedCallback = () => {
+      cleanup();
       if (window.turnstile) {
-        resolve(window.turnstile);
+        if (typeof window.turnstile.ready === "function") {
+          window.turnstile.ready(() => resolve(window.turnstile!));
+        } else {
+          resolve(window.turnstile);
+        }
       } else {
         reject(new Error("Turnstile did not initialize."));
       }
     };
-    const handleError = () => reject(new Error("Turnstile failed to load."));
 
-    script.addEventListener("load", handleLoad, { once: true });
-    script.addEventListener("error", handleError, { once: true });
-    if (!existing) {
-      document.head.append(script);
+    let script = document.querySelector<HTMLScriptElement>(
+      'script[data-turnstile-script="true"]'
+    );
+
+    if (!script) {
+      script = document.createElement("script");
+      script.src = `https://challenges.cloudflare.com/turnstile/v0/api.js?onload=${callbackName}&render=explicit`;
+      script.async = true;
+      script.defer = true;
+      script.dataset.turnstileScript = "true";
+
+      script.onerror = () => {
+        cleanup();
+        script?.remove();
+        turnstileLoadPromise = null;
+        reject(new Error("Turnstile failed to load."));
+      };
+
+      document.head.appendChild(script);
+    } else {
+      if (window.turnstile?.render) {
+        cleanup();
+        if (typeof window.turnstile.ready === "function") {
+          window.turnstile.ready(() => resolve(window.turnstile!));
+        } else {
+          resolve(window.turnstile);
+        }
+      } else {
+        script.addEventListener(
+          "error",
+          () => {
+            cleanup();
+            script?.remove();
+            turnstileLoadPromise = null;
+            reject(new Error("Turnstile failed to load."));
+          },
+          { once: true }
+        );
+      }
     }
   }).catch((error: unknown) => {
-    turnstileScriptPromise = null;
+    turnstileLoadPromise = null;
     throw error;
   });
 
-  return turnstileScriptPromise;
+  return turnstileLoadPromise;
 }
 
 export default function TurnstileWidget({
   action,
   siteKey,
   onTokenChange,
+  onErrorChange,
 }: TurnstileWidgetProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const tokenCallbackRef = useRef(onTokenChange);
+  const errorCallbackRef = useRef(onErrorChange);
   const [widgetError, setWidgetError] = useState("");
   const [widgetReady, setWidgetReady] = useState(false);
   const [hasToken, setHasToken] = useState(false);
@@ -93,89 +140,161 @@ export default function TurnstileWidget({
   }, [onTokenChange]);
 
   useEffect(() => {
+    errorCallbackRef.current = onErrorChange;
+  }, [onErrorChange]);
+
+  useEffect(() => {
     let cancelled = false;
     let widgetId: string | null = null;
+    const container = containerRef.current;
 
     if (!siteKey) {
       tokenCallbackRef.current("");
+      errorCallbackRef.current?.(
+        "Security verification is not configured. Please try again later."
+      );
       return;
     }
 
-    void loadTurnstile()
+    loadTurnstile()
       .then((turnstile) => {
-        if (cancelled || !containerRef.current) {
+        if (cancelled || !container) {
           return;
         }
-        widgetId = turnstile.render(containerRef.current, {
-          sitekey: siteKey,
-          action,
-          theme: "light",
-          callback: (token) => {
-            setHasToken(true);
+
+        const render = () => {
+          if (cancelled || !container) {
+            return;
+          }
+
+          container.innerHTML = "";
+
+          try {
+            widgetId = turnstile.render(container, {
+              sitekey: siteKey,
+              action,
+              theme: "light",
+              callback: (token) => {
+                if (cancelled) return;
+                setHasToken(true);
+                setWidgetError("");
+                tokenCallbackRef.current(token);
+                errorCallbackRef.current?.("");
+              },
+              "expired-callback": () => {
+                if (cancelled) return;
+                setHasToken(false);
+                const msg = "The security check expired. Complete it again.";
+                setWidgetError(msg);
+                tokenCallbackRef.current("");
+                errorCallbackRef.current?.(msg);
+                if (widgetId && window.turnstile?.reset) {
+                  window.turnstile.reset(widgetId);
+                }
+              },
+              "error-callback": () => {
+                if (cancelled) return;
+                setHasToken(false);
+                const msg =
+                  "The security check could not load. Please retry shortly.";
+                setWidgetError(msg);
+                tokenCallbackRef.current("");
+                errorCallbackRef.current?.(msg);
+                if (widgetId && window.turnstile?.reset) {
+                  window.turnstile.reset(widgetId);
+                }
+              },
+              "timeout-callback": () => {
+                if (cancelled) return;
+                setHasToken(false);
+                const msg = "The security check timed out. Complete it again.";
+                setWidgetError(msg);
+                tokenCallbackRef.current("");
+                errorCallbackRef.current?.(msg);
+                if (widgetId && window.turnstile?.reset) {
+                  window.turnstile.reset(widgetId);
+                }
+              },
+            });
+
+            if (cancelled) {
+              if (widgetId && window.turnstile?.remove) {
+                window.turnstile.remove(widgetId);
+              }
+              return;
+            }
+
+            setWidgetReady(true);
             setWidgetError("");
-            tokenCallbackRef.current(token);
-          },
-          "expired-callback": () => {
-            setHasToken(false);
-            setWidgetError("The security check expired. Complete it again.");
-            tokenCallbackRef.current("");
-          },
-          "error-callback": () => {
-            setHasToken(false);
-            setWidgetError(
-              "The security check could not load. Please retry shortly."
-            );
-            tokenCallbackRef.current("");
-          },
-          "timeout-callback": () => {
-            setHasToken(false);
-            setWidgetError("The security check timed out. Complete it again.");
-            tokenCallbackRef.current("");
-          },
-        });
-        setWidgetReady(true);
-        setWidgetError("");
+            errorCallbackRef.current?.("");
+          } catch {
+            if (!cancelled) {
+              setWidgetReady(false);
+              const msg =
+                "The security check is temporarily unavailable. Please retry shortly.";
+              setWidgetError(msg);
+              tokenCallbackRef.current("");
+              errorCallbackRef.current?.(msg);
+            }
+          }
+        };
+
+        if (typeof turnstile.ready === "function") {
+          turnstile.ready(render);
+        } else {
+          render();
+        }
       })
       .catch(() => {
         if (!cancelled) {
           setWidgetReady(false);
-          setWidgetError(
-            "The security check is temporarily unavailable. Please retry shortly."
-          );
+          const msg =
+            "The security check is temporarily unavailable. Please retry shortly.";
+          setWidgetError(msg);
           tokenCallbackRef.current("");
+          errorCallbackRef.current?.(msg);
         }
       });
 
     return () => {
       cancelled = true;
-      if (widgetId && window.turnstile) {
-        window.turnstile.remove(widgetId);
+      if (widgetId && window.turnstile?.remove) {
+        try {
+          window.turnstile.remove(widgetId);
+        } catch {
+          // ignore
+        }
+      }
+      if (container) {
+        container.innerHTML = "";
       }
     };
   }, [action, siteKey]);
 
   const displayError =
-    widgetError ||
     (!siteKey
       ? "Security verification is not configured. Please try again later."
-      : "");
+      : widgetError);
+  const isReady = Boolean(siteKey) && widgetReady;
 
   return (
     <div className={styles.container}>
       <div ref={containerRef} />
       {displayError && (
-        <p className={styles.message} role="status" aria-live="polite">
+        <p className={styles.error} role="status" aria-live="polite">
           {displayError}
         </p>
       )}
-      {!widgetReady && !displayError && (
+      {!isReady && !displayError && (
         <p className={styles.message} role="status">
           Loading security check...
         </p>
       )}
-      {widgetReady && !displayError && !hasToken && (
+      {isReady && !displayError && !hasToken && (
         <p className={styles.message} role="status">
-          Complete the security check to enable submission.
+          {action === "review_submit"
+            ? "Complete the security check to submit your review."
+            : "Complete the security check to submit your request."}
         </p>
       )}
     </div>

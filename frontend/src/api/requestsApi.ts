@@ -18,6 +18,7 @@ export interface ConfirmedRequest {
 }
 
 interface ApiErrorResponse {
+  code?: string;
   message?: string;
 }
 
@@ -25,14 +26,44 @@ async function readResponse<T>(
   response: Response,
   fallbackMessage: string
 ): Promise<T> {
-  const data = await response.json();
+  let payload: unknown = null;
+  try {
+    payload = await response.json();
+  } catch {
+    // response is not JSON
+  }
 
   if (!response.ok) {
-    const error = data as ApiErrorResponse;
+    const error = (payload && typeof payload === "object" ? payload : {}) as ApiErrorResponse;
+
+    if (response.status === 429) {
+      throw new Error("Too many attempts. Please wait before trying again.");
+    }
+    if (response.status === 403) {
+      if (
+        error.code === "invalid-token" ||
+        error.message?.toLowerCase().includes("security check")
+      ) {
+        throw new Error("Please complete the security check and try again.");
+      }
+      throw new Error(error.message ?? "Please complete the security check and try again.");
+    }
+    if (response.status === 503) {
+      if (
+        error.code === "unavailable" ||
+        error.message?.toLowerCase().includes("security")
+      ) {
+        throw new Error(
+          "Security verification is temporarily unavailable. Please try again shortly."
+        );
+      }
+      throw new Error(error.message ?? fallbackMessage);
+    }
+
     throw new Error(error.message ?? fallbackMessage);
   }
 
-  return data as T;
+  return payload as T;
 }
 
 export async function createServiceRequest(

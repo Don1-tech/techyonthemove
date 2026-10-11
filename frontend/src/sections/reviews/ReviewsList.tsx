@@ -29,6 +29,7 @@ export default function ReviewsList() {
     isLoading,
     isSubmitting,
     error,
+    setError,
     clearError,
     submitReview,
     reloadReviews,
@@ -204,18 +205,44 @@ export default function ReviewsList() {
     event: React.FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault();
-    if (submitLockRef.current || !turnstileToken) {
-      if (!turnstileToken) {
-        clearError();
-      }
+    clearError();
+
+    if (submitLockRef.current || isSubmitting) {
+      return;
+    }
+
+    const trimmedName = customerName.trim();
+    if (!trimmedName || trimmedName.length < 2) {
+      setError("Please enter your name.");
+      return;
+    }
+
+    if (!serviceCategory) {
+      setError("Please select the service you received.");
+      return;
+    }
+
+    if (rating < 1 || rating > 5) {
+      setError("Please select a rating from 1 to 5 stars.");
+      return;
+    }
+
+    const trimmedText = reviewText.trim();
+    if (!trimmedText || trimmedText.length < 5) {
+      setError("Please provide a little more detail about your experience.");
+      return;
+    }
+
+    if (!turnstileToken) {
+      setError("Please complete the security check and try again.");
       return;
     }
 
     const content: Omit<CreateReviewInput, "turnstileToken" | "idempotencyKey"> = {
-      customerName: customerName.trim(),
+      customerName: trimmedName,
       serviceCategory,
       rating,
-      reviewText: reviewText.trim(),
+      reviewText: trimmedText,
     };
     const fingerprint = JSON.stringify(content);
     if (submissionKeyRef.current?.fingerprint !== fingerprint) {
@@ -225,26 +252,30 @@ export default function ReviewsList() {
       };
     }
     submitLockRef.current = true;
-    const review = await submitReview({
-      ...content,
-      turnstileToken,
-      idempotencyKey: submissionKeyRef.current.key,
-    });
-    submitLockRef.current = false;
-    setTurnstileToken("");
-    setTurnstileWidgetKey((key) => key + 1);
-    if (!review) {
-      return;
-    }
+    try {
+      const review = await submitReview({
+        ...content,
+        turnstileToken,
+        idempotencyKey: submissionKeyRef.current.key,
+      });
 
-    setCustomerName("");
-    setServiceCategory("");
-    setRating(0);
-    setReviewText("");
-    submissionKeyRef.current = null;
-    setShowForm(false);
-    setShowSuccessToast(true);
-    await reloadReviews();
+      if (!review) {
+        return;
+      }
+
+      setCustomerName("");
+      setServiceCategory("");
+      setRating(0);
+      setReviewText("");
+      submissionKeyRef.current = null;
+      setShowForm(false);
+      setShowSuccessToast(true);
+      await reloadReviews();
+    } finally {
+      submitLockRef.current = false;
+      setTurnstileToken("");
+      setTurnstileWidgetKey((key) => key + 1);
+    }
   };
 
   const displayedCount = Math.min(
@@ -446,7 +477,10 @@ export default function ReviewsList() {
                             ? styles.ratingStarActive
                             : styles.ratingStar
                         }
-                        onClick={() => setRating(star)}
+                        onClick={() => {
+                          setRating(star);
+                          clearError();
+                        }}
                         aria-label={`${star} star${star === 1 ? "" : "s"}`}
                         aria-pressed={star === rating}
                       >
@@ -473,7 +507,12 @@ export default function ReviewsList() {
                   key={turnstileWidgetKey}
                   siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY ?? ""}
                   action="review_submit"
-                  onTokenChange={setTurnstileToken}
+                  onTokenChange={(token) => {
+                    setTurnstileToken(token);
+                    if (token) {
+                      clearError();
+                    }
+                  }}
                 />
 
                 {error && showForm && (
@@ -494,11 +533,11 @@ export default function ReviewsList() {
                   className={styles.submitReviewButton}
                   disabled={
                     isSubmitting ||
-                    !turnstileToken ||
-                    !customerName.trim() ||
-                    !reviewText.trim() ||
+                    customerName.trim().length < 2 ||
+                    !serviceCategory ||
                     rating === 0 ||
-                    !serviceCategory
+                    reviewText.trim().length < 5 ||
+                    !turnstileToken
                   }
                 >
                   {isSubmitting ? (

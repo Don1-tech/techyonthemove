@@ -80,10 +80,10 @@ export function useReviews() {
     } catch (err) {
       setError(
         err instanceof TypeError
-          ? "We couldn't reach the service. Check your connection and try again."
+          ? "Unable to reach the server. Check your connection and retry."
           : err instanceof Error
           ? err.message
-          : "Unable to submit your review. Please try again."
+          : "We couldn't submit your review right now. Please try again later."
       );
       return null;
     } finally {
@@ -96,6 +96,7 @@ export function useReviews() {
     isLoading,
     isSubmitting,
     error,
+    setError,
     clearError,
     submitReview,
     reloadReviews: loadReviews,
