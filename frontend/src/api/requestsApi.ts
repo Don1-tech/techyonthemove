@@ -12,12 +12,6 @@ export interface CreateRequestInput {
   requestedTime: string;
 }
 
-export interface VerificationChallenge {
-  verificationId: string;
-  expiresAt: string;
-  resendAt: string;
-}
-
 export interface ConfirmedRequest {
   reference: string;
   approximatePrice: number | null;
@@ -41,9 +35,11 @@ async function readResponse<T>(
   return data as T;
 }
 
-export async function startRequestVerification(
-  input: CreateRequestInput
-): Promise<VerificationChallenge> {
+export async function createServiceRequest(
+  input: CreateRequestInput,
+  turnstileToken: string,
+  idempotencyKey: string
+): Promise<ConfirmedRequest> {
   const response = await fetch(
     `${API_BASE_URL}/api/requests`,
     {
@@ -51,70 +47,12 @@ export async function startRequestVerification(
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(input),
-    }
-  );
-
-  const data = await readResponse<{
-    verification: VerificationChallenge;
-  }>(response, "Unable to start phone verification.");
-  return data.verification;
-}
-
-export async function verifyRequestPhone(
-  verificationId: string,
-  code: string,
-  idempotencyKey: string
-): Promise<ConfirmedRequest> {
-  const response = await fetch(
-    `${API_BASE_URL}/api/requests/verification/verify`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ verificationId, code, idempotencyKey }),
+      body: JSON.stringify({ ...input, turnstileToken, idempotencyKey }),
     }
   );
 
   const data = await readResponse<{
     request: ConfirmedRequest;
-  }>(response, "Unable to verify your phone number.");
+  }>(response, "Unable to submit your service request.");
   return data.request;
-}
-
-export async function resendRequestVerification(
-  verificationId: string
-): Promise<VerificationChallenge> {
-  const response = await fetch(
-    `${API_BASE_URL}/api/requests/verification/resend`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ verificationId }),
-    }
-  );
-
-  const data = await readResponse<{
-    verification: VerificationChallenge;
-  }>(response, "Unable to resend the verification code.");
-  return data.verification;
-}
-
-export async function cancelRequestVerification(
-  verificationId: string
-): Promise<void> {
-  const response = await fetch(
-    `${API_BASE_URL}/api/requests/verification/cancel`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ verificationId }),
-    }
-  );
-
-  await readResponse<{ cancelled: boolean }>(
-    response,
-    "Unable to cancel phone verification."
-  );
 }

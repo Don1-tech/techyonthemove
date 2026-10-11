@@ -1,5 +1,6 @@
 
 import styles from "./ConfirmationStep.module.css";
+import TurnstileWidget from "../../../components/security/TurnstileWidget";
 
 interface ConfirmationStepProps {
   serviceName: string;
@@ -14,6 +15,10 @@ interface ConfirmationStepProps {
   approximatePrice: number | null;
   submitting: boolean;
   error: string;
+  turnstileToken: string;
+  turnstileWidgetKey: number;
+  turnstileSiteKey: string;
+  onTurnstileTokenChange: (token: string) => void;
 
   onBack: () => void;
   onConfirm: () => void;
@@ -32,6 +37,10 @@ export default function ConfirmationStep({
   approximatePrice,
   submitting,
   error,
+  turnstileToken,
+  turnstileWidgetKey,
+  turnstileSiteKey,
+  onTurnstileTokenChange,
   onBack,
   onConfirm,
 }: ConfirmationStepProps) {
@@ -250,6 +259,16 @@ export default function ConfirmationStep({
           </div>
         )}
 
+        <div className={styles.securityCheck}>
+          <p>Complete the security check to submit your request.</p>
+          <TurnstileWidget
+            key={turnstileWidgetKey}
+            action="request_create"
+            siteKey={turnstileSiteKey}
+            onTokenChange={onTurnstileTokenChange}
+          />
+        </div>
+
         <div className={styles.notice}>
           <span
             className={styles.infoIcon}
@@ -302,7 +321,7 @@ export default function ConfirmationStep({
           type="button"
           className={styles.confirmButton}
           onClick={onConfirm}
-          disabled={submitting}
+          disabled={submitting || !turnstileToken}
           aria-busy={submitting}
         >
           {submitting ? (

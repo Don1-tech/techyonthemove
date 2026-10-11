@@ -10,13 +10,9 @@ export interface Review {
 
 export interface CreateReviewInput {
   customerName: string;
-  phone: string;
   serviceCategory: string;
   rating: number;
   reviewText: string;
-}
-
-export interface ReviewChallenge {
-  verificationId: string;
-  expiresAt: string;
+  turnstileToken: string;
+  idempotencyKey: string;
 }

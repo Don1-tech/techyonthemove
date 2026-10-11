@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import ReviewCard from "../../components/cards/ReviewCard";
+import TurnstileWidget from "../../components/security/TurnstileWidget";
 import { useReviews } from "../../hooks/useReviews";
 
 import type { CreateReviewInput } from "../../types/review";
@@ -28,23 +29,24 @@ export default function ReviewsList() {
     isLoading,
     isSubmitting,
     error,
+    clearError,
     submitReview,
-    confirmReview,
     reloadReviews,
   } = useReviews();
 
   const [showForm, setShowForm] = useState(false);
 
   const [customerName, setCustomerName] = useState("");
-  const [phone, setPhone] = useState("");
   const [serviceCategory, setServiceCategory] = useState("");
   const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState("");
-  const [reviewVerificationId, setReviewVerificationId] = useState("");
-  const [reviewVerificationExpiresAt, setReviewVerificationExpiresAt] =
-    useState("");
-  const [reviewVerificationCode, setReviewVerificationCode] = useState("");
-  const [reviewVerificationNow, setReviewVerificationNow] = useState(0);
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileWidgetKey, setTurnstileWidgetKey] = useState(0);
+  const submitLockRef = useRef(false);
+  const submissionKeyRef = useRef<{
+    fingerprint: string;
+    key: string;
+  } | null>(null);
 
   const [visibleCount, setVisibleCount] =
     useState(REVIEWS_PER_LOAD);
@@ -58,6 +60,7 @@ export default function ReviewsList() {
     }
 
     const dialog = reviewDialogRef.current;
+    const trigger = reviewTriggerRef.current;
 
     if (!dialog) {
       return;
@@ -144,7 +147,7 @@ export default function ReviewsList() {
       document.body.style.overflow = previousBodyOverflow;
       document.documentElement.style.overflow =
         previousRootOverflow;
-      reviewTriggerRef.current?.focus({ preventScroll: true });
+      trigger?.focus({ preventScroll: true });
     };
   }, [showForm]);
 
@@ -176,23 +179,12 @@ export default function ReviewsList() {
 
     const timeout = window.setTimeout(() => {
       setShowSuccessToast(false);
-    }, 9000);
+    }, 7000);
 
     return () => {
       window.clearTimeout(timeout);
     };
   }, [showSuccessToast]);
-
-  useEffect(() => {
-    if (!reviewVerificationId) {
-      return;
-    }
-    const interval = window.setInterval(
-      () => setReviewVerificationNow(Date.now()),
-      1000
-    );
-    return () => window.clearInterval(interval);
-  }, [reviewVerificationId]);
 
   const openReviewForm = () => {
     setShowForm(true);
@@ -203,9 +195,8 @@ export default function ReviewsList() {
       return;
     }
 
-    setReviewVerificationId("");
-    setReviewVerificationExpiresAt("");
-    setReviewVerificationCode("");
+    setTurnstileToken("");
+    clearError();
     setShowForm(false);
   };
 
@@ -213,69 +204,46 @@ export default function ReviewsList() {
     event: React.FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault();
+    if (submitLockRef.current || !turnstileToken) {
+      if (!turnstileToken) {
+        clearError();
+      }
+      return;
+    }
 
-    const input: CreateReviewInput = {
+    const content: Omit<CreateReviewInput, "turnstileToken" | "idempotencyKey"> = {
       customerName: customerName.trim(),
-      phone: phone.trim(),
       serviceCategory,
       rating,
       reviewText: reviewText.trim(),
     };
-
-    const challenge = await submitReview(input);
-
-    if (!challenge) {
-      return;
+    const fingerprint = JSON.stringify(content);
+    if (submissionKeyRef.current?.fingerprint !== fingerprint) {
+      submissionKeyRef.current = {
+        fingerprint,
+        key: crypto.randomUUID(),
+      };
     }
-
-    setReviewVerificationId(challenge.verificationId);
-    setReviewVerificationExpiresAt(challenge.expiresAt);
-    setReviewVerificationCode("");
-    setReviewVerificationNow(Date.now());
-  };
-
-  const handleVerifyReview = async (
-    event: React.FormEvent<HTMLFormElement>
-  ) => {
-    event.preventDefault();
-    if (!reviewVerificationId) {
-      return;
-    }
-
-    const review = await confirmReview(
-      reviewVerificationId,
-      reviewVerificationCode
-    );
+    submitLockRef.current = true;
+    const review = await submitReview({
+      ...content,
+      turnstileToken,
+      idempotencyKey: submissionKeyRef.current.key,
+    });
+    submitLockRef.current = false;
+    setTurnstileToken("");
+    setTurnstileWidgetKey((key) => key + 1);
     if (!review) {
       return;
     }
 
-    /*
-     * Clear form fields.
-     */
     setCustomerName("");
-    setPhone("");
     setServiceCategory("");
     setRating(0);
     setReviewText("");
-    setReviewVerificationId("");
-    setReviewVerificationExpiresAt("");
-    setReviewVerificationCode("");
-
-    /*
-     * Close the form.
-     */
+    submissionKeyRef.current = null;
     setShowForm(false);
-
-    /*
-     * Show success toast.
-     */
     setShowSuccessToast(true);
-
-    /*
-     * Reload reviews from the backend.
-     * The backend remains the source of truth.
-     */
     await reloadReviews();
   };
 
@@ -291,10 +259,6 @@ export default function ReviewsList() {
 
   const hasMoreReviews =
     displayedCount < reviews.length;
-
-  const canViewLess =
-    reviews.length > REVIEWS_PER_LOAD &&
-    displayedCount > REVIEWS_PER_LOAD;
 
   const handleShowMore = () => {
     setVisibleCount(() =>
@@ -319,86 +283,74 @@ export default function ReviewsList() {
   return (
     <>
       <div className={styles.reviewsContent}>
-        <div className={styles.reviewsList}>
-          {isLoading && (
-            <p className={styles.reviewStatus}>
-              Loading reviews...
-            </p>
-          )}
-
-          {!isLoading && error && (
-            <p className={styles.reviewError}>
-              {error}
-            </p>
-          )}
-
-          {!isLoading &&
-            !error &&
-            reviews.length === 0 && (
-              <p className={styles.reviewStatus}>
-                No reviews available yet.
-              </p>
-            )}
-
-          {!isLoading &&
-            visibleReviews.map((review) => (
-              <ReviewCard
-                key={review.id}
-                review={review}
-              />
-            ))}
+        <div className={styles.reviewToolbar}>
+          <button
+            type="button"
+            ref={reviewTriggerRef}
+            className={styles.addReviewButton}
+            onClick={openReviewForm}
+          >
+            <span aria-hidden="true">+</span>
+            Add Review
+          </button>
         </div>
 
-        {!isLoading && reviews.length > 0 && (
-          <div className={styles.reviewActions}>
-            <button
-              type="button"
-              ref={reviewTriggerRef}
-              className={styles.addReviewButton}
-              onClick={openReviewForm}
-            >
-              <span aria-hidden="true">+</span>
-              Add Review
-            </button>
-
-            {reviews.length > REVIEWS_PER_LOAD && (
-              <button
-                type="button"
-                className={styles.showMoreButton}
-                onClick={
-                  hasMoreReviews
-                    ? handleShowMore
-                    : handleShowLess
-                }
+        {isLoading && (
+          <div
+            className={styles.reviewsGrid}
+            role="status"
+            aria-label="Loading reviews"
+          >
+            {Array.from({ length: 3 }, (_, index) => (
+              <div
+                key={index}
+                className={styles.reviewSkeleton}
+                aria-hidden="true"
               >
-                <span aria-hidden="true">
-                  {hasMoreReviews ? "+" : "−"}
-                </span>
-
-                {hasMoreReviews
-                  ? "Show More"
-                  : canViewLess
-                    ? "View Less"
-                    : "Show More"}
-              </button>
-            )}
+                <span />
+                <span />
+                <span />
+              </div>
+            ))}
           </div>
         )}
 
-        {!isLoading &&
-          reviews.length === 0 && (
-            <div className={styles.reviewActions}>
-              <button
-                type="button"
-                ref={reviewTriggerRef}
-                className={styles.addReviewButton}
-                onClick={openReviewForm}
-              >
-                <span aria-hidden="true">+</span>
-                Add Review
-              </button>
-            </div>
-          )}
+        {!isLoading && error && !showForm && (
+          <div className={styles.reviewLoadError} role="alert">
+            <p>{error}</p>
+            <button type="button" onClick={() => void reloadReviews()}>
+              Try again
+            </button>
+          </div>
+        )}
+
+        {!isLoading && !error && reviews.length === 0 && (
+          <div className={styles.reviewEmptyState}>
+            <span aria-hidden="true">✦</span>
+            <p>No reviews yet. Be the first to share your experience.</p>
+          </div>
+        )}
+
+        {!isLoading && !error && reviews.length > 0 && (
+          <div className={styles.reviewsGrid}>
+            {visibleReviews.map((review) => (
+              <ReviewCard key={review.id} review={review} />
+            ))}
+          </div>
+        )}
+
+        {!isLoading && !error && reviews.length > REVIEWS_PER_LOAD && (
+          <div className={styles.reviewPagination}>
+            <button
+              type="button"
+              className={styles.showMoreButton}
+              onClick={hasMoreReviews ? handleShowMore : handleShowLess}
+            >
+              <span aria-hidden="true">{hasMoreReviews ? "+" : "−"}</span>
+              {hasMoreReviews ? "Show More" : "View Less"}
+            </button>
+          </div>
+        )}
       </div>
 
       {showForm &&
@@ -443,163 +395,98 @@ export default function ReviewsList() {
 
               <form
                 className={styles.reviewForm}
-                onSubmit={reviewVerificationId ? handleVerifyReview : handleSubmit}
+                onSubmit={handleSubmit}
+                onChange={clearError}
               >
-                {reviewVerificationId ? (
-                  <>
-                    <p>
-                      If the details match a service request, a six-digit code
-                      was sent by SMS. Enter it below to submit your review.
-                    </p>
-                    <label className={styles.reviewField}>
-                      <span>Verification code</span>
-                      <input
-                        type="text"
-                        inputMode="numeric"
-                        autoComplete="one-time-code"
-                        value={reviewVerificationCode}
-                        onChange={(event) =>
-                          setReviewVerificationCode(
-                            event.target.value.replace(/\D/g, "").slice(0, 6)
-                          )
+                <p className={styles.reviewEligibilityTip}>
+                  <span aria-hidden="true">ⓘ</span>
+                  Use the same name you used when making your service request.
+                </p>
+
+                <label className={styles.reviewField}>
+                  <span>Your Name</span>
+                  <input
+                    type="text"
+                    value={customerName}
+                    onChange={(event) => setCustomerName(event.target.value)}
+                    minLength={2}
+                    maxLength={120}
+                    required
+                    placeholder="Enter your name"
+                  />
+                </label>
+
+                <label className={styles.reviewField}>
+                  <span>Service Category</span>
+                  <select
+                    value={serviceCategory}
+                    onChange={(event) => setServiceCategory(event.target.value)}
+                    required
+                  >
+                    <option value="" disabled>
+                      Select the service you received
+                    </option>
+                    {serviceCategories.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <fieldset className={styles.ratingField}>
+                  <legend>Your Rating</legend>
+                  <div className={styles.ratingStars}>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        className={
+                          star <= rating
+                            ? styles.ratingStarActive
+                            : styles.ratingStar
                         }
-                        maxLength={6}
-                        pattern="[0-9]{6}"
-                        required
-                        aria-label="Six-digit verification code"
-                      />
-                    </label>
-                    <p role="timer">
-                      Code expires in{" "}
-                      {Math.max(
-                        0,
-                        Math.ceil(
-                          (Date.parse(reviewVerificationExpiresAt) -
-                            reviewVerificationNow) /
-                            1000
-                        )
-                      )}{" "}
-                      seconds.
-                    </p>
-                    <p>
-                      If the SMS does not arrive, close this form and try again
-                      after a short wait.
-                    </p>
+                        onClick={() => setRating(star)}
+                        aria-label={`${star} star${star === 1 ? "" : "s"}`}
+                        aria-pressed={star === rating}
+                      >
+                        ★
+                      </button>
+                    ))}
+                  </div>
+                </fieldset>
+
+                <label className={styles.reviewField}>
+                  <span>Your Review</span>
+                  <textarea
+                    value={reviewText}
+                    onChange={(event) => setReviewText(event.target.value)}
+                    minLength={5}
+                    maxLength={1000}
+                    required
+                    placeholder="Tell us about your experience..."
+                    rows={5}
+                  />
+                </label>
+
+                <TurnstileWidget
+                  key={turnstileWidgetKey}
+                  siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY ?? ""}
+                  action="review_submit"
+                  onTokenChange={setTurnstileToken}
+                />
+
+                {error && showForm && (
+                  <div className={styles.reviewError} role="alert">
+                    <span>{error}</span>
                     <button
                       type="button"
-                      className={styles.closeReviewForm}
-                      onClick={() => {
-                        setReviewVerificationId("");
-                        setReviewVerificationExpiresAt("");
-                        setReviewVerificationCode("");
-                      }}
-                      disabled={isSubmitting}
+                      onClick={clearError}
+                      aria-label="Dismiss error"
                     >
-                      Start again
+                      ×
                     </button>
-                  </>
-                ) : (
-                  <>
-                    <label className={styles.reviewField}>
-                      <span>Your Name</span>
-
-                      <input
-                        type="text"
-                        value={customerName}
-                        onChange={(event) =>
-                          setCustomerName(event.target.value)
-                        }
-                        minLength={2}
-                        maxLength={120}
-                        required
-                        placeholder="Enter your name"
-                      />
-                    </label>
-
-                    <label className={styles.reviewField}>
-                      <span>Phone number used for your service request</span>
-
-                      <input
-                        type="tel"
-                        value={phone}
-                        onChange={(event) => setPhone(event.target.value)}
-                        minLength={7}
-                        maxLength={30}
-                        autoComplete="tel"
-                        required
-                        placeholder="e.g. 0712 345 678"
-                      />
-                    </label>
-
-                    <label className={styles.reviewField}>
-                      <span>Service Category</span>
-
-                      <select
-                        value={serviceCategory}
-                        onChange={(event) =>
-                          setServiceCategory(event.target.value)
-                        }
-                        required
-                      >
-                        <option value="" disabled>
-                          Select the service you received
-                        </option>
-
-                        {serviceCategories.map((category) => (
-                          <option key={category} value={category}>
-                            {category}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-
-                    <fieldset className={styles.ratingField}>
-                      <legend>Your Rating</legend>
-
-                      <div className={styles.ratingStars}>
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <button
-                            key={star}
-                            type="button"
-                            className={
-                              star <= rating
-                                ? styles.ratingStarActive
-                                : styles.ratingStar
-                            }
-                            onClick={() => setRating(star)}
-                            aria-label={`${star} star${
-                              star === 1 ? "" : "s"
-                            }`}
-                            aria-pressed={star === rating}
-                          >
-                            ★
-                          </button>
-                        ))}
-                      </div>
-                    </fieldset>
-
-                    <label className={styles.reviewField}>
-                      <span>Your Review</span>
-
-                      <textarea
-                        value={reviewText}
-                        onChange={(event) =>
-                          setReviewText(event.target.value)
-                        }
-                        minLength={5}
-                        maxLength={1000}
-                        required
-                        placeholder="Tell us about your experience..."
-                        rows={5}
-                      />
-                    </label>
-                  </>
-                )}
-
-                {error && (
-                  <p className={styles.reviewError}>
-                    {error}
-                  </p>
+                  </div>
                 )}
 
                 <button
@@ -607,24 +494,24 @@ export default function ReviewsList() {
                   className={styles.submitReviewButton}
                   disabled={
                     isSubmitting ||
-                      (reviewVerificationId
-                        ? reviewVerificationCode.length !== 6
-                        : false) ||
-                      !customerName.trim() ||
-                      (!reviewVerificationId &&
-                        (!phone.trim() ||
-                          !reviewText.trim() ||
-                          rating === 0 ||
-                          !serviceCategory))
+                    !turnstileToken ||
+                    !customerName.trim() ||
+                    !reviewText.trim() ||
+                    rating === 0 ||
+                    !serviceCategory
                   }
                 >
-                    {isSubmitting
-                      ? reviewVerificationId
-                        ? "Verifying..."
-                        : "Sending code..."
-                      : reviewVerificationId
-                        ? "Verify and Submit"
-                        : "Submit Review"}
+                  {isSubmitting ? (
+                    <>
+                      <span
+                        className={styles.submitSpinner}
+                        aria-hidden="true"
+                      />
+                      Submitting review...
+                    </>
+                  ) : (
+                    "Submit Review"
+                  )}
                 </button>
               </form>
             </section>
@@ -647,10 +534,16 @@ export default function ReviewsList() {
 
           <div className={styles.successToastContent}>
             <h4 className={styles.successToastTitle}>
-              Review submitted. Thankyou!
+              Review submitted. Thank you!
             </h4>
-
           </div>
+          <button
+            type="button"
+            onClick={() => setShowSuccessToast(false)}
+            aria-label="Dismiss success message"
+          >
+            ×
+          </button>
         </div>
       )}
     </>

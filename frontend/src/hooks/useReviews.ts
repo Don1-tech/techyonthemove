@@ -4,13 +4,11 @@ import { useCallback, useEffect, useState } from "react";
 import {
   createReview,
   getReviews,
-  verifyReview,
 } from "../api/reviewsApi";
 
 import type {
   CreateReviewInput,
   Review,
-  ReviewChallenge,
 } from "../types/review";
 
 export function useReviews() {
@@ -18,6 +16,7 @@ export function useReviews() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const clearError = useCallback(() => setError(null), []);
 
   const loadReviews = useCallback(async () => {
     try {
@@ -73,40 +72,18 @@ export function useReviews() {
 
   const submitReview = async (
     input: CreateReviewInput
-  ): Promise<ReviewChallenge | null> => {
-    try {
-      setIsSubmitting(true);
-      setError(null);
-
-      const review = await createReview(input);
-
-      return review;
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to submit review."
-      );
-
-      return null;
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const confirmReview = async (
-    verificationId: string,
-    code: string
   ): Promise<Review | null> => {
     try {
       setIsSubmitting(true);
       setError(null);
-      return await verifyReview(verificationId, code);
+      return await createReview(input);
     } catch (err) {
       setError(
-        err instanceof Error
+        err instanceof TypeError
+          ? "We couldn't reach the service. Check your connection and try again."
+          : err instanceof Error
           ? err.message
-          : "Failed to verify review."
+          : "Unable to submit your review. Please try again."
       );
       return null;
     } finally {
@@ -119,8 +96,8 @@ export function useReviews() {
     isLoading,
     isSubmitting,
     error,
+    clearError,
     submitReview,
-    confirmReview,
     reloadReviews: loadReviews,
   };
 }

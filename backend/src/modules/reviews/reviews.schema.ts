@@ -3,10 +3,11 @@ export const createReviewSchema = {
     type: "object",
     required: [
       "customerName",
-      "phone",
       "serviceCategory",
       "rating",
       "reviewText",
+      "turnstileToken",
+      "idempotencyKey",
     ],
     additionalProperties: false,
     properties: {
@@ -15,13 +16,6 @@ export const createReviewSchema = {
         minLength: 2,
         maxLength: 120,
       },
-
-      phone: {
-        type: "string",
-        minLength: 7,
-        maxLength: 30,
-      },
-
       serviceCategory: {
         type: "string",
         minLength: 2,
@@ -38,6 +32,17 @@ export const createReviewSchema = {
         type: "string",
         minLength: 5,
         maxLength: 1000,
+      },
+
+      turnstileToken: {
+        type: "string",
+        minLength: 1,
+        maxLength: 2048,
+      },
+
+      idempotencyKey: {
+        type: "string",
+        format: "uuid",
       },
     },
   },

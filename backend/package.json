@@ -8,7 +8,7 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "migrate": "tsx src/db/migrate.ts",
-    "test": "tsx --test src/modules/reviews/reviewValidation.test.ts src/modules/requests/phoneNumbers.test.ts src/modules/requests/smsProvider.test.ts"
+    "test": "tsx --test src/security/turnstile.test.ts src/modules/reviews/reviewValidation.test.ts src/modules/requests/phoneNumbers.test.ts"
   },
   "keywords": [],
   "author": "",

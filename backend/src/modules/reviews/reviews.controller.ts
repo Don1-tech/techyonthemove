@@ -1,65 +1,65 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 
 import {
-  deleteReviewById,
   listReviews,
-  startReviewVerification,
-  confirmReviewVerification,
-  ReviewVerificationError,
+  submitReview,
+  ReviewEligibilityError,
 } from "./reviews.service";
+import { SubmissionConflictError } from "../../db/submissionIdempotency";
 
-import type { CreateReviewInput } from "./reviews.types";
+import type { ReviewSubmissionInput } from "./reviews.types";
 import { ReviewValidationError } from "./reviewValidation";
-
-interface ReviewIdParams {
-  id: string;
-}
+import { TurnstileError, verifyTurnstileToken } from "../../security/turnstile";
 
 export async function createReviewController(
-  request: FastifyRequest<{ Body: CreateReviewInput }>,
+  request: FastifyRequest<{ Body: ReviewSubmissionInput }>,
   reply: FastifyReply
 ) {
   try {
-    const challenge = await startReviewVerification(
-      request.body,
-      request.ip,
+    await verifyTurnstileToken(
+      request.body.turnstileToken,
+      "review_submit",
       request.log
     );
-    return reply.code(202).send(challenge);
-  } catch (error) {
-    if (error instanceof ReviewValidationError) {
-      return reply.code(400).send({ message: error.message });
-    }
-    if (error instanceof ReviewVerificationError) {
-      return reply.code(error.statusCode).send({ message: error.message });
-    }
-
-    request.log.error(error, "Failed to submit review");
-    return reply.internalServerError("Unable to start review verification.");
-  }
-}
-
-interface VerifyReviewBody {
-  verificationId: string;
-  code: string;
-}
-
-export async function verifyReviewController(
-  request: FastifyRequest<{ Body: VerifyReviewBody }>,
-  reply: FastifyReply
-) {
-  try {
-    const review = await confirmReviewVerification(
-      request.body.verificationId,
-      request.body.code
-    );
+    const input = {
+      customerName: request.body.customerName,
+      serviceCategory: request.body.serviceCategory,
+      rating: request.body.rating,
+      reviewText: request.body.reviewText,
+    };
+    const { idempotencyKey } = request.body;
+    const review = await submitReview(input, idempotencyKey);
     return reply.code(201).send(review);
   } catch (error) {
-    if (error instanceof ReviewVerificationError) {
+    if (error instanceof TurnstileError) {
+      if (error.statusCode === 503) {
+        request.log.error(
+          { code: error.code },
+          "Turnstile verification unavailable for review submission"
+        );
+      } else {
+        request.log.warn(
+          { code: error.code },
+          "Review submission rejected by Turnstile"
+        );
+      }
+      return reply.code(error.statusCode).send({
+        code: error.code,
+        message: error.message,
+      });
+    }
+    if (error instanceof ReviewValidationError) {
+      return reply.code(422).send({ message: error.message });
+    }
+    if (error instanceof SubmissionConflictError) {
       return reply.code(error.statusCode).send({ message: error.message });
     }
-    request.log.error(error, "Failed to verify review submission");
-    return reply.internalServerError("Unable to verify review submission.");
+    if (error instanceof ReviewEligibilityError) {
+      request.log.info("Review submission name did not match a request");
+      return reply.code(403).send({ message: error.message });
+    }
+    request.log.error(error, "Failed to submit review");
+    return reply.internalServerError("Unable to submit review.");
   }
 }
 
@@ -70,19 +70,4 @@ export async function getReviewsController(
   const reviews = await listReviews();
 
   return reply.send(reviews);
-}
-
-export async function deleteReviewController(
-  request: FastifyRequest<{ Params: ReviewIdParams }>,
-  reply: FastifyReply
-) {
-  const review = await deleteReviewById(request.params.id);
-
-  if (!review) {
-    return reply.code(404).send({
-      message: "Review not found",
-    });
-  }
-
-  return reply.send(review);
 }

@@ -8,11 +8,10 @@ import reviewsRoutes from "./modules/reviews/reviews.route";
 import servicesRoutes from "./modules/services/services.route";
 import availabilityRoutes from "./modules/availability/availability.route";
 import requestsRoutes from "./modules/requests/requests.route";
-import { cleanExpiredRequestVerifications } from "./modules/requests/requestVerification.service";
-import { cleanExpiredReviewVerifications } from "./modules/reviews/reviews.service";
 
 export async function buildApp() {
   const app = Fastify({
+    bodyLimit: 16 * 1024,
     logger: {
       redact: {
         paths: [
@@ -43,26 +42,6 @@ export async function buildApp() {
   await app.register(servicesRoutes);
   await app.register(availabilityRoutes);
   await app.register(requestsRoutes);
-
-  void cleanExpiredRequestVerifications().catch((error) => {
-    app.log.error(error, "Failed to clean expired request verifications");
-  });
-  void cleanExpiredReviewVerifications().catch((error) => {
-    app.log.error(error, "Failed to clean expired review verifications");
-  });
-
-  const verificationCleanupTimer = setInterval(() => {
-    void cleanExpiredRequestVerifications().catch((error) => {
-      app.log.error(error, "Failed to clean expired request verifications");
-    });
-    void cleanExpiredReviewVerifications().catch((error) => {
-      app.log.error(error, "Failed to clean expired review verifications");
-    });
-  }, 15 * 60 * 1000);
-  verificationCleanupTimer.unref();
-  app.addHook("onClose", async () => {
-    clearInterval(verificationCleanupTimer);
-  });
 
   return app;
 }

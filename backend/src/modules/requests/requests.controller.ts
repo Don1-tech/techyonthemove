@@ -4,21 +4,15 @@ import type {
 } from "fastify";
 
 import {
-  cancelRequestVerification,
-  confirmRequestVerification,
-  VerificationError,
-  resendRequestVerification,
-  startRequestVerification,
-} from "./requestVerification.service";
-import { RequestValidationError } from "./requests.service";
+  RequestValidationError,
+  submitServiceRequest,
+} from "./requests.service";
 import type { CreateRequestInput } from "./requests.types";
+import { TurnstileError, verifyTurnstileToken } from "../../security/turnstile";
+import { SubmissionConflictError } from "../../db/submissionIdempotency";
 
-interface VerificationIdBody {
-  verificationId: string;
-}
-
-interface VerifyBody extends VerificationIdBody {
-  code: string;
+interface CreateRequestBody extends CreateRequestInput {
+  turnstileToken: string;
   idempotencyKey: string;
 }
 
@@ -28,13 +22,32 @@ function sendError(
   error: unknown,
   genericMessage: string
 ) {
-  if (
-    error instanceof VerificationError ||
-    error instanceof RequestValidationError
-  ) {
+  if (error instanceof TurnstileError) {
+    if (error.statusCode === 503) {
+      request.log.error(
+        { code: error.code },
+        "Turnstile verification unavailable for request submission"
+      );
+    } else {
+      request.log.warn(
+        { code: error.code },
+        "Request submission rejected by Turnstile"
+      );
+    }
+    return reply.code(error.statusCode).send({
+      code: error.code,
+      message: error.message,
+    });
+  }
+
+  if (error instanceof RequestValidationError) {
     return reply.code(error.statusCode).send({
       message: error.message,
     });
+  }
+
+  if (error instanceof SubmissionConflictError) {
+    return reply.code(error.statusCode).send({ message: error.message });
   }
 
   if (
@@ -51,81 +64,49 @@ function sendError(
   return reply.internalServerError(genericMessage);
 }
 
-export async function startRequestVerificationController(
-  request: FastifyRequest<{ Body: CreateRequestInput }>,
+export async function createRequestController(
+  request: FastifyRequest<{ Body: CreateRequestBody }>,
   reply: FastifyReply
 ) {
   try {
-    const verification = await startRequestVerification(
-      request.body,
-      request.ip
+    await verifyTurnstileToken(
+      request.body.turnstileToken,
+      "request_create",
+      request.log
     );
-    return reply.code(202).send({ verification });
+    const {
+      serviceId,
+      issueId,
+      issueDetails,
+      fullName,
+      phone,
+      email,
+      location,
+      directions,
+      requestedDate,
+      requestedTime,
+      idempotencyKey,
+    } = request.body;
+    const input: CreateRequestInput = {
+      serviceId,
+      issueId,
+      issueDetails,
+      fullName,
+      phone,
+      email,
+      location,
+      directions,
+      requestedDate,
+      requestedTime,
+    };
+    const result = await submitServiceRequest(input, idempotencyKey);
+    return reply.code(201).send({ request: result });
   } catch (error) {
     return sendError(
       request,
       reply,
       error,
-      "Unable to start phone verification."
-    );
-  }
-}
-
-export async function confirmRequestVerificationController(
-  request: FastifyRequest<{
-    Body: VerifyBody;
-  }>,
-  reply: FastifyReply
-) {
-  try {
-    const result = await confirmRequestVerification(
-      request.body.verificationId,
-      request.body.code,
-      request.body.idempotencyKey
-    );
-    return reply.send({ request: result });
-  } catch (error) {
-    return sendError(
-      request,
-      reply,
-      error,
-      "Unable to verify your phone number."
-    );
-  }
-}
-
-export async function resendRequestVerificationController(
-  request: FastifyRequest<{ Body: VerificationIdBody }>,
-  reply: FastifyReply
-) {
-  try {
-    const verification = await resendRequestVerification(
-      request.body.verificationId
-    );
-    return reply.send({ verification });
-  } catch (error) {
-    return sendError(
-      request,
-      reply,
-      error,
-      "Unable to resend the verification code."
-    );
-  }
-}
-
-export async function cancelRequestVerificationController(
-  request: FastifyRequest<{ Body: VerificationIdBody }>,
-  reply: FastifyReply
-) {
-  try {
-    await cancelRequestVerification(request.body.verificationId);
-    return reply.send({ cancelled: true });
-  } catch (error) {
-    return sendError(
-      request,
-      reply,
-      error,
-      "Unable to cancel phone verification."
+      "Unable to submit your service request."
     );
   }
 }

@@ -8,8 +8,8 @@ import {
 } from "./reviewValidation";
 
 test("normalizes names consistently without removing legitimate letters", () => {
-  assert.equal(normalizeCustomerName(" Achieng  OTIENO "), "achiengotieno");
-  assert.equal(normalizeCustomerName("José Mwangi"), "josemwangi");
+  assert.equal(normalizeCustomerName(" Achieng  OTIENO "), "achieng otieno");
+  assert.equal(normalizeCustomerName("José Mwangi"), "josé mwangi");
 });
 
 test("rejects HTML, encoded markup, event handlers, and script URLs", () => {

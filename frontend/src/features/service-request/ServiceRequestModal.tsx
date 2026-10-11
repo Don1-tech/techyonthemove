@@ -19,14 +19,7 @@ import SuccessStep from "./components/SuccessStep";
 
 import ServiceRequestHeader from "./components/ServiceRequestHeader";
 import ServiceRequestProgress from "./components/ServiceRequestProgress";
-import {
-  cancelRequestVerification,
-  resendRequestVerification,
-  startRequestVerification,
-  verifyRequestPhone,
-  type VerificationChallenge,
-} from "../../api/requestsApi";
-import PhoneVerificationModal from "./components/PhoneVerificationModal";
+import { createServiceRequest } from "../../api/requestsApi";
 
 interface ServiceRequestModalProps {
   open: boolean;
@@ -97,33 +90,20 @@ function ServiceRequestDialog({
   const [requestReference, setRequestReference] =
     useState("");
 
-  const [verificationChallenge, setVerificationChallenge] =
-    useState<
-      (VerificationChallenge & { idempotencyKey: string }) | null
-    >(null);
-  const [verificationError, setVerificationError] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileWidgetKey, setTurnstileWidgetKey] = useState(0);
+  const requestSubmissionRef = useRef<{
+    fingerprint: string;
+    idempotencyKey: string;
+  } | null>(null);
+  const isSubmittingRef = useRef(false);
 
-  const handleCloseRequest = useCallback(async () => {
+  const handleCloseRequest = useCallback(() => {
     if (isSubmitting) {
       return;
     }
-
-    if (verificationChallenge) {
-      try {
-        await cancelRequestVerification(
-          verificationChallenge.verificationId
-        );
-      } catch {
-        setVerificationError(
-          "We couldn't cancel verification. No request was created; the code will expire automatically. Please try Cancel again."
-        );
-        return;
-      }
-      setVerificationChallenge(null);
-    }
-
     onClose();
-  }, [isSubmitting, onClose, verificationChallenge]);
+  }, [isSubmitting, onClose]);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -359,16 +339,17 @@ function ServiceRequestDialog({
      ========================================================= */
 
   const handleConfirmRequest = async () => {
-    /*
-     * Prevent duplicate submissions.
-     */
-    if (isSubmitting) {
+    if (isSubmitting || isSubmittingRef.current) {
+      return;
+    }
+    if (!turnstileToken) {
+      setSubmitError("Complete the security check before submitting.");
       return;
     }
 
+    isSubmittingRef.current = true;
     setIsSubmitting(true);
     setSubmitError("");
-    setVerificationError("");
 
     try {
       if (!selectedCategory) {
@@ -377,7 +358,7 @@ function ServiceRequestDialog({
         );
       }
 
-      const challenge = await startRequestVerification({
+      const requestInput = {
         serviceId: selectedCategory.id,
         issueDetails,
         fullName: customerInformation.fullName,
@@ -387,99 +368,35 @@ function ServiceRequestDialog({
         directions: customerInformation.directions,
         requestedDate: selectedDate,
         requestedTime: selectedTime,
-      });
-
-      setVerificationChallenge({
-        ...challenge,
-        idempotencyKey: crypto.randomUUID(),
-      });
+      };
+      const fingerprint = JSON.stringify(requestInput);
+      if (requestSubmissionRef.current?.fingerprint !== fingerprint) {
+        requestSubmissionRef.current = {
+          fingerprint,
+          idempotencyKey: crypto.randomUUID(),
+        };
+      }
+      const createdRequest = await createServiceRequest(
+        requestInput,
+        turnstileToken,
+        requestSubmissionRef.current.idempotencyKey
+      );
+      setRequestReference(createdRequest.reference);
+      setApproximatePrice(createdRequest.approximatePrice);
+      setCurrentStep(6);
     } catch (error) {
       setSubmitError(
-        error instanceof Error
+        error instanceof TypeError
+          ? "We couldn't reach the service. Your details are still here; complete the new security check and retry."
+          : error instanceof Error
           ? error.message
           : "We could not submit your request. Please try again."
       );
     } finally {
+      isSubmittingRef.current = false;
       setIsSubmitting(false);
-    }
-  };
-
-  const handleVerifyCode = async (code: string) => {
-    if (!verificationChallenge || isSubmitting) {
-      return;
-    }
-
-    setIsSubmitting(true);
-    setVerificationError("");
-
-    try {
-      const createdRequest = await verifyRequestPhone(
-        verificationChallenge.verificationId,
-        code,
-        verificationChallenge.idempotencyKey
-      );
-      setRequestReference(createdRequest.reference);
-      setApproximatePrice(createdRequest.approximatePrice);
-      setVerificationChallenge(null);
-      setCurrentStep(6);
-    } catch (error) {
-      setVerificationError(
-        error instanceof Error
-          ? error.message
-          : "We could not verify your phone number. Please try again."
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleResendCode = async () => {
-    if (!verificationChallenge || isSubmitting) {
-      return;
-    }
-
-    setIsSubmitting(true);
-    setVerificationError("");
-
-    try {
-      const challenge = await resendRequestVerification(
-        verificationChallenge.verificationId
-      );
-      setVerificationChallenge({
-        ...challenge,
-        idempotencyKey: verificationChallenge.idempotencyKey,
-      });
-    } catch (error) {
-      setVerificationError(
-        error instanceof Error
-          ? error.message
-          : "We could not resend the verification code."
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleCancelVerification = async () => {
-    if (!verificationChallenge || isSubmitting) {
-      return;
-    }
-
-    try {
-      await cancelRequestVerification(
-        verificationChallenge.verificationId
-      );
-      setVerificationChallenge(null);
-      setVerificationError("");
-      setSubmitError(
-        "Phone verification was cancelled. Your request has not been submitted."
-      );
-    } catch (error) {
-      setVerificationError(
-        error instanceof Error
-          ? error.message
-          : "We couldn't cancel verification. Please try again."
-      );
+      setTurnstileToken("");
+      setTurnstileWidgetKey((key) => key + 1);
     }
   };
 
@@ -586,6 +503,17 @@ function ServiceRequestDialog({
               approximatePrice={approximatePrice}
               submitting={isSubmitting}
               error={submitError}
+              turnstileToken={turnstileToken}
+              turnstileWidgetKey={turnstileWidgetKey}
+              turnstileSiteKey={
+                import.meta.env.VITE_TURNSTILE_SITE_KEY ?? ""
+              }
+              onTurnstileTokenChange={(token) => {
+                setTurnstileToken(token);
+                if (token) {
+                  setSubmitError("");
+                }
+              }}
               onBack={() => setCurrentStep(4)}
               onConfirm={handleConfirmRequest}
             />
@@ -605,18 +533,6 @@ function ServiceRequestDialog({
           )}
         </div>
 
-        {verificationChallenge && (
-          <PhoneVerificationModal
-            key={verificationChallenge.expiresAt}
-            challenge={verificationChallenge}
-            phoneNumber={customerInformation.phone}
-            error={verificationError}
-            busy={isSubmitting}
-            onVerify={handleVerifyCode}
-            onResend={handleResendCode}
-            onCancel={handleCancelVerification}
-          />
-        )}
       </section>
     </div>
   );

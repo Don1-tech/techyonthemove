@@ -8,6 +8,8 @@ export const createRequestBodySchema = {
     "location",
     "requestedDate",
     "requestedTime",
+    "turnstileToken",
+    "idempotencyKey",
   ],
   additionalProperties: false,
   properties: {
@@ -68,5 +70,15 @@ export const createRequestBodySchema = {
       enum: ["07:00", "11:00", "16:00"],
     },
 
+    turnstileToken: {
+      type: "string",
+      minLength: 1,
+      maxLength: 2048,
+    },
+
+    idempotencyKey: {
+      type: "string",
+      format: "uuid",
+    },
   },
 } as const;

@@ -1,4 +1,13 @@
+import {
+  hashSubmissionPayload,
+  lockSubmissionKey,
+  removeExpiredSubmissionKeys,
+  SubmissionConflictError,
+} from "../../db/submissionIdempotency";
 import { db } from "../../db/client";
+import { generateRequestReference } from "./requestReference";
+import { createRequest } from "./requests.repository";
+import { normalizeKenyanPhone } from "./phoneNumbers";
 
 import {
   findServiceById,
@@ -19,6 +28,11 @@ export class RequestValidationError extends Error {
   ) {
     super(message);
   }
+}
+
+export interface CreatedRequestReceipt {
+  reference: string;
+  approximatePrice: number | null;
 }
 
 function isWithinBookingWindow(dateValue: string): boolean {
@@ -58,6 +72,13 @@ export async function validateRequest(
   ) {
     throw new RequestValidationError(
       "Check your name, email address, and service location.",
+      400
+    );
+  }
+
+  if (!normalizeKenyanPhone(input.phone)) {
+    throw new RequestValidationError(
+      "Enter a valid Kenyan phone number.",
       400
     );
   }
@@ -126,4 +147,106 @@ export async function validateRequest(
   }
 
   return service.basePrice;
+}
+
+export async function submitServiceRequest(
+  input: CreateRequestInput,
+  idempotencyKey: string
+): Promise<CreatedRequestReceipt> {
+  const phone = normalizeKenyanPhone(input.phone);
+  if (!phone) {
+    throw new RequestValidationError(
+      "Enter a valid Kenyan phone number.",
+      400
+    );
+  }
+
+  const normalizedInput: CreateRequestInput = {
+    ...input,
+    fullName: input.fullName.trim().replace(/\s+/g, " "),
+    phone,
+    email: input.email.trim(),
+    location: input.location.trim(),
+    directions: input.directions?.trim() ?? null,
+    issueDetails: input.issueDetails?.trim() ?? null,
+  };
+  const payloadHash = hashSubmissionPayload("request", normalizedInput);
+  const client = await db.connect();
+
+  try {
+    await client.query("BEGIN");
+    await lockSubmissionKey(client, idempotencyKey);
+    await removeExpiredSubmissionKeys(client);
+
+    const existingResult = await client.query<{
+      payload_hash: string;
+      request_id: string | null;
+      review_id: string | null;
+      reference: string | null;
+      approximate_price: string | null;
+    }>(
+      `
+        SELECT
+          submission_idempotency.payload_hash,
+          submission_idempotency.request_id,
+          submission_idempotency.review_id,
+          requests.reference,
+          requests.approximate_price
+        FROM submission_idempotency
+        LEFT JOIN requests
+          ON requests.id = submission_idempotency.request_id
+        WHERE submission_idempotency.idempotency_key = $1
+        FOR UPDATE OF submission_idempotency
+      `,
+      [idempotencyKey]
+    );
+    const existing = existingResult.rows[0];
+    if (existing) {
+      if (
+        existing.payload_hash !== payloadHash ||
+        !existing.request_id ||
+        existing.review_id ||
+        !existing.reference
+      ) {
+        throw new SubmissionConflictError();
+      }
+
+      await client.query("COMMIT");
+      return {
+        reference: existing.reference,
+        approximatePrice:
+          existing.approximate_price === null
+            ? null
+            : Number(existing.approximate_price),
+      };
+    }
+
+    const approximatePrice = await validateRequest(normalizedInput);
+    const request = await createRequest(
+      normalizedInput,
+      generateRequestReference(),
+      approximatePrice,
+      client
+    );
+    await client.query(
+      `
+        INSERT INTO submission_idempotency (
+          idempotency_key, payload_hash, request_id
+        )
+        VALUES ($1, $2, $3)
+      `,
+      [idempotencyKey, payloadHash, request.id]
+    );
+    await client.query("COMMIT");
+
+    return {
+      reference: request.reference,
+      approximatePrice: request.approximatePrice,
+    };
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
 }

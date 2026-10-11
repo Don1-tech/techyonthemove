@@ -22,16 +22,10 @@ export const env = {
 
   businessEmail: process.env.BUSINESS_EMAIL!,
 
-  otpHmacSecret: process.env.OTP_HMAC_SECRET,
+  turnstileSecretKey: process.env.TURNSTILE_SECRET_KEY,
 
-  africaTalkingUsername: process.env.AFRICASTALKING_USERNAME,
-
-  africaTalkingApiKey: process.env.AFRICASTALKING_API_KEY,
-
-  africaTalkingSenderId: process.env.AFRICASTALKING_SENDER_ID,
-
-  africaTalkingEnvironment:
-    process.env.AFRICASTALKING_ENVIRONMENT === "production"
-      ? "production"
-      : "sandbox",
+  turnstileAllowedHostnames: process.env.TURNSTILE_ALLOWED_HOSTNAMES
+    ?.split(",")
+    .map((hostname) => hostname.trim().toLowerCase())
+    .filter(Boolean) ?? [],
 };

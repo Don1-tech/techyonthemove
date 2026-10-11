@@ -3,7 +3,6 @@ import type { FastifyInstance } from "fastify";
 import {
   createReviewController,
   getReviewsController,
-  verifyReviewController,
 } from "./reviews.controller";
 
 import {
@@ -61,27 +60,4 @@ export default async function reviewsRoutes(
     createReviewController
   );
 
-  fastify.post(
-    "/api/reviews/verification/verify",
-    {
-      schema: {
-        body: {
-          type: "object",
-          required: ["verificationId", "code"],
-          additionalProperties: false,
-          properties: {
-            verificationId: { type: "string", format: "uuid" },
-            code: { type: "string", pattern: "^[0-9]{6}$" },
-          },
-        },
-      },
-      config: {
-        rateLimit: {
-          max: 15,
-          timeWindow: "1 minute",
-        },
-      },
-    },
-    verifyReviewController
-  );
 }

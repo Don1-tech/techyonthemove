@@ -68,7 +68,11 @@ function normalizeLetters(value: string): string {
 }
 
 export function normalizeCustomerName(value: string): string {
-  return normalizeLetters(value);
+  return value
+    .normalize("NFKC")
+    .trim()
+    .replace(/\s+/g, " ")
+    .toLocaleLowerCase("en");
 }
 
 export function containsUnsafeMarkup(value: string): boolean {

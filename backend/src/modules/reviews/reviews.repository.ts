@@ -5,29 +5,26 @@ import { normalizeCustomerName } from "./reviewValidation";
 
 export async function findMatchingRequestCustomer(
   normalizedName: string,
-  normalizedPhone: string,
   client: PoolClient | typeof db = db
 ): Promise<boolean> {
-  const phoneDigits = normalizedPhone.slice(1);
-  const localPhone = `0${phoneDigits.slice(3)}`;
-  const nationalPhone = phoneDigits.slice(3);
-
-  const result = await client.query<{ full_name: string }>(
+  const result = await client.query<{ id: string }>(
     `
-      SELECT full_name
+      SELECT id
       FROM requests
-      WHERE regexp_replace(phone, '[^0-9]', '', 'g') = ANY($1::text[])
+      WHERE lower(
+        regexp_replace(btrim(full_name), '[[:space:]]+', ' ', 'g')
+      ) = $1
+      ORDER BY created_at ASC, id ASC
+      LIMIT 1
     `,
-    [[phoneDigits, localPhone, nationalPhone]]
+    [normalizeCustomerName(normalizedName)]
   );
 
-  return result.rows.some(
-    (row) => normalizeCustomerName(row.full_name) === normalizedName
-  );
+  return result.rows.length > 0;
 }
 
 export async function createReview(
-  input: Omit<CreateReviewInput, "phone">,
+  input: CreateReviewInput,
   client: PoolClient | typeof db = db
 ): Promise<Review> {
   const result = await client.query<Review>(
@@ -69,7 +66,7 @@ export async function getAllReviews(): Promise<Review[]> {
         review_text AS "reviewText",
         created_at AS "createdAt"
       FROM reviews
-      ORDER BY rating DESC;
+      ORDER BY rating DESC, created_at DESC;
     `
   );
 
